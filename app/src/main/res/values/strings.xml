@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Dexon BPM</string>
+
+    <!-- Hints -->
+    <string name="txt_loginemail_hint">Email</string>
+    <string name="txt_loginpassword_hint">Contraseña</string>
+    <string name="txt_forgotemail_hint">Username or Email</string>
+
+    <!-- Button Texts -->
+    <string name="btn_login_text">iniciar sesion</string>
+    <string name="btn_forgotpass_text">olvide contraseña</string>
+    <string name="btn_recoverpass_text">Recordar</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="btn_cancel_text">Cancelar</string>
+    <string name="btn_ok_text">Aceptar</string>
+
+</resources>
