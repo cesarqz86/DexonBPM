@@ -26,6 +26,7 @@ public class IncidentsActivity extends ActionBarActivity {
         for (int rows = 0; rows <= 2000; rows++) {
             tbl_incident_data = CommonService.AddRowToTable(this, tbl_incident_data, false, headerText);
         }
+
     }
 
     @Override
