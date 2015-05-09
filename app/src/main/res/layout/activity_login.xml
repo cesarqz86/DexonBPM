@@ -1,34 +1,59 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    android:background="@drawable/splash">
+
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_margin="25dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_logo"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp">
+
 
     <EditText
         android:id="@+id/txt_loginemail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/txt_loginemail_hint" />
+        android:hint="@string/txt_loginemail_hint"
+        android:layout_marginTop="100dp"
+        style="@style/textfield_style_1"/>
 
     <EditText
         android:id="@+id/txt_loginpassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/txt_loginpassword_hint" />
+        android:hint="@string/txt_loginpassword_hint"
+        style="@style/textfield_style_1"
+        android:layout_marginTop="10dp"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAllCaps="true"
         android:text="@string/btn_login_text"
-        android:onClick="btnLoginClick"/>
+        android:onClick="btnLoginClick"
+        style="@style/buttons_style_1"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAllCaps="true"
         android:text="@string/btn_forgotpass_text"
-        android:onClick="btnForgotpassClick"/>
+        android:onClick="btnForgotpassClick"
+        style="@style/buttons_style_1"/>
 
-</LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -15,7 +15,7 @@ import us.dexon.dexonbpm.R;
 
 public class HomeActivity extends ActionBarActivity {
 
-    // Updating the test commit
+    // Updating the test commit 2
 
     public Context context;
 
@@ -58,7 +58,7 @@ public class HomeActivity extends ActionBarActivity {
             menuOptionList = this.getResources().getStringArray(R.array.array_menu_finaluser);
         }
 
-        ArrayAdapter<String> menuAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptionList);
+        ArrayAdapter<String> menuAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, menuOptionList);
         ListView lstvw_menu = (ListView) this.findViewById(R.id.lstvw_menu);
         lstvw_menu.setAdapter(menuAdapter);
         lstvw_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
