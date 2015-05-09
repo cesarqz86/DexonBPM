@@ -15,7 +15,7 @@ import us.dexon.dexonbpm.R;
 
 public class HomeActivity extends ActionBarActivity {
 
-    // Updating the test commit
+    // Updating the test commit 2
 
     public Context context;
 
