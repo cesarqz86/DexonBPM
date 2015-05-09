@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import us.dexon.dexonbpm.R;
 
 public class ForgotPasswordActivity extends ActionBarActivity {
+    
+    //Test Commit 4 :P
 
     //Test Commit 4 :P
 
