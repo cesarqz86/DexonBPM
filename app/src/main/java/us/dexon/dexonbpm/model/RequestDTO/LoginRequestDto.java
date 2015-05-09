@@ -1,9 +1,9 @@
-package us.dexon.dexonbpm.model;
+package us.dexon.dexonbpm.model.RequestDTO;
 
 /**
  * Created by Cesar Quiroz on 4/11/15.
  */
-public class LoginDto {
+public class LoginRequestDto {
 
     private String myGivenPass;
     private String userName;

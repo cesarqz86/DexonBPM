@@ -8,14 +8,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
-import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
-import us.dexon.dexonbpm.infrastructure.implementations.HttpService;
-import us.dexon.dexonbpm.model.LoginDto;
+import us.dexon.dexonbpm.infrastructure.implementations.LoginService;
+import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
+import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -62,12 +60,12 @@ public class LoginActivity extends ActionBarActivity {
 
         EditText txt_loginemail = (EditText) this.findViewById(R.id.txt_loginemail);
         EditText txt_loginpassword = (EditText) this.findViewById(R.id.txt_loginpassword);
-        LoginDto logintData = new LoginDto();
-        logintData.setUserName(txt_loginemail.getText().toString());
-        logintData.setPassword(txt_loginpassword.getText().toString());
-        logintData.setMyGivenPass(ConfigurationService.getConfigurationValue(this, "Serial"));
-        /*String dataResult = HttpService.CallPost(this, "URLLogon", logintData);
-        Toast.makeText(this, dataResult, Toast.LENGTH_LONG).show();*/
+        LoginRequestDto loginData = new LoginRequestDto();
+        loginData.setUserName(txt_loginemail.getText().toString());
+        loginData.setPassword(txt_loginpassword.getText().toString());
+        loginData.setMyGivenPass(ConfigurationService.getConfigurationValue(this, "Serial"));
+        ILoginService loginService = LoginService.getInstance();
+        loginService.loginUser(this, loginData);
 
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.putExtra("isTech", true);

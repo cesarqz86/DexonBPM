@@ -1,7 +1,6 @@
 {
     "URLBase": "http://181.48.101.85/Restful_Services/",
     "URLIntegracion": "app_integration.asmx",
-    "URLLogon": "api/Logon/GetLoggedUser",
     "Serial": "jdheGYklRTpeG788r4HJ877904JJHfgKLOFGHjIJMtGHBN-20150120-Android_App",
     "Get_my_app_PCUID": "Get_my_app_PCUID",
     "ColorPrimario": "",
