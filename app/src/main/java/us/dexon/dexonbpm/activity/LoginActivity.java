@@ -33,8 +33,6 @@ public class LoginActivity extends FragmentActivity {
     }
 
     public void btnLoginClick(View view) {
-
-<<<<<<< HEAD
         try {
 
             EditText txt_loginemail = (EditText) this.findViewById(R.id.txt_loginemail);
@@ -68,23 +66,5 @@ public class LoginActivity extends FragmentActivity {
         } catch (Exception ex) {
             CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error);
         }
-=======
-        EditText txt_loginemail = (EditText) this.findViewById(R.id.txt_loginemail);
-        EditText txt_loginpassword = (EditText) this.findViewById(R.id.txt_loginpassword);
-        LoginRequestDto loginData = new LoginRequestDto();
-        loginData.setUserName(txt_loginemail.getText().toString());
-        loginData.setPassword(txt_loginpassword.getText().toString());
-        loginData.setMyGivenPass(ConfigurationService.getConfigurationValue(this, "Serial"));
-        ILoginService loginService = LoginService.getInstance();
-        loginService.loginUser(this, loginData);
-
-        Intent homeIntent = new Intent(this, HomeActivity.class);
-        homeIntent.putExtra("isTech", true);
-        //CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error);
-        startActivity(homeIntent);
-        overridePendingTransition(R.anim.right_slide_in,
-                R.anim.right_slide_out);
-        finish();
->>>>>>> origin/master
     }
 }
