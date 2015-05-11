@@ -23,7 +23,9 @@ public class LoginActivity extends FragmentActivity {
 
     public void btnForgotpassClick(View view) {
         Intent forgotPassIntent = new Intent(this, ForgotPasswordActivity.class);
-        this.startActivity(forgotPassIntent);
+        startActivity(forgotPassIntent);
+        overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
     }
 
     public void btnLoginClick(View view) {
@@ -40,7 +42,9 @@ public class LoginActivity extends FragmentActivity {
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.putExtra("isTech", true);
         //CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error);
-        this.startActivity(homeIntent);
-        this.finish();
+        startActivity(homeIntent);
+        overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
+        finish();
     }
 }
