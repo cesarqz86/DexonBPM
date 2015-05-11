@@ -4,6 +4,7 @@ package us.dexon.dexonbpm.infrastructure.enums;
  * Created by Cesar Quiroz on 4/15/15.
  */
 public enum MessageTypeIcon {
+
     Success(0),
     Warning(1),
     Error(2),

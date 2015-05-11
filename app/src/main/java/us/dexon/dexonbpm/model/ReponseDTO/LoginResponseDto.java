@@ -7,25 +7,30 @@ import com.google.gson.annotations.SerializedName;
  */
 public class LoginResponseDto {
 
-    // Response example:
-    /*
-    {
-        user_id: 44
-        person_name: "confcorreo"
-        user: "confcorreo"
-        logged_on: true
-        person_id: 1060
-        tech_id: 65
-        profile_id: 20
-        preferred_lang_ID: 1
-        last_error_code: 0
-        last_error_str: null
-        token: "ZoX0DoOBU15nk3IWQMvSkmmg1U9v1SadEPQeVWsUkwftIT7frO+ni1bjgUBgHAQV.(1060.44.65)."
-        sessionId: "F04FE384A48268B0"
-        uniqueCode: "ZoX0D44"
-     }
+    /* Response example:
+        {
+            user_id: 44
+            person_name: "confcorreo"
+            user: "confcorreo"
+            logged_on: true
+            person_id: 1060
+            tech_id: 65
+            profile_id: 20
+            preferred_lang_ID: 1
+            last_error_code: 0
+            last_error_str: null
+            token: "ZoX0DoOBU15nk3IWQMvSkmmg1U9v1SadEPQeVWsUkwftIT7frO+ni1bjgUBgHAQV.(1060.44.65)."
+            sessionId: "F04FE384A48268B0"
+            uniqueCode: "ZoX0D44"
+         }
+
+       Error response:
+       {
+            "error":"The loggedUserModel object is not correct or is null"
+       }
      */
 
+    //region Attributes
     @SerializedName("user_id")
     private int userID;
 
@@ -65,6 +70,11 @@ public class LoginResponseDto {
     @SerializedName("uniqueCode")
     private String uniqueCode;
 
+    @SerializedName("error")
+    private String errorMessage;
+    //endregion
+
+    //region Properties
     public int getUserID() {
         return userID;
     }
@@ -168,4 +178,13 @@ public class LoginResponseDto {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+    //endregion
 }

@@ -25,23 +25,30 @@ import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
  */
 public final class LoginService implements ILoginService {
 
+    //region Attributes
     /**
      * Single instance created upon class loading.
      */
     private static final LoginService fINSTANCE =  new LoginService();
 
     private static String LOGIN_URL = "api/Logon/GetLoggedUser";
+    //endregion
 
+    //region Properties
     public static LoginService getInstance() {
         return fINSTANCE;
     }
+    //endregion
 
+    //region Constructor
     /**
      * Private constructor prevents construction outside this class.
      */
     private LoginService() {
     }
+    //endregion
 
+    //region Public Methods
     @Override
     public LoginResponseDto loginUser(Context context, LoginRequestDto loginData) {
         LoginResponseDto finalResponse = new LoginResponseDto();
@@ -67,4 +74,8 @@ public final class LoginService implements ILoginService {
 
         return finalResponse;
     }
+    //endregion
+
+    //region Private Methods
+    //endregion
 }

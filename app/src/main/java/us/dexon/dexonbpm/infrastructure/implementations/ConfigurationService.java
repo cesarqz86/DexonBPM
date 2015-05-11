@@ -13,6 +13,8 @@ import java.io.InputStream;
  */
 public class ConfigurationService{
 
+    //region Public Methods
+
     public static String getConfigurationValue (Context context, String configurationName)
     {
         String finalValue = "";
@@ -36,4 +38,9 @@ public class ConfigurationService{
 
         return  finalValue;
     }
+
+    //endregion
+
+    //region Private Methods
+    //endregion
 }

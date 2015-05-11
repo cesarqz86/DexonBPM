@@ -16,6 +16,7 @@ import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
  */
 public class CommonService {
 
+    //region Public Methods
     public static TableLayout AddRowToTable(Context context, TableLayout tableLayout, boolean isHeader, String[] contentData) {
         TableRow rowToAdd = new TableRow(context);
 
@@ -81,4 +82,50 @@ public class CommonService {
         alertDialog.show();
     }
 
+    public static void ShowAlertDialog(Context context, int titleID, String message, MessageTypeIcon messageTypeIcon) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle(context.getString(titleID));
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setCancelable(true);
+        alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                }
+        );
+        alertDialogBuilder.setNegativeButton(context.getString(R.string.btn_cancel_text), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        switch (messageTypeIcon) {
+            case Success: {
+                //alertDialogBuilder.setIcon(android.R.drawable);
+                break;
+            }
+            case Warning: {
+                alertDialogBuilder.setIcon(R.drawable.ic_warning_amber);
+                break;
+            }
+            case Error: {
+                //alertDialogBuilder.setIcon(android.R.drawable);
+                alertDialogBuilder.setIcon(R.drawable.ic_error_red);
+                break;
+            }
+            case Information: {
+                alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
+                break;
+            }
+            case Question:{
+                //alertDialogBuilder.setIcon(android.R.drawable);
+                break;
+            }
+        }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+    //endregion
+
+    //region Private Methods
+    //endregion
 }

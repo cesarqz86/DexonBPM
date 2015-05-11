@@ -24,6 +24,8 @@ import java.util.Arrays;
  */
 public class HttpService {
 
+    //region Public Methods
+
     public static String CallPost(Context context, String propertyService, Object bodyData) {
         String finalResult = "";
 
@@ -47,4 +49,9 @@ public class HttpService {
         }
         return finalResult;
     }
+
+    //endregion
+
+    //region Private Methods
+    //endregion
 }
