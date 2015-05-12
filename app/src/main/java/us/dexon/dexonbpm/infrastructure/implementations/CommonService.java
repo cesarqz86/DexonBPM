@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,12 +40,23 @@ public class CommonService {
         return tableLayout;
     }
 
-    public static void ShowAlertDialog(Context context, int titleID, int messageID, MessageTypeIcon messageTypeIcon) {
+    public static void ShowAlertDialog(final Context context, int titleID, int messageID, MessageTypeIcon messageTypeIcon, final boolean closeView) {
+
+        final Activity currentActivity = (Activity) context;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setTitle(context.getString(titleID));
         alertDialogBuilder.setMessage(context.getString(messageID));
         alertDialogBuilder.setCancelable(true);
-        alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNeutralButton(android.R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        if (closeView) {
+                            currentActivity.finish();
+                        }
+                    }
+                });
+        /*alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -77,17 +89,28 @@ public class CommonService {
                 //alertDialogBuilder.setIcon(android.R.drawable);
                 break;
             }
-        }
+        }*/
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
-    public static void ShowAlertDialog(Context context, int titleID, String message, MessageTypeIcon messageTypeIcon) {
+    public static void ShowAlertDialog(Context context, int titleID, String message, MessageTypeIcon messageTypeIcon, final boolean closeView) {
+
+        final Activity currentActivity = (Activity) context;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setTitle(context.getString(titleID));
         alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setCancelable(true);
-        alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNeutralButton(android.R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        if (closeView) {
+                            currentActivity.finish();
+                        }
+                    }
+                });
+        /*alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -120,7 +143,7 @@ public class CommonService {
                 //alertDialogBuilder.setIcon(android.R.drawable);
                 break;
             }
-        }
+        }*/
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }

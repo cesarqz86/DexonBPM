@@ -3,12 +3,15 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -16,6 +19,7 @@ import java.util.Arrays;
 
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 
 /**
@@ -27,7 +31,7 @@ public class ForgotPasswordService implements IForgotPasswordService {
     /**
      * Single instance created upon class loading.
      */
-    private static final ForgotPasswordService fINSTANCE =  new ForgotPasswordService();
+    private static final ForgotPasswordService fINSTANCE = new ForgotPasswordService();
 
     private static String FORGOT_URL = "api/Logon/ForgetPassword";
     //endregion
@@ -39,6 +43,7 @@ public class ForgotPasswordService implements IForgotPasswordService {
     //endregion
 
     //region Constructor
+
     /**
      * Private constructor prevents construction outside this class.
      */
@@ -50,7 +55,7 @@ public class ForgotPasswordService implements IForgotPasswordService {
     @Override
     public ForgotPassResponseDto restorePassword(Context context, ForgotPassRequestDto requestData) {
         ForgotPassResponseDto finalResponse = new ForgotPassResponseDto();
-
+        Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
             finalUrl += FORGOT_URL;
@@ -66,10 +71,14 @@ public class ForgotPasswordService implements IForgotPasswordService {
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, ForgotPassResponseDto.class);
             finalResponse = response.getBody();
 
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ForgotPassResponseDto.class);
+            Log.e("CallingService: " + FORGOT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + FORGOT_URL, ex.getMessage(), ex);
         }
-        return  finalResponse;
+        return finalResponse;
     }
     //endregion
 

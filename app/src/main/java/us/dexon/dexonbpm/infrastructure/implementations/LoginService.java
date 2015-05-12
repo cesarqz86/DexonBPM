@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.springframework.http.HttpEntity;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -29,7 +31,7 @@ public final class LoginService implements ILoginService {
     /**
      * Single instance created upon class loading.
      */
-    private static final LoginService fINSTANCE =  new LoginService();
+    private static final LoginService fINSTANCE = new LoginService();
 
     private static String LOGIN_URL = "api/Logon/GetLoggedUser";
     //endregion
@@ -41,6 +43,7 @@ public final class LoginService implements ILoginService {
     //endregion
 
     //region Constructor
+
     /**
      * Private constructor prevents construction outside this class.
      */
@@ -52,7 +55,7 @@ public final class LoginService implements ILoginService {
     @Override
     public LoginResponseDto loginUser(Context context, LoginRequestDto loginData) {
         LoginResponseDto finalResponse = new LoginResponseDto();
-
+        Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
             finalUrl += LOGIN_URL;
@@ -68,7 +71,11 @@ public final class LoginService implements ILoginService {
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, LoginResponseDto.class);
             finalResponse = response.getBody();
 
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), LoginResponseDto.class);
+            Log.e("CallingService: " + LOGIN_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + LOGIN_URL, ex.getMessage(), ex);
         }
 

@@ -3,4 +3,9 @@
     <!-- Login -->
     <string name="validation_login_error_title">Error de autenticación</string>
     <string name="validation_login_error_invaliduser">Usuario o contraseña invalida</string>
+
+    <!-- Forgot Password -->
+    <string name="validation_forgot_success_title">Recuperar password</string>
+    <string name="validation_forgot_error_title">Error al recuperar password</string>
+    <string name="validation_forgot_error_genericerror">Error al tratar de recuperar el password</string>
 </resources>

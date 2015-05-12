@@ -13,6 +13,8 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="btn_cancel_text">Cancelar</string>
     <string name="btn_ok_text">Aceptar</string>
+
+    <!-- Label Texts -->
     <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviara un correo con su contraseña nueva.</string>
 
 </resources>

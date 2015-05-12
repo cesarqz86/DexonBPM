@@ -50,21 +50,10 @@ public class LoginActivity extends FragmentActivity {
                 loginData.setMyGivenPass(ConfigurationService.getConfigurationValue(this, "Serial"));
                 ServiceExecuter serviceExecuter = new ServiceExecuter();
                 ServiceExecuter.ExecuteLoginService loginService = serviceExecuter.new ExecuteLoginService(this);
-                loginService.wait();
-                LoginResponseDto loginResponse = loginService.execute(loginData).get();
-
-                if (loginResponse != null && CommonValidations.validateEmpty(loginResponse.getErrorMessage())) {
-
-                    Intent homeIntent = new Intent(this, HomeActivity.class);
-                    homeIntent.putExtra("isTech", true);
-                    this.startActivity(homeIntent);
-                    this.finish();
-                } else {
-                    CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, loginResponse.getErrorMessage(), MessageTypeIcon.Error);
-                }
+                loginService.execute(loginData);
             }
         } catch (Exception ex) {
-            CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error);
+            CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error, false);
         }
     }
 }
