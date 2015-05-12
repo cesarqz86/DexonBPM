@@ -5,16 +5,20 @@
     <string name="txt_loginemail_hint">Email</string>
     <string name="txt_loginpassword_hint">Contraseña</string>
     <string name="txt_forgotemail_hint">Username or Email</string>
+    <string name="txt_currentpassword_hint">Contraseña Actual</string>
+    <string name="txt_newpassword_hint">Contraseña Nueva</string>
+    <string name="txt_confirmpassword_hint">Confirme Contraseña</string>
 
     <!-- Button Texts -->
     <string name="btn_login_text">INICIAR SESION</string>
     <string name="btn_forgotpass_text">RECORDAR CONTRASEÑA</string>
     <string name="btn_recoverpass_text">RECORDAR</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="btn_changepass_text">ACEPTAR</string>
     <string name="btn_cancel_text">Cancelar</string>
     <string name="btn_ok_text">Aceptar</string>
 
     <!-- Label Texts -->
-    <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviara un correo con su contraseña nueva.</string>
+    <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviará un correo con su contraseña nueva.</string>
+    <string name="txt_change_password_label">Para cambiar la contraseña, digite la información solicitada a continuación:</string>
 
 </resources>
