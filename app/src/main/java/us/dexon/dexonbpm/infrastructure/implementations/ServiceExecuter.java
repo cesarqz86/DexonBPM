@@ -51,7 +51,6 @@ public class ServiceExecuter {
         }
     }
 
-
     public class ExecuteForgotPassService extends AsyncTask<ForgotPassRequestDto, Void, ForgotPassResponseDto> {
 
         private Context currentContext;
