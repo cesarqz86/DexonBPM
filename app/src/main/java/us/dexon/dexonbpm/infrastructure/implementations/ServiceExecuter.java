@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ConfirmPasswordActivity;
 import us.dexon.dexonbpm.activity.HomeActivity;
+import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
@@ -43,9 +44,9 @@ public class ServiceExecuter {
             if (loginResponse != null && !CommonValidations.validateEmpty(loginResponse.getErrorMessage())) {
 
                 Activity loginActivity = (Activity) this.currentContext;
-                Intent homeIntent = new Intent(loginActivity, HomeActivity.class);
-                homeIntent.putExtra("isTech", true);
-                loginActivity.startActivity(homeIntent);
+                Intent incidentActivity = new Intent(loginActivity, IncidentsActivity.class);
+                incidentActivity.putExtra("isTech", true);
+                loginActivity.startActivity(incidentActivity);
                 loginActivity.finish();
 
             } else {
