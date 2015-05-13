@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.model.RequestDTO;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -16,6 +17,9 @@ public class ChangePassRequestDto {
 
     @SerializedName("newpassword")
     private String newPassword;
+
+    @Expose(serialize = false, deserialize = false)
+    private String confirmPassword;
     //endregion
 
     //region Properties
@@ -41,6 +45,14 @@ public class ChangePassRequestDto {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
     //endregion
 

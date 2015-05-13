@@ -8,4 +8,7 @@
     <string name="validation_forgot_success_title">Recuperar password</string>
     <string name="validation_forgot_error_title">Error al recuperar password</string>
     <string name="validation_forgot_error_genericerror">Error al tratar de recuperar el password</string>
+
+    <!-- Change Password -->
+    <string name="validation_change_error_title">Error al cambiar password</string>
 </resources>

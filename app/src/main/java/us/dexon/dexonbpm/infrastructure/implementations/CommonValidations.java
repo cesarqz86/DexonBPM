@@ -9,5 +9,9 @@ public final class CommonValidations {
     public static boolean validateEmpty(String dataToValidate) {
         return dataToValidate != null && !dataToValidate.isEmpty();
     }
+
+    public static boolean validateEqualsValues(String originalValue, String newValue) {
+        return originalValue != null && newValue != null && originalValue.equalsIgnoreCase(newValue);
+    }
     //endregion
 }

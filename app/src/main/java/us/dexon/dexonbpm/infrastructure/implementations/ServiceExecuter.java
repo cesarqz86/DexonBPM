@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.ConfirmPasswordActivity;
 import us.dexon.dexonbpm.activity.HomeActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
+import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
+import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 
@@ -78,4 +82,29 @@ public class ServiceExecuter {
         }
     }
 
+    public class ExecuteChangePassService extends AsyncTask<ChangePassRequestDto, Void, ChangePassResponseDto> {
+
+        private Context currentContext;
+
+        public ExecuteChangePassService(Context context) {
+            this.currentContext = context;
+        }
+
+        @Override
+        protected ChangePassResponseDto doInBackground(ChangePassRequestDto... params) {
+            IChangePasswordService serviceInstance = ChangePasswordService.getInstance();
+            return serviceInstance.changePassword(this.currentContext, params[0]);
+        }
+
+        protected void onPostExecute(ChangePassResponseDto responseData) {
+            if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
+                Activity changePassActivity = (Activity) this.currentContext;
+                Intent confirmIntent = new Intent(changePassActivity, ConfirmPasswordActivity.class);
+                changePassActivity.startActivity(confirmIntent);
+                changePassActivity.finish();
+            } else {
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
+            }
+        }
+    }
 }

@@ -20,5 +20,6 @@
     <!-- Label Texts -->
     <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviará un correo con su contraseña nueva.</string>
     <string name="txt_change_password_label">Para cambiar la contraseña, digite la información solicitada a continuación:</string>
+    <string name="txt_change_passwordconfirm_label">La contraseña cambió satisfactoriamente.</string>
 
 </resources>
