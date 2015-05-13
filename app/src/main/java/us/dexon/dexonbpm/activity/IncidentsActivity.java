@@ -23,7 +23,7 @@ public class IncidentsActivity extends ActionBarActivity {
         tbl_incident_data = (TableLayout) this.findViewById(R.id.tbl_incident_data);
 
         tbl_incident_header = CommonService.AddRowToTable(this, tbl_incident_header, true, headerText);
-        for (int rows = 0; rows <= 2000; rows++) {
+        for (int rows = 0; rows <= 20; rows++) {
             tbl_incident_data = CommonService.AddRowToTable(this, tbl_incident_data, false, headerText);
         }
 
