@@ -99,10 +99,7 @@ public class ServiceExecuter {
 
         protected void onPostExecute(ChangePassResponseDto responseData) {
             if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
-                Activity changePassActivity = (Activity) this.currentContext;
-                Intent confirmIntent = new Intent(changePassActivity, ConfirmPasswordActivity.class);
-                changePassActivity.startActivity(confirmIntent);
-                changePassActivity.finish();
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_success_title, responseData.getErrorMessage(), MessageTypeIcon.Information, true);
             } else {
                 CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
             }
