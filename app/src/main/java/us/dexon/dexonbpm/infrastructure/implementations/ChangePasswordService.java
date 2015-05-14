@@ -3,12 +3,15 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -27,7 +30,7 @@ public class ChangePasswordService implements IChangePasswordService {
     /**
      * Single instance created upon class loading.
      */
-    private static final ChangePasswordService fINSTANCE =  new ChangePasswordService();
+    private static final ChangePasswordService fINSTANCE = new ChangePasswordService();
 
     private static String CHANGE_PASS_URL = "api/Logon/ChangePassword";
     //endregion
@@ -39,6 +42,7 @@ public class ChangePasswordService implements IChangePasswordService {
     //endregion
 
     //region Constructor
+
     /**
      * Private constructor prevents construction outside this class.
      */
@@ -54,7 +58,7 @@ public class ChangePasswordService implements IChangePasswordService {
     @Override
     public ChangePassResponseDto changePassword(Context context, ChangePassRequestDto changeRequest) {
         ChangePassResponseDto finalResponse = new ChangePassResponseDto();
-
+        Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
             finalUrl += CHANGE_PASS_URL;
@@ -70,9 +74,13 @@ public class ChangePasswordService implements IChangePasswordService {
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, ChangePassResponseDto.class);
             finalResponse = response.getBody();
 
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ChangePassResponseDto.class);
+            Log.e("CallingService: " + CHANGE_PASS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + CHANGE_PASS_URL, ex.getMessage(), ex);
         }
-        return  finalResponse;
+        return finalResponse;
     }
 }

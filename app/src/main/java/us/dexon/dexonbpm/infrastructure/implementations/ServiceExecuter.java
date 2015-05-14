@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -28,20 +29,36 @@ public class ServiceExecuter {
     public class ExecuteLoginService extends AsyncTask<LoginRequestDto, Void, LoginResponseDto> {
 
         private Context currentContext;
+        private LoginRequestDto loginRequestDto;
+        private ProgressDialog progressDialog;
 
         public ExecuteLoginService(Context context) {
             this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
         }
 
         @Override
         protected LoginResponseDto doInBackground(LoginRequestDto... params) {
             ILoginService loginService = LoginService.getInstance();
-            return loginService.loginUser(this.currentContext, params[0]);
+            this.loginRequestDto = params[0];
+            return loginService.loginUser(this.currentContext, this.loginRequestDto);
         }
 
         protected void onPostExecute(LoginResponseDto loginResponse) {
 
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
             if (loginResponse != null && !CommonValidations.validateEmpty(loginResponse.getErrorMessage())) {
+
+                ConfigurationService.saveUserInfo(this.currentContext, this.loginRequestDto);
 
                 Activity loginActivity = (Activity) this.currentContext;
                 Intent incidentActivity = new Intent(loginActivity, IncidentsActivity.class);
@@ -59,9 +76,17 @@ public class ServiceExecuter {
     public class ExecuteForgotPassService extends AsyncTask<ForgotPassRequestDto, Void, ForgotPassResponseDto> {
 
         private Context currentContext;
+        private ProgressDialog progressDialog;
 
         public ExecuteForgotPassService(Context context) {
             this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
         }
 
         @Override
@@ -72,13 +97,17 @@ public class ServiceExecuter {
 
         protected void onPostExecute(ForgotPassResponseDto responseData) {
 
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
             if (responseData != null && !CommonValidations.validateEmpty(responseData.getErrorMessage())) {
 
                 CommonService.ShowAlertDialog(this.currentContext, R.string.validation_forgot_success_title, responseData.getResultMessage(), MessageTypeIcon.Information, true);
 
             } else {
 
-                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_forgot_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
             }
         }
     }
@@ -86,9 +115,17 @@ public class ServiceExecuter {
     public class ExecuteChangePassService extends AsyncTask<ChangePassRequestDto, Void, ChangePassResponseDto> {
 
         private Context currentContext;
+        private ProgressDialog progressDialog;
 
         public ExecuteChangePassService(Context context) {
             this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
         }
 
         @Override
@@ -98,6 +135,11 @@ public class ServiceExecuter {
         }
 
         protected void onPostExecute(ChangePassResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
             if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
                 CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_success_title, responseData.getErrorMessage(), MessageTypeIcon.Information, true);
             } else {

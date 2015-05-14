@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General -->
+    <string name="validation_general_error_title">Error de validación</string>
+    <string name="validation_general_error_required">Por favor diligencie todos los campos requeridos.</string>
+    <string name="validation_general_error_fieldrequired">Campo requerido.</string>
+    <string name="general_loading">Procesando...</string>
+
     <!-- Login -->
     <string name="validation_login_error_title">Error de autenticación</string>
     <string name="validation_login_error_invaliduser">Usuario o contraseña invalida</string>
 
     <!-- Forgot Password -->
     <string name="validation_forgot_success_title">Recuperar contraseña</string>
-    <string name="validation_forgot_error_title">Error de validación</string>
     <string name="validation_forgot_error_genericerror">Error al tratar de recuperar la contraseña.</string>
 
     <!-- Change Password -->
     <string name="validation_change_error_title">Error al cambiar la contraseña</string>
     <string name="validation_change_success_title">Cambiar contraseña</string>
+    <string name="validation_change_error_notequals">La contraseña nueva no coincide.</string>
 </resources>

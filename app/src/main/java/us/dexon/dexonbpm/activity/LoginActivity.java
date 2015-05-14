@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -23,6 +24,15 @@ public class LoginActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // We have to enable this later.
+        /*LoginRequestDto loginUser = ConfigurationService.getUserInfo(this);
+        if (loginUser != null) {
+            Intent incidentActivity = new Intent(this, IncidentsActivity.class);
+            incidentActivity.putExtra("isTech", true);
+            this.startActivity(incidentActivity);
+            this.finish();
+        }*/
     }
 
     public void btnForgotpassClick(View view) {
@@ -39,8 +49,8 @@ public class LoginActivity extends FragmentActivity {
             EditText txt_loginpassword = (EditText) this.findViewById(R.id.txt_loginpassword);
             String loginEmailValue = txt_loginemail.getText().toString();
             String loginPasswordValue = txt_loginpassword.getText().toString();
-            boolean isLoginEmailValid = CommonValidations.validateEmpty(loginEmailValue);
-            boolean isPasswordValid = CommonValidations.validateEmpty(loginPasswordValue);
+            boolean isLoginEmailValid = CommonValidations.validateEmpty(this, txt_loginemail, loginEmailValue);
+            boolean isPasswordValid = CommonValidations.validateEmpty(this, txt_loginpassword, loginPasswordValue);
 
             if (isLoginEmailValid && isPasswordValid) {
 
@@ -51,6 +61,8 @@ public class LoginActivity extends FragmentActivity {
                 ServiceExecuter serviceExecuter = new ServiceExecuter();
                 ServiceExecuter.ExecuteLoginService loginService = serviceExecuter.new ExecuteLoginService(this);
                 loginService.execute(loginData);
+            } else {
+                CommonService.ShowAlertDialog(this, R.string.validation_general_error_title, R.string.validation_general_error_required, MessageTypeIcon.Error, false);
             }
         } catch (Exception ex) {
             CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error, false);

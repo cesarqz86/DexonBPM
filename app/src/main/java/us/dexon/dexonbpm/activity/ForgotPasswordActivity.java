@@ -25,7 +25,7 @@ public class ForgotPasswordActivity extends FragmentActivity {
 
             EditText txt_forgotemail = (EditText) this.findViewById(R.id.txt_forgotemail);
             String loginEmailValue = txt_forgotemail.getText().toString();
-            boolean isLoginEmailValid = CommonValidations.validateEmpty(loginEmailValue);
+            boolean isLoginEmailValid = CommonValidations.validateEmpty(this, txt_forgotemail, loginEmailValue);
             if (isLoginEmailValid) {
 
                 ForgotPassRequestDto forgotData = new ForgotPassRequestDto();
@@ -34,10 +34,12 @@ public class ForgotPasswordActivity extends FragmentActivity {
                 ServiceExecuter serviceExecuter = new ServiceExecuter();
                 ServiceExecuter.ExecuteForgotPassService forgotService = serviceExecuter.new ExecuteForgotPassService(this);
                 forgotService.execute(forgotData);
+            } else {
+                CommonService.ShowAlertDialog(this, R.string.validation_general_error_title, R.string.validation_general_error_required, MessageTypeIcon.Error, false);
             }
 
         } catch (Exception ex) {
-            CommonService.ShowAlertDialog(this, R.string.validation_forgot_error_title, R.string.validation_forgot_error_genericerror, MessageTypeIcon.Error, false);
+            CommonService.ShowAlertDialog(this, R.string.validation_general_error_title, R.string.validation_forgot_error_genericerror, MessageTypeIcon.Error, false);
         }
 
     }

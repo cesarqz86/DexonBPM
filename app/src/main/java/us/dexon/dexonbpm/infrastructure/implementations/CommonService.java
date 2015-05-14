@@ -2,13 +2,16 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.Gravity;
+import android.view.WindowManager;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 
 /**
@@ -57,8 +60,10 @@ public class CommonService {
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-        TextView messageView = (TextView)alertDialog.findViewById(android.R.id.message);
-        messageView.setGravity(Gravity.CENTER);
+        TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
+        if (messageView != null) {
+            messageView.setGravity(Gravity.CENTER);
+        }
     }
 
     public static void ShowAlertDialog(Context context, int titleID, String message, MessageTypeIcon messageTypeIcon, final boolean closeView) {
@@ -79,8 +84,23 @@ public class CommonService {
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-        TextView messageView = (TextView)alertDialog.findViewById(android.R.id.message);
-        messageView.setGravity(Gravity.CENTER);
+        TextView messageView = (TextView) alertDialog.findViewById(android.R.id.message);
+        if (messageView != null) {
+            messageView.setGravity(Gravity.CENTER);
+        }
+    }
+
+    public static ProgressDialog getCustomProgressDialog(Context context) {
+        ProgressDialog dialog = new ProgressDialog(context);
+        try {
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+
+        }
+        dialog.setCancelable(false);
+        //dialog.setContentView(android.support.v7.appcompat.R.drawable);
+        dialog.setMessage(context.getString(R.string.general_loading));
+        return dialog;
     }
     //endregion
 

@@ -9,8 +9,10 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 
 public class ChangePasswordActivity extends FragmentActivity {
 
@@ -20,7 +22,7 @@ public class ChangePasswordActivity extends FragmentActivity {
         setContentView(R.layout.activity_change_password);
     }
 
-    public void btnChangePasswordClick(View view){
+    public void btnChangePasswordClick(View view) {
 
         try {
 
@@ -32,15 +34,17 @@ public class ChangePasswordActivity extends FragmentActivity {
             String newPasswordValue = txt_newpassword.getText().toString();
             String confirmPasswordValue = txt_confirmpassword.getText().toString();
 
-            boolean isCurrentPassValid = CommonValidations.validateEmpty(currentPasswordValue);
-            boolean isNewPassValid = CommonValidations.validateEmpty(newPasswordValue);
-            boolean isConfirmPassValid = CommonValidations.validateEmpty(confirmPasswordValue);
-            boolean isSamePasswordValid = CommonValidations.validateEqualsValues(newPasswordValue, confirmPasswordValue);
+            boolean isCurrentPassValid = CommonValidations.validateEmpty(this, txt_currentpassword, currentPasswordValue);
+            boolean isNewPassValid = CommonValidations.validateEmpty(this, txt_newpassword, newPasswordValue);
+            boolean isConfirmPassValid = CommonValidations.validateEmpty(this, txt_confirmpassword, confirmPasswordValue);
+            boolean isSamePasswordValid = CommonValidations.validateEqualsValues(this, txt_confirmpassword, newPasswordValue, confirmPasswordValue);
 
-            if (isCurrentPassValid && isNewPassValid && isConfirmPassValid && isSamePasswordValid) {
+            LoginRequestDto loginObject = ConfigurationService.getUserInfo(this);
+
+            if (isCurrentPassValid && isNewPassValid && isConfirmPassValid && isSamePasswordValid && loginObject != null) {
 
                 ChangePassRequestDto changePassData = new ChangePassRequestDto();
-                changePassData.setUserName("");
+                changePassData.setUserName(loginObject.getUserName());
                 changePassData.setCurrentPassword(currentPasswordValue);
                 changePassData.setNewPassword(newPasswordValue);
                 changePassData.setConfirmPassword(confirmPasswordValue);
@@ -48,6 +52,8 @@ public class ChangePasswordActivity extends FragmentActivity {
                 ServiceExecuter serviceExecuter = new ServiceExecuter();
                 ServiceExecuter.ExecuteChangePassService changeService = serviceExecuter.new ExecuteChangePassService(this);
                 changeService.execute(changePassData);
+            } else {
+                CommonService.ShowAlertDialog(this, R.string.validation_general_error_title, R.string.validation_general_error_required, MessageTypeIcon.Error, false);
             }
 
         } catch (Exception ex) {
