@@ -22,7 +22,7 @@
     <string name="txt_change_password_label">Digite la información a continuación:</string>
     <string name="txt_change_passwordconfirm_label">La contraseña cambió satisfactoriamente.</string>
 
-    <!-- MEnu Labels -->
+    <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Salir</string>
     <string name="menu_cancel_label">Cancelar</string>
