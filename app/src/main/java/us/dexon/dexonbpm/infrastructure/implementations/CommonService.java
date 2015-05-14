@@ -9,7 +9,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 
 /**
@@ -110,42 +109,10 @@ public class CommonService {
                         }
                     }
                 });
-        /*alertDialogBuilder.setPositiveButton(context.getString(R.string.btn_ok_text), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }
-        );
-        alertDialogBuilder.setNegativeButton(context.getString(R.string.btn_cancel_text), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        switch (messageTypeIcon) {
-            case Success: {
-                //alertDialogBuilder.setIcon(android.R.drawable);
-                break;
-            }
-            case Warning: {
-                alertDialogBuilder.setIcon(R.drawable.ic_warning_amber);
-                break;
-            }
-            case Error: {
-                //alertDialogBuilder.setIcon(android.R.drawable);
-                alertDialogBuilder.setIcon(R.drawable.ic_error_red);
-                break;
-            }
-            case Information: {
-                alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_info);
-                break;
-            }
-            case Question:{
-                //alertDialogBuilder.setIcon(android.R.drawable);
-                break;
-            }
-        }*/
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+        TextView messageView = (TextView)alertDialog.findViewById(android.R.id.message);
+        messageView.setGravity(Gravity.CENTER);
     }
     //endregion
 

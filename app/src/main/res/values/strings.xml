@@ -12,14 +12,19 @@
     <!-- Button Texts -->
     <string name="btn_login_text">INICIAR SESION</string>
     <string name="btn_forgotpass_text">RECORDAR CONTRASEÑA</string>
-    <string name="btn_recoverpass_text">RECORDAR</string>
+    <string name="btn_recoverpass_text">RECORDAR CONTRASEÑA</string>
     <string name="btn_changepass_text">ACEPTAR</string>
     <string name="btn_cancel_text">Cancelar</string>
     <string name="btn_ok_text">Aceptar</string>
 
     <!-- Label Texts -->
     <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviará un correo con su contraseña nueva.</string>
-    <string name="txt_change_password_label">Para cambiar la contraseña, digite la información solicitada a continuación:</string>
+    <string name="txt_change_password_label">Digite la información a continuación:</string>
     <string name="txt_change_passwordconfirm_label">La contraseña cambió satisfactoriamente.</string>
+
+    <!-- MEnu Labels -->
+    <string name="menu_change_password_label">Cambiar Contraseña</string>
+    <string name="menu_exit_label">Salir</string>
+    <string name="menu_cancel_label">Cancelar</string>
 
 </resources>
