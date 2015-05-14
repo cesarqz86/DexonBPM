@@ -1,7 +1,7 @@
 package us.dexon.dexonbpm.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,7 +12,7 @@ import android.widget.TableLayout;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 
-public class IncidentsActivity extends Activity {
+public class IncidentsActivity extends FragmentActivity {
 
     private TableLayout tbl_incident_header;
     private TableLayout tbl_incident_data;
