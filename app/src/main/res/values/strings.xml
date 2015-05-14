@@ -12,7 +12,7 @@
     <!-- Button Texts -->
     <string name="btn_login_text">INICIAR SESION</string>
     <string name="btn_forgotpass_text">RECORDAR CONTRASEÑA</string>
-    <string name="btn_recoverpass_text">RECORDAR</string>
+    <string name="btn_recoverpass_text">RECORDAR CONTRASEÑA</string>
     <string name="btn_changepass_text">ACEPTAR</string>
     <string name="btn_cancel_text">Cancelar</string>
     <string name="btn_ok_text">Aceptar</string>
