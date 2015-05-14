@@ -60,10 +60,12 @@ public class IncidentsActivity extends FragmentActivity {
                 this.startActivity(changePassIntent);
                 return true;
             case R.id.button2_menu_opt2:
-                //accion para salir
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                this.startActivity(loginIntent);
+                this.finish();
                 return true;
             case R.id.button2_menu_opt3:
-                //accion para cancelar
+                //Cancel does not do anything.
                 return true;
             default:
                 return super.onContextItemSelected(item);
