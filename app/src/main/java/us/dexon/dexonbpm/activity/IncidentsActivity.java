@@ -13,7 +13,7 @@ import android.widget.TableLayout;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 
-public class IncidentsActivity extends FragmentActivity {
+public class IncidentsActivity extends FragmentActivity implements View.OnClickListener{
 
     private TableLayout tbl_incident_header;
     private TableLayout tbl_incident_data;
@@ -33,6 +33,7 @@ public class IncidentsActivity extends FragmentActivity {
 
         ImageButton menuButton = (ImageButton) findViewById(R.id.menu_button);
         registerForContextMenu(menuButton);
+        menuButton.setOnClickListener(this);
 
     }
 
@@ -69,6 +70,15 @@ public class IncidentsActivity extends FragmentActivity {
                 return true;
             default:
                 return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.menu_button:
+                this.openContextMenu(v);
+                break;
         }
     }
 }
