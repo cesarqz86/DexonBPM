@@ -7,7 +7,8 @@
 
 
     <style name="textfield_style_1">
-        <item name="android:background">@color/white_transparent</item>
+        <!--<item name="android:background">@color/white_transparent</item>-->
+        <item name="android:background">@drawable/txt_border_style</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
         <item name="android:padding">7dp</item>
