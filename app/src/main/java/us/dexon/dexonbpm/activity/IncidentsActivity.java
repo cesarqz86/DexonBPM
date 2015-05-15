@@ -12,6 +12,7 @@ import android.widget.TableLayout;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener{
 
@@ -61,6 +62,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                 this.startActivity(changePassIntent);
                 return true;
             case R.id.button2_menu_opt2:
+                // Delete the user info.
+                ConfigurationService.deleteUserInfo(this);
                 Intent loginIntent = new Intent(this, LoginActivity.class);
                 this.startActivity(loginIntent);
                 this.finish();

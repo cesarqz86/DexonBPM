@@ -68,6 +68,13 @@ public class ConfigurationService {
         return finalResult;
     }
 
+    public static void deleteUserInfo(Context context){
+        SharedPreferences deviceSettings = context.getSharedPreferences(USER_SETTINGS, 0);
+        SharedPreferences.Editor editorSettings = deviceSettings.edit();
+        editorSettings.remove(USER_SETTINGS_VALUE);
+        editorSettings.commit();
+    }
+
     //endregion
 
     //region Private Methods
