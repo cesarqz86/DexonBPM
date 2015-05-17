@@ -11,6 +11,7 @@ import org.json.JSONStringer;
 
 import java.io.InputStream;
 
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 
 /**
@@ -73,6 +74,9 @@ public class ConfigurationService {
         SharedPreferences.Editor editorSettings = deviceSettings.edit();
         editorSettings.remove(USER_SETTINGS_VALUE);
         editorSettings.commit();
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(context);
+        dexonDatabase.deleteUserTable();
     }
 
     //endregion

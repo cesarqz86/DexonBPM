@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.Arrays;
 
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -70,6 +71,9 @@ public final class LoginService implements ILoginService {
             ResponseEntity<LoginResponseDto> response;
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, LoginResponseDto.class);
             finalResponse = response.getBody();
+            IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+            dexonDatabase.setContext(context);
+            dexonDatabase.saveLoggedUser(finalResponse);
 
         } catch (HttpClientErrorException ex) {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), LoginResponseDto.class);

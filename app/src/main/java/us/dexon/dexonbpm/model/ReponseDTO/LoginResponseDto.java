@@ -35,7 +35,7 @@ public class LoginResponseDto {
     private int userID;
 
     @SerializedName("person_name")
-    private String personaName;
+    private String personName;
 
     @SerializedName("user")
     private String userName;
@@ -83,12 +83,12 @@ public class LoginResponseDto {
         this.userID = userID;
     }
 
-    public String getPersonaName() {
-        return personaName;
+    public String getPersonName() {
+        return personName;
     }
 
-    public void setPersonaName(String personaName) {
-        this.personaName = personaName;
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 
     public boolean isLogged() {

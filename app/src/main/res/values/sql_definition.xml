@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Tables definition -->
+    <string name="sql_table_user">
+        CREATE TABLE LoggedUser (
+            user_id             NUMERIC PRIMARY KEY,
+            person_name         TEXT,
+            user                TEXT,
+            logged_on           NUMERIC,
+            person_id           NUMERIC,
+            tech_id             NUMERIC,
+            profile_id          NUMERIC,
+            preferred_lang_ID   NUMERIC,
+            last_error_code     NUMERIC,
+            last_error_str      TEXT,
+            token               TEXT,
+            sessionId           TEXT,
+            uniqueCode          TEXT
+        );
+    </string>
+    <string name="sql_table_ticket">
+        CREATE TABLE TicketInfo (
+            TicketID            NUMERIC PRIMARY KEY,
+            ColumnKey           TEXT,
+            ColumnValue         TEXT
+        );
+    </string>
+
+    <!-- Queries definition -->
+</resources>
