@@ -3,6 +3,10 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 import android.content.Context;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -17,6 +21,7 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,15 +96,21 @@ public class TicketService implements ITicketService {
     //endregion
 
     //region Private Methods
-    private ArrayList<TicketsResponseDto> convertJsonToTicketArray(JsonElement jsonElement) {
+    private ArrayList<TicketsResponseDto> convertJsonToTicketArray(JsonElement jsonElement) throws IOException {
         ArrayList<TicketsResponseDto> finalResponse = new ArrayList<TicketsResponseDto>();
         Gson gsonSerializer = new Gson();
+
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper jacksonSerializer = new ObjectMapper(factory);
+        TypeReference<HashMap<String, Object>> typeReference = new TypeReference<HashMap<String, Object>>() {
+        };
         if (jsonElement != null && jsonElement.isJsonArray()) {
             JsonArray arrayData = jsonElement.getAsJsonArray();
             for (JsonElement ticketData : arrayData) {
+                String ticketString = gsonSerializer.toJson(ticketData);
                 TicketsResponseDto ticketResponseData = new TicketsResponseDto();
-                HashMap<String, String> ticketDataList = new HashMap<>();
-                ticketDataList = gsonSerializer.fromJson(ticketData, ticketDataList.getClass());
+                HashMap<String, Object> ticketDataList = new HashMap<>();
+                ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
                 ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));
                 ticketDataList.remove("HD_INCIDENT_ID");
                 ticketResponseData.setTicketDataList(ticketDataList);
