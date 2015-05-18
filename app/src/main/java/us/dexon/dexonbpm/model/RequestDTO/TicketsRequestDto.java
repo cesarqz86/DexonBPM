@@ -17,8 +17,9 @@ public class TicketsRequestDto {
     @SerializedName("getClosedTickets")
     private boolean includeClosedTickets;
 
+    // Check enum TicketFilterType
     @SerializedName("currentFilter")
-    private TicketFilter ticketFilterType;
+    private int ticketFilterType;
 
     @SerializedName("ticketsPerPage")
     private int ticketsPerPage;
@@ -42,11 +43,11 @@ public class TicketsRequestDto {
         this.includeClosedTickets = includeClosedTickets;
     }
 
-    public TicketFilter getTicketFilterType() {
+    public int getTicketFilterType() {
         return ticketFilterType;
     }
 
-    public void setTicketFilterType(TicketFilter ticketFilterType) {
+    public void setTicketFilterType(int ticketFilterType) {
         this.ticketFilterType = ticketFilterType;
     }
 

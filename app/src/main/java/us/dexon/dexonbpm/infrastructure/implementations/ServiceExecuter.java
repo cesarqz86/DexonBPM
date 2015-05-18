@@ -6,20 +6,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+import java.util.ArrayList;
+
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.activity.ConfirmPasswordActivity;
-import us.dexon.dexonbpm.activity.HomeActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 /**
  * Created by Cesar Quiroz on 5/9/15.
@@ -145,6 +148,42 @@ public class ServiceExecuter {
             } else {
                 CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
             }
+        }
+    }
+
+    public class ExecuteTicketService extends AsyncTask<TicketsRequestDto, Void, ArrayList<TicketsResponseDto>> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+
+        public ExecuteTicketService(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<TicketsResponseDto> doInBackground(TicketsRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            return ticketService.getTicketData(this.currentContext, params[0]);
+        }
+
+        protected void onPostExecute(ArrayList<TicketsResponseDto> responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            /*if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_success_title, responseData.getErrorMessage(), MessageTypeIcon.Information, true);
+            } else {
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
+            }*/
         }
     }
 }

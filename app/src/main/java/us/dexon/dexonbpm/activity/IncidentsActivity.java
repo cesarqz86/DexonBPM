@@ -11,8 +11,14 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
+import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener{
 
@@ -35,6 +41,20 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ImageButton menuButton = (ImageButton) findViewById(R.id.menu_button);
         registerForContextMenu(menuButton);
         menuButton.setOnClickListener(this);
+
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        TicketsRequestDto ticketFirstData = new TicketsRequestDto();
+        ticketFirstData.setIncludeClosedTickets(false);
+        ticketFirstData.setLoggedUser(loggedUser);
+        ticketFirstData.setTicketFilterType(TicketFilter.None.getCode());
+        ticketFirstData.setTicketsPerPage(20); // First type we will get only 20 tickets
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
+        ticketService.execute(ticketFirstData);
 
     }
 
