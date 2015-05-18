@@ -2,6 +2,8 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.widget.EditText;
 
 import us.dexon.dexonbpm.R;
@@ -34,6 +36,14 @@ public final class CommonValidations {
         if (!finalResult) {
             editText.setError(context.getString(R.string.validation_change_error_notequals));
         }
+        return finalResult;
+    }
+
+    public static boolean validateConnection(Context context) {
+        boolean finalResult;
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        finalResult = networkInfo != null && networkInfo.isConnected();
         return finalResult;
     }
     //endregion
