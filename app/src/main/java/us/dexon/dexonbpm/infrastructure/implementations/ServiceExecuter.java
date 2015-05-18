@@ -67,6 +67,8 @@ public class ServiceExecuter {
                 Intent incidentActivity = new Intent(loginActivity, IncidentsActivity.class);
                 incidentActivity.putExtra("isTech", true);
                 loginActivity.startActivity(incidentActivity);
+                loginActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
                 loginActivity.finish();
 
             } else {

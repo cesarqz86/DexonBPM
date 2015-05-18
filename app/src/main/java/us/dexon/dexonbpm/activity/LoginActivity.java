@@ -1,6 +1,5 @@
 package us.dexon.dexonbpm.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -12,10 +11,7 @@ import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
-import us.dexon.dexonbpm.infrastructure.implementations.LoginService;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
-import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
-import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 
 public class LoginActivity extends FragmentActivity {

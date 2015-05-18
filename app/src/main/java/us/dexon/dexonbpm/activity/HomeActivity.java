@@ -2,8 +2,8 @@ package us.dexon.dexonbpm.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 import us.dexon.dexonbpm.R;
 
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends FragmentActivity {
 
     // Updating the test commit 2
 

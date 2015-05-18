@@ -3,12 +3,16 @@ package us.dexon.dexonbpm.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
@@ -56,6 +60,22 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
         ticketService.execute(ticketFirstData);
 
+        TextView asignadosBtn = (TextView) findViewById(R.id.asignados_btn);
+        asignadosBtn.setOnClickListener(this);
+
+        final EditText findDaemon = (EditText) findViewById(R.id.search_field);
+        findDaemon.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                String wordTyped = findDaemon.getText().toString().trim();
+               //Hacer tratamiento ala palabra digitada
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        });
+
+
     }
 
     @Override
@@ -101,6 +121,12 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         switch(v.getId()){
             case R.id.menu_button:
                 this.openContextMenu(v);
+                break;
+            case R.id.asignados_btn:
+                Intent incidentActivity = new Intent(IncidentsActivity.this, HomeActivity.class);
+                startActivity(incidentActivity);
+                overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
                 break;
         }
     }

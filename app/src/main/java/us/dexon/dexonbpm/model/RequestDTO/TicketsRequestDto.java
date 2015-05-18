@@ -2,7 +2,6 @@ package us.dexon.dexonbpm.model.RequestDTO;
 
 import com.google.gson.annotations.SerializedName;
 
-import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 
 /**

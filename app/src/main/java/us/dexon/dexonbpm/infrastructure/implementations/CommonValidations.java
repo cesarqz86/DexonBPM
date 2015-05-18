@@ -1,7 +1,6 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.EditText;
