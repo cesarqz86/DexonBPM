@@ -5,7 +5,7 @@
     <!-- Hints -->
     <string name="txt_loginemail_hint">Usuario</string>
     <string name="txt_loginpassword_hint">Contraseña</string>
-    <string name="txt_forgotemail_hint">Usuario</string>
+    <string name="txt_forgotemail_hint">Usuario o Email</string>
     <string name="txt_currentpassword_hint">Contraseña Actual</string>
     <string name="txt_newpassword_hint">Contraseña Nueva</string>
     <string name="txt_confirmpassword_hint">Confirme Contraseña</string>
@@ -20,14 +20,14 @@
     <string name="btn_ok_text">Aceptar</string>
 
     <!-- Label Texts -->
-    <string name="txt_forgot_password_label">Digite su usuario o Email. Se le enviará un correo con su contraseña nueva.</string>
-    <string name="txt_change_password_label">Digite la información a continuación:</string>
+    <string name="txt_forgot_password_label">Digite su usuario o email, se le enviará un correo con su contraseña nueva.</string>
+    <string name="txt_change_password_label">Para cambiar la contraseña, digite la información solicitada a continuación:</string>
     <string name="txt_change_passwordconfirm_label">La contraseña cambió satisfactoriamente.</string>
     <string name="txt_asignados_label">Asignados</string>
 
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
-    <string name="menu_exit_label">Salir</string>
+    <string name="menu_exit_label">Cerrar Sesión</string>
     <string name="menu_cancel_label">Cancelar</string>
 
     <!-- Activity Title -->
