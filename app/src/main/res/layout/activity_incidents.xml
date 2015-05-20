@@ -11,42 +11,43 @@
         android:layout_height="wrap_content"
         android:background="@color/gray_light">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/search_field"
-        android:background="@drawable/rounded_corners"
-        android:layout_margin="10dp"
-        android:drawableLeft="@drawable/lupa"
-        android:drawablePadding="10dp"
-        android:padding="5dp"
-        android:textColorHint="@color/gray_darker"
-        android:hint="@string/txt_palabra_clave_hint"/>
+        <EditText
+            android:id="@+id/search_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_corners"
+            android:drawableLeft="@drawable/lupa"
+            android:drawablePadding="10dp"
+            android:hint="@string/txt_palabra_clave_hint"
+            android:padding="5dp"
+            android:textColorHint="@color/gray_darker" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/asignados_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/txt_asignados_label"
-        android:paddingRight="5dp"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:padding="20dp"
-        android:background="@drawable/white_btn_style"
         android:layout_below="@+id/search_container"
-        android:drawableRight="@drawable/ic_arrow"/>
+        android:background="@drawable/white_btn_style"
+        android:drawableRight="@drawable/ic_arrow"
+        android:padding="20dp"
+        android:paddingRight="5dp"
+        android:text="@string/txt_asignados_label"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
     <View
         android:id="@+id/blue_separator"
-        android:layout_below="@+id/asignados_btn"
         android:layout_width="fill_parent"
         android:layout_height="1dip"
+        android:layout_below="@+id/asignados_btn"
         android:background="@color/blue_buttons" />
 
     <HorizontalScrollView
-        android:layout_below="@+id/blue_separator"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/blue_separator">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -91,25 +92,27 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_incidentes"/>
+            android:src="@drawable/ic_incidentes" />
 
         <ImageButton
             android:id="@+id/dexon_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:background="@android:color/transparent"
-            android:src="@drawable/logo_mini"/>
+            android:clickable="true"
+            android:onClick="logoClick"
+            android:src="@drawable/logo_mini" />
 
         <ImageButton
             android:id="@+id/plus_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_plus"/>
+            android:src="@drawable/ic_plus" />
 
     </RelativeLayout>
 

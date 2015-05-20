@@ -1,5 +1,7 @@
 package us.dexon.dexonbpm.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -60,5 +62,13 @@ public class ChangePasswordActivity extends FragmentActivity {
             CommonService.ShowAlertDialog(this, R.string.validation_change_error_title, R.string.validation_change_error_title, MessageTypeIcon.Error, false);
         }
 
+    }
+
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
     }
 }

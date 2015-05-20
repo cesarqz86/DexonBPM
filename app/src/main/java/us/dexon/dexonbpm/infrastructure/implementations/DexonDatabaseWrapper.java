@@ -6,8 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 
 /**
  * Created by Cesar Quiroz on 5/16/15.
@@ -96,14 +101,81 @@ public class DexonDatabaseWrapper implements IDexonDatabaseWrapper {
             finalResult.setSessionID(cursor.getString(cursor.getColumnIndex("sessionId")));
             finalResult.setUniqueCode(cursor.getString(cursor.getColumnIndex("uniqueCode")));
         }
-
-
         return finalResult;
     }
 
-    public void deleteUserTable(){
+    public void deleteUserTable() {
         SQLiteDatabase database = dexonDatabase.getWritableDatabase();
-        database.delete(dexonDatabase.USER_TABLE,null, null);
+        database.delete(dexonDatabase.USER_TABLE, null, null);
+    }
+
+    public void saveTicketData(ArrayList<TicketsResponseDto> ticketDataList) {
+        if (ticketDataList != null && !ticketDataList.isEmpty()) {
+            SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+
+            for (TicketsResponseDto ticketData : ticketDataList) {
+
+                TicketsResponseDto existingTicket = this.getTicketData(ticketData.getTicketID());
+
+                for (String keysValues : ticketData.getTicketDataList().keySet()) {
+                    ContentValues sqlTicketData = new ContentValues();
+                    sqlTicketData.put("TicketID", ticketData.getTicketID());
+                    sqlTicketData.put("ColumnKey", keysValues);
+                    sqlTicketData.put("ColumnValue", String.valueOf(ticketData.getTicketDataList().get(keysValues)));
+
+                    if (existingTicket != null && existingTicket.getTicketDataList() != null && existingTicket.getTicketDataList().containsKey(keysValues)) {
+                        database.update(dexonDatabase.TICKET_TABLE, sqlTicketData, "TicketID == '" + ticketData.getTicketID() + "' AND ColumnKey == '" + keysValues + "'", null);
+
+                    } else {
+                        database.insert(dexonDatabase.TICKET_TABLE, null, sqlTicketData);
+                    }
+                }
+            }
+        }
+    }
+
+    public TicketsResponseDto getTicketData(String ticketID) {
+        TicketsResponseDto finalResult = null;
+
+        SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        SQLiteQueryBuilder userQuery = new SQLiteQueryBuilder();
+        userQuery.setTables(dexonDatabase.TICKET_TABLE);
+        Cursor cursor = userQuery.query(database, null, "TicketID == '" + ticketID + "'", null, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            finalResult = new TicketsResponseDto();
+            finalResult.setTicketID(ticketID);
+            HashMap<String, Object> ticketDataList = new HashMap<>();
+            ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+
+            while (cursor.moveToNext()) {
+                ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+            }
+            finalResult.setTicketDataList(ticketDataList);
+        }
+        return finalResult;
+    }
+
+    public ArrayList<TicketsResponseDto> getTicketData(String filterWord, TicketFilter ticketFilter) {
+        ArrayList<TicketsResponseDto> finalResult = new ArrayList<>();
+
+        /*SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        SQLiteQueryBuilder userQuery = new SQLiteQueryBuilder();
+        userQuery.setTables(dexonDatabase.TICKET_TABLE);
+        Cursor cursor = userQuery.query(database, null, null, null, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            TicketsResponseDto temporalTicket = new TicketsResponseDto();
+            temporalTicket.setTicketID(ticketID);
+            HashMap<String, Object> ticketDataList = new HashMap<>();
+            ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+
+            while (cursor.moveToNext()) {
+                ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+            }
+            temporalTicket.setTicketDataList(ticketDataList);
+            finalResult.add(temporalTicket);
+        }*/
+
+        return finalResult;
     }
     //endregion
 

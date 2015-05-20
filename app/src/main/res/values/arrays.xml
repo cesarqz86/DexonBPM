@@ -2,29 +2,26 @@
 <resources>
     <!-- Array Lists -->
     <array name="array_menu_finaluser">
-        <item>Incidentes</item>
+        <item>Colaborando</item>
+        <item>Creados</item>
+        <item>Relacionados</item>
+        <item>Asignados</item>
+        <item>Ninguno</item>
     </array>
 
     <array name="array_menu_techuser">
-        <item>Incidentes</item>
-        <item>Asignados</item>
         <item>Colaborando</item>
-        <item>Reportados</item>
-        <item>Flujos de Trabajo Principal</item>
-        <item>Cerrados</item>
+        <item>Creados</item>
+        <item>Relacionados</item>
+        <item>Asignados</item>
+        <item>Ninguno</item>
     </array>
 
     <array name="array_column_incidents">
-        <item>Solicitud</item>
-        <item>Actividad</item>
-        <item>Cliente</item>
-        <item>Eficacia</item>
-        <item>Estado</item>
-        <item>Fecha Solicitud</item>
-        <item>Lugar</item>
-        <item>Responsable</item>
-        <item>Solicitud</item>
-        <item>Tipo Solicitud</item>
-        <item>Usuario</item>
+        <item>Colaborando</item>
+        <item>Creados</item>
+        <item>Relacionados</item>
+        <item>Asignados</item>
+        <item>Ninguno</item>
     </array>
 </resources>

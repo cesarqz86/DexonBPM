@@ -1,6 +1,8 @@
 package us.dexon.dexonbpm.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
@@ -9,6 +11,7 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
@@ -67,14 +70,16 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         findDaemon.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String wordTyped = findDaemon.getText().toString().trim();
-               //Hacer tratamiento ala palabra digitada
+                //Hacer tratamiento ala palabra digitada
             }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
         });
-
 
     }
 
@@ -129,5 +134,13 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                         R.anim.right_slide_out);
                 break;
         }
+    }
+
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
     }
 }

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -82,6 +83,10 @@ public class TicketService implements ITicketService {
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
             JsonElement jsonData = response.getBody();
             finalResponse = this.convertJsonToTicketArray(jsonData);
+
+            IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
+            databaseWrapper.setContext(context);
+            databaseWrapper.saveTicketData(finalResponse);
 
         } catch (HttpClientErrorException ex) {
             //finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), LoginResponseDto.class);

@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">Dexon BPM</string>
+    <string name="dexon_website">http://dexon.us/</string>
 
     <!-- Hints -->
-    <string name="txt_loginemail_hint">Email</string>
+    <string name="txt_loginemail_hint">Usuario</string>
     <string name="txt_loginpassword_hint">Contraseña</string>
-    <string name="txt_forgotemail_hint">Username or Email</string>
+    <string name="txt_forgotemail_hint">Usuario</string>
     <string name="txt_currentpassword_hint">Contraseña Actual</string>
     <string name="txt_newpassword_hint">Contraseña Nueva</string>
     <string name="txt_confirmpassword_hint">Confirme Contraseña</string>
@@ -28,5 +29,8 @@
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Salir</string>
     <string name="menu_cancel_label">Cancelar</string>
+
+    <!-- Activity Title -->
+    <string name="activity_incident_title">Incidentes</string>
 
 </resources>

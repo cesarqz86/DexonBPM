@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -22,13 +23,13 @@ public class LoginActivity extends FragmentActivity {
         setContentView(R.layout.activity_login);
 
         // We have to enable this later.
-        /*LoginRequestDto loginUser = ConfigurationService.getUserInfo(this);
+        LoginRequestDto loginUser = ConfigurationService.getUserInfo(this);
         if (loginUser != null) {
             Intent incidentActivity = new Intent(this, IncidentsActivity.class);
             incidentActivity.putExtra("isTech", true);
             this.startActivity(incidentActivity);
             this.finish();
-        }*/
+        }
     }
 
     public void btnForgotpassClick(View view) {
@@ -63,5 +64,13 @@ public class LoginActivity extends FragmentActivity {
         } catch (Exception ex) {
             CommonService.ShowAlertDialog(this, R.string.validation_login_error_title, R.string.validation_login_error_invaliduser, MessageTypeIcon.Error, false);
         }
+    }
+
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
     }
 }
