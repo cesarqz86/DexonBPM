@@ -56,8 +56,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         TicketsRequestDto ticketFirstData = new TicketsRequestDto();
         ticketFirstData.setIncludeClosedTickets(false);
         ticketFirstData.setLoggedUser(loggedUser);
-        ticketFirstData.setTicketFilterType(TicketFilter.None.getCode());
-        ticketFirstData.setTicketsPerPage(20); // First type we will get only 20 tickets
+        ticketFirstData.setTicketFilterType(TicketFilter.AssignedTickets.getCode());
+        ticketFirstData.setTicketsPerPage(0); // First type we will get only 20 tickets
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);

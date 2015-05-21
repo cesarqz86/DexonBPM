@@ -4,13 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -26,8 +24,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
@@ -84,9 +80,9 @@ public class TicketService implements ITicketService {
             JsonElement jsonData = response.getBody();
             finalResponse = this.convertJsonToTicketArray(jsonData);
 
-            IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
+            /*IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
             databaseWrapper.setContext(context);
-            databaseWrapper.saveTicketData(finalResponse);
+            databaseWrapper.saveTicketData(finalResponse);*/
 
         } catch (HttpClientErrorException ex) {
             //finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), LoginResponseDto.class);

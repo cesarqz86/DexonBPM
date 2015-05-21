@@ -38,11 +38,8 @@ public class DexonDatabaseHelper extends SQLiteOpenHelper {
     //region Public Methods
     @Override
     public void onCreate(SQLiteDatabase db) {
-        StringBuilder databaseCreate = new StringBuilder();
-        databaseCreate.append(this.UserTable);
-        databaseCreate.append(this.TicketTable);
-
-        db.execSQL(databaseCreate.toString());
+        db.execSQL(this.UserTable);
+        db.execSQL(this.TicketTable);
     }
 
     @Override
