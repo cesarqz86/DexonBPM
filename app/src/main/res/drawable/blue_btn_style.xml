@@ -26,7 +26,9 @@
             <item android:left="2dp" android:top="2dp">
                 <shape>
                     <solid android:color="#26000000" />
-                    <corners android:radius="5dip" />
+                    <!--<corners android:radius="5dip" />-->
+                    <corners android:bottomLeftRadius="5dip" />
+                    <corners android:bottomRightRadius="5dip" />
                 </shape>
             </item>
             <!-- CONTENT LAYER -->
