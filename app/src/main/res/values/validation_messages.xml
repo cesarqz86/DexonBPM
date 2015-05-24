@@ -18,4 +18,7 @@
     <string name="validation_change_error_title">Error al cambiar la contraseña</string>
     <string name="validation_change_success_title">Cambiar contraseña</string>
     <string name="validation_change_error_notequals">La contraseña nueva no coincide.</string>
+
+    <!-- Incident -->
+    <string name="validation_incident_error_title">Incidentes</string>
 </resources>

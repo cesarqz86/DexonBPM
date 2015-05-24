@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -67,8 +69,9 @@ public class TicketService implements ITicketService {
 
     //region Public Methods
     @Override
-    public ArrayList<TicketsResponseDto> getTicketData(Context context, TicketsRequestDto ticketFilter) {
-        ArrayList<TicketsResponseDto> finalResponse = new ArrayList<TicketsResponseDto>();
+    public TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter) {
+        TicketWrapperResponseDto finalResponse = new TicketWrapperResponseDto();
+        Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
             finalUrl += TICKET_URL;
@@ -83,9 +86,12 @@ public class TicketService implements ITicketService {
             ResponseEntity<JsonElement> response;
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
             JsonElement jsonData = response.getBody();
-            finalResponse = this.convertJsonToTicketArray(jsonData);
+            finalResponse.setTicketArrayData(this.convertJsonToTicketArray(jsonData));
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
+            Log.e("CallingService: " + TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() == HttpStatus.FORBIDDEN || ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 loginService.loginUser(context, loginRequestData);
@@ -95,10 +101,10 @@ public class TicketService implements ITicketService {
                 ticketFilter.setLoggedUser(loggedUser);
                 this.getTicketData(context, ticketFilter);
             }
-            //finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), LoginResponseDto.class);
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             Log.e("CallingService: " + TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
-            //finalResponse.setErrorMessage(ex.getMessage());
+            finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + TICKET_URL, ex.getMessage(), ex);
         }
 
@@ -108,7 +114,7 @@ public class TicketService implements ITicketService {
 
     //region Private Methods
     private ArrayList<TicketsResponseDto> convertJsonToTicketArray(JsonElement jsonElement) throws IOException {
-        ArrayList<TicketsResponseDto> finalResponse = new ArrayList<>();
+        ArrayList<TicketsResponseDto> finalResponse = null;
         Gson gsonSerializer = new Gson();
 
         JsonFactory factory = new JsonFactory();
@@ -116,6 +122,7 @@ public class TicketService implements ITicketService {
         TypeReference<HashMap<String, Object>> typeReference = new TypeReference<HashMap<String, Object>>() {
         };
         if (jsonElement != null && jsonElement.isJsonArray()) {
+            finalResponse = new ArrayList<>();
             JsonArray arrayData = jsonElement.getAsJsonArray();
             for (JsonElement ticketData : arrayData) {
                 String ticketString = gsonSerializer.toJson(ticketData);

@@ -18,6 +18,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
@@ -153,7 +154,7 @@ public class ServiceExecuter {
         }
     }
 
-    public class ExecuteTicketService extends AsyncTask<TicketsRequestDto, Void, ArrayList<TicketsResponseDto>> {
+    public class ExecuteTicketService extends AsyncTask<TicketsRequestDto, Void, TicketWrapperResponseDto> {
 
         private Context currentContext;
         private ProgressDialog progressDialog;
@@ -170,26 +171,27 @@ public class ServiceExecuter {
         }
 
         @Override
-        protected ArrayList<TicketsResponseDto> doInBackground(TicketsRequestDto... params) {
+        protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
             return ticketService.getTicketData(this.currentContext, params[0]);
         }
 
-        protected void onPostExecute(ArrayList<TicketsResponseDto> responseData) {
+        protected void onPostExecute(TicketWrapperResponseDto responseData) {
 
             if (this.progressDialog != null && this.progressDialog.isShowing()) {
                 this.progressDialog.dismiss();
             }
-            IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
-            if (incidentsActivity != null) {
-                incidentsActivity.ticketListData = responseData;
-            }
 
-            /*if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
-                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_success_title, responseData.getErrorMessage(), MessageTypeIcon.Information, true);
-            } else {
-                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
-            }*/
+            if (responseData != null) {
+                if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
+                    IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+                    if (incidentsActivity != null) {
+                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
+                    }
+                } else {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_incident_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
+                }
+            }
         }
     }
 }

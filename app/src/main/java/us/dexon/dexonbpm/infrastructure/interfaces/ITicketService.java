@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
+import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -12,6 +13,6 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
  */
 public interface ITicketService {
 
-    ArrayList<TicketsResponseDto> getTicketData(Context context, TicketsRequestDto ticketFilter);
+    TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter);
 
 }
