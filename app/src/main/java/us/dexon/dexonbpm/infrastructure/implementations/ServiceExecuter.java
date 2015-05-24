@@ -180,6 +180,10 @@ public class ServiceExecuter {
             if (this.progressDialog != null && this.progressDialog.isShowing()) {
                 this.progressDialog.dismiss();
             }
+            IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+            if (incidentsActivity != null) {
+                incidentsActivity.ticketListData = responseData;
+            }
 
             /*if (responseData != null && CommonValidations.validateEqualsValues(responseData.getErrorMessage(), "No error") && responseData.isWasPasswordChanged()) {
                 CommonService.ShowAlertDialog(this.currentContext, R.string.validation_change_success_title, responseData.getErrorMessage(), MessageTypeIcon.Information, true);

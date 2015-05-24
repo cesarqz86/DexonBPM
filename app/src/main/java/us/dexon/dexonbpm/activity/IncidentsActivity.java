@@ -17,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
@@ -25,12 +27,15 @@ import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener{
 
     private TableLayout tbl_incident_header;
     private TableLayout tbl_incident_data;
+
+    public ArrayList<TicketsResponseDto> ticketListData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ticketFirstData.setIncludeClosedTickets(false);
         ticketFirstData.setLoggedUser(loggedUser);
         ticketFirstData.setTicketFilterType(TicketFilter.AssignedTickets.getCode());
-        ticketFirstData.setTicketsPerPage(100); // First type we will get only 20 tickets
+        ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
