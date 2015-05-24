@@ -30,12 +30,16 @@ import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
-public class IncidentsActivity extends FragmentActivity implements View.OnClickListener{
+public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
 
     private TableLayout tbl_incident_header;
     private TableLayout tbl_incident_data;
+    private TicketFilter currentTicketFilter;
+    static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
     public ArrayList<TicketsResponseDto> ticketListData;
+
+    private TextView asignados_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,27 +50,16 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         tbl_incident_data = (TableLayout) this.findViewById(R.id.tbl_incident_data);
 
         tbl_incident_header = CommonService.AddRowToTable(this, tbl_incident_header, true, headerText);
-        /*for (int rows = 0; rows <= 2000; rows++) {
-            tbl_incident_data = CommonService.AddRowToTable(this, tbl_incident_data, false, headerText);
-        }*/
+
+        asignados_btn = (TextView) this.findViewById(R.id.asignados_btn);
 
         ImageButton menuButton = (ImageButton) findViewById(R.id.menu_button);
         registerForContextMenu(menuButton);
         menuButton.setOnClickListener(this);
 
-        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-        dexonDatabase.setContext(this);
-        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+        currentTicketFilter = TicketFilter.AssignedTickets;
 
-        TicketsRequestDto ticketFirstData = new TicketsRequestDto();
-        ticketFirstData.setIncludeClosedTickets(false);
-        ticketFirstData.setLoggedUser(loggedUser);
-        ticketFirstData.setTicketFilterType(TicketFilter.AssignedTickets.getCode());
-        ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
-
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
-        ticketService.execute(ticketFirstData);
+        this.executeSearch();
 
         TextView asignadosBtn = (TextView) findViewById(R.id.asignados_btn);
         asignadosBtn.setOnClickListener(this);
@@ -128,16 +121,29 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.menu_button:
                 this.openContextMenu(v);
                 break;
             case R.id.asignados_btn:
-                Intent incidentActivity = new Intent(IncidentsActivity.this, HomeActivity.class);
-                startActivity(incidentActivity);
-                overridePendingTransition(R.anim.right_slide_in,
+                Intent incidentFilterActivity = new Intent(this, HomeActivity.class);
+                incidentFilterActivity.putExtra("CurrentFilter", this.currentTicketFilter.getCode());
+                this.startActivityForResult(incidentFilterActivity, FILTER_INCIDENT_CODE);
+                this.overridePendingTransition(R.anim.right_slide_in,
                         R.anim.right_slide_out);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // check if the request code is same as what is passed here it is 1
+        if (requestCode == FILTER_INCIDENT_CODE) {
+            String filterText = data.getStringExtra("CurrentFilter");
+            this.currentTicketFilter = TicketFilter.GetValue(filterText);
+            asignados_btn.setText(filterText);
+            this.executeSearch();
         }
     }
 
@@ -147,5 +153,21 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
         webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
         this.startActivity(webIntent);
+    }
+
+    private void executeSearch() {
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        TicketsRequestDto ticketFirstData = new TicketsRequestDto();
+        ticketFirstData.setIncludeClosedTickets(false);
+        ticketFirstData.setLoggedUser(loggedUser);
+        ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
+        ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
+        ticketService.execute(ticketFirstData);
     }
 }

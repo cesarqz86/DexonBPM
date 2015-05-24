@@ -20,6 +20,7 @@
             android:drawableLeft="@drawable/lupa"
             android:drawablePadding="10dp"
             android:hint="@string/txt_palabra_clave_hint"
+            android:inputType="textAutoComplete"
             android:padding="5dp"
             android:textColorHint="@color/gray_darker" />
     </LinearLayout>
