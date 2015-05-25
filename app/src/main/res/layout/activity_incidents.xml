@@ -55,20 +55,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TableLayout
-                android:id="@+id/tbl_incident_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:stretchColumns="*">
-
-            </TableLayout>
-
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TableLayout
-                    android:id="@+id/tbl_incident_data"
+                    android:id="@+id/tbl_incidents"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 

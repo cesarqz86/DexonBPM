@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
-
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -19,7 +17,6 @@ import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
-import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -187,6 +184,7 @@ public class ServiceExecuter {
                     IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
                     if (incidentsActivity != null) {
                         incidentsActivity.ticketListData = responseData.getTicketArrayData();
+                        incidentsActivity.inidentsCallBack();
                     }
                 } else {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_incident_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);

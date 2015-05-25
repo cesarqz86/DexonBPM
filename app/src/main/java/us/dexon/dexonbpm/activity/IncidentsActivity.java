@@ -1,6 +1,5 @@
 package us.dexon.dexonbpm.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
@@ -32,8 +30,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
 
-    private TableLayout tbl_incident_header;
-    private TableLayout tbl_incident_data;
+    private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
@@ -45,12 +42,6 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_incidents);
-        String[] headerText = this.getResources().getStringArray(R.array.array_column_incidents);
-        tbl_incident_header = (TableLayout) this.findViewById(R.id.tbl_incident_header);
-        tbl_incident_data = (TableLayout) this.findViewById(R.id.tbl_incident_data);
-
-        tbl_incident_header = CommonService.AddRowToTable(this, tbl_incident_header, true, headerText);
-
         asignados_btn = (TextView) this.findViewById(R.id.asignados_btn);
 
         ImageButton menuButton = (ImageButton) findViewById(R.id.menu_button);
@@ -169,5 +160,13 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
         ticketService.execute(ticketFirstData);
+    }
+
+    public void inidentsCallBack(){
+        //String[] headerText = this.getResources().getStringArray(R.array.array_column_incidents);
+        tbl_incidents = (TableLayout) this.findViewById(R.id.tbl_incidents);
+
+        CommonService.AddRowToTable(IncidentsActivity.this, tbl_incidents,
+                ticketListData);
     }
 }
