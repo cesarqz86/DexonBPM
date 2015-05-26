@@ -12,14 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.adapters.TableMainLayout;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
-import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -30,7 +30,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
 
-    private TableLayout tbl_incidents;
+    //private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
@@ -163,10 +163,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     }
 
     public void inidentsCallBack(){
-        //String[] headerText = this.getResources().getStringArray(R.array.array_column_incidents);
-        tbl_incidents = (TableLayout) this.findViewById(R.id.tbl_incidents);
-
-        CommonService.AddRowToTable(IncidentsActivity.this, tbl_incidents,
-                ticketListData);
+        LinearLayout tableContainer = (LinearLayout) findViewById(R.id.table_container);
+        tableContainer.addView(new TableMainLayout(this, ticketListData));
     }
 }

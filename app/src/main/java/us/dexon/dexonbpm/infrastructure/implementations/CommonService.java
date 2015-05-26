@@ -39,50 +39,24 @@ public class CommonService {
         rowParamsH.width = TableLayout.LayoutParams.WRAP_CONTENT;
 
         for(int i = -1; i < titles.length; i++){
-
-            TableRow.LayoutParams columnParams = new TableRow.LayoutParams();
             TextView txtColumn = (TextView) context.getLayoutInflater().inflate(R.layout.row_header, null);
             txtColumn.setText(i == -1 ? "ID" : titles[i].toString());
-            rowToAddH.addView(txtColumn, columnParams);
+            rowToAddH.addView(txtColumn, rowParamsH);
         }
         tableLayout.addView(rowToAddH, rowParamsH);
 
         for(int k = 0; k < ticketListData.size();k++){
             TableRow rowToAdd = new TableRow(context);
-            TableRow.LayoutParams rowParams = new TableRow.LayoutParams();
-            rowParams.height = TableLayout.LayoutParams.WRAP_CONTENT;
-            rowParams.width = TableLayout.LayoutParams.WRAP_CONTENT;
-            //manejo de colores de columnas
             TicketsResponseDto ticket = ticketListData.get(k);
             for(int l = -1; l <ticket.getTicketDataList().size(); l++){
-
-                TableRow.LayoutParams columnParams = new TableRow.LayoutParams();
                 TextView txtColumn = (TextView) context.getLayoutInflater()
                         .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
                 txtColumn.setText(l == -1 ? ticket.getTicketID() :
                         ticket.getTicketDataList().get(titles[l]).toString());
-                rowToAdd.addView(txtColumn, columnParams);
+                rowToAdd.addView(txtColumn, rowParamsH);
             }
-            tableLayout.addView(rowToAdd, rowParams);
+            tableLayout.addView(rowToAdd, rowParamsH);
         }
-
-
-        /*TableRow rowToAdd = new TableRow(context);
-
-        TableRow.LayoutParams rowParams = new TableRow.LayoutParams();
-        // Wrap-up the content of the row
-        rowParams.height = TableLayout.LayoutParams.WRAP_CONTENT;
-        rowParams.width = TableLayout.LayoutParams.WRAP_CONTENT;
-
-        for (String columnData : contentData) {
-            TableRow.LayoutParams columnParams = new TableRow.LayoutParams();
-            TextView txtColumn = (TextView) context.getLayoutInflater().inflate(R.layout.row_header, null);
-            txtColumn.setText(columnData);
-            rowToAdd.addView(txtColumn, columnParams);
-        }
-
-        tableLayout.addView(rowToAdd, rowParams);
-        //return tableLayout;*/
     }
 
     public static void ShowAlertDialog(final Context context, int titleID, int messageID, MessageTypeIcon messageTypeIcon, final boolean closeView) {
