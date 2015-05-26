@@ -15,4 +15,6 @@ public interface ITicketService {
 
     TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter);
 
+    //void getTicketInfo (String ticketID);
+
 }

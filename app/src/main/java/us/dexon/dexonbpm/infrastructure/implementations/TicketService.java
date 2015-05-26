@@ -1,6 +1,5 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -49,7 +47,8 @@ public class TicketService implements ITicketService {
      */
     private static final TicketService fINSTANCE = new TicketService();
 
-    private static String TICKET_URL = "api/Incident/GetTickets";
+    private static String TICKETS_URL = "api/Incident/GetTickets";
+    private static String TICKET_URL = "api/Incident/GetTicket";
     //endregion
 
     //region Properties
@@ -74,7 +73,7 @@ public class TicketService implements ITicketService {
         Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
-            finalUrl += TICKET_URL;
+            finalUrl += TICKETS_URL;
 
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
@@ -89,7 +88,7 @@ public class TicketService implements ITicketService {
             finalResponse.setTicketArrayData(this.convertJsonToTicketArray(jsonData));
         } catch (HttpServerErrorException ex) {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
-            Log.e("CallingService: " + TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+            Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR) {
                 ILoginService loginService = LoginService.getInstance();
@@ -102,10 +101,10 @@ public class TicketService implements ITicketService {
                 this.getTicketData(context, ticketFilter);
             }
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
-            Log.e("CallingService: " + TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+            Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
-            Log.e("CallingService: " + TICKET_URL, ex.getMessage(), ex);
+            Log.e("CallingService: " + TICKETS_URL, ex.getMessage(), ex);
         }
 
         return finalResponse;
