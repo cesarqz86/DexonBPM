@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 
 public class TableMainLayout extends RelativeLayout {
@@ -39,6 +40,10 @@ public class TableMainLayout extends RelativeLayout {
     String dummySpace = "        ";
 
     String emptyHeaders[] = {
+            "",
+            "",
+            "",
+            "",
             "",
             "",
             "",
@@ -177,6 +182,7 @@ public class TableMainLayout extends RelativeLayout {
         int headerFieldCount = this.headers.length;
 
         TableRow.LayoutParams params = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+        //TableRow.LayoutParams params = new TableRow.LayoutParams(200, 44);
         params.setMargins(2, 0, 0, 0);
 
         for (int x = 0; x < headerFieldCount; x++) {
@@ -228,7 +234,8 @@ public class TableMainLayout extends RelativeLayout {
             TableRow.LayoutParams params = new TableRow.LayoutParams(headerCellsWidth[x + 1], LayoutParams.MATCH_PARENT);
             params.setMargins(2, 2, 0, 0);
 
-            TextView textViewB = this.bodyTextView(sampleObject.getTicketDataList().get(headers[x]).toString(), evenOddAux);
+            String dataValue = sampleObject.getTicketDataList().containsKey(headers[x]) ? sampleObject.getTicketDataList().get(headers[x]).toString() : dummySpace;
+            TextView textViewB = this.bodyTextView(dataValue, evenOddAux);
             taleRowForTableD.addView(textViewB, params);
         }
 

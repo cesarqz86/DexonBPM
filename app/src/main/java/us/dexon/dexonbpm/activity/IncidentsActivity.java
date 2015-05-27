@@ -156,10 +156,20 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ticketFirstData.setLoggedUser(loggedUser);
         ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
         ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
+        //ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
         ticketService.execute(ticketFirstData);
+
+        TicketsRequestDto ticketTotalData = new TicketsRequestDto();
+        ticketTotalData.setIncludeClosedTickets(false);
+        ticketTotalData.setLoggedUser(loggedUser);
+        ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
+        ticketTotalData.setTicketsPerPage(0); // Get all the tickets
+
+        ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
+        //totalTicketService.execute(ticketTotalData);
     }
 
     public void inidentsCallBack(){

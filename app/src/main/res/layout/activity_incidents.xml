@@ -32,7 +32,7 @@
         android:layout_below="@+id/search_container"
         android:background="@drawable/white_btn_style"
         android:drawableRight="@drawable/ic_arrow"
-        android:padding="10dp"
+        android:padding="15dp"
         android:paddingRight="5dp"
         android:text="@string/txt_asignados_label"
         android:textColor="@color/black"
@@ -49,8 +49,8 @@
         android:id="@+id/table_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/blue_separator"
         android:layout_above="@+id/footer_container"
+        android:layout_below="@+id/blue_separator"
         android:orientation="vertical">
 
     </LinearLayout>

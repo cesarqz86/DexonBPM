@@ -48,8 +48,8 @@
         <item name="android:padding">10dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/gray_darker</item>
-        <item name="android:layout_marginBottom">1dip</item>
-        <item name="android:layout_marginRight">1dip</item>
+        <!--<item name="android:layout_marginBottom">1dip</item>
+        <item name="android:layout_marginRight">1dip</item>-->
     </style>
 
     <style name="row_style_even">
@@ -57,8 +57,8 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/gray_darker</item>
-        <item name="android:layout_marginBottom">1dip</item>
-        <item name="android:layout_marginRight">1dip</item>
+        <!--<item name="android:layout_marginBottom">1dip</item>
+        <item name="android:layout_marginRight">1dip</item>-->
     </style>
 
     <style name="row_style_odd">
@@ -66,8 +66,8 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/gray_darker</item>
-        <item name="android:layout_marginBottom">1dip</item>
-        <item name="android:layout_marginRight">1dip</item>
+        <!--<item name="android:layout_marginBottom">1dip</item>
+        <item name="android:layout_marginRight">1dip</item>-->
     </style>
 
 

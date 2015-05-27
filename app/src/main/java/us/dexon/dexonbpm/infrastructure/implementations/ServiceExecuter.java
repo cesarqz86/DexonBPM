@@ -198,4 +198,39 @@ public class ServiceExecuter {
             }
         }
     }
+
+    public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, TicketWrapperResponseDto> {
+
+        private Context currentContext;
+
+        public ExecuteTicketTotalService(Context context) {
+            this.currentContext = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            return ticketService.getTicketData(this.currentContext, params[0]);
+        }
+
+        protected void onPostExecute(TicketWrapperResponseDto responseData) {
+
+            if (responseData != null) {
+
+                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+
+                if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
+                    if (incidentsActivity != null) {
+                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
+                        incidentsActivity.inidentsCallBack();
+                    }
+                }
+            }
+        }
+    }
 }
