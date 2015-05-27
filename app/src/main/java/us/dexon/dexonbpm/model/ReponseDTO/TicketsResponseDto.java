@@ -10,6 +10,8 @@ public class TicketsResponseDto {
     //region Attributes
     private String ticketID;
 
+    private String incidentID;
+
     private HashMap<String, Object> ticketDataList;
     //endregion
 
@@ -28,6 +30,14 @@ public class TicketsResponseDto {
 
     public void setTicketDataList(HashMap<String, Object> ticketDataList) {
         this.ticketDataList = ticketDataList;
+    }
+
+    public String getIncidentID() {
+        return incidentID;
+    }
+
+    public void setIncidentID(String incidentID) {
+        this.incidentID = incidentID;
     }
 
     //endregion

@@ -180,13 +180,19 @@ public class ServiceExecuter {
             }
 
             if (responseData != null) {
+
+                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+
                 if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
-                    IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
                     if (incidentsActivity != null) {
                         incidentsActivity.ticketListData = responseData.getTicketArrayData();
                         incidentsActivity.inidentsCallBack();
                     }
                 } else {
+                    if (incidentsActivity != null) {
+                        incidentsActivity.ticketListData = null;
+                        incidentsActivity.inidentsCallBack();
+                    }
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_incident_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
                 }
             }

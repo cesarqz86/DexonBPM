@@ -38,13 +38,26 @@ public class TableMainLayout extends RelativeLayout {
 
     String dummySpace = "        ";
 
+    String emptyHeaders[] = {
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
+
     public TableMainLayout(Activity context, ArrayList<TicketsResponseDto> ticketListData) {
 
         super(context);
         this.context = context;
-        this.ticketListData = ticketListData;
+        this.ticketListData = ticketListData != null && !ticketListData.isEmpty() ? ticketListData : new ArrayList<TicketsResponseDto>();
 
-        this.headers = ticketListData.get(0).getTicketDataList().keySet().toArray();
+        if (this.ticketListData.isEmpty()) {
+            this.headers = emptyHeaders;
+        } else {
+            this.headers = this.ticketListData.get(0).getTicketDataList().keySet().toArray();
+        }
         this.headerCellsWidth = new int[this.headers.length + 1];
 
         // initialize the main components (TableLayouts, HorizontalScrollView, ScrollView)
@@ -66,7 +79,7 @@ public class TableMainLayout extends RelativeLayout {
 
         // add some table rows
         this.addTableRowToTableA();
-        this. addTableRowToTableB();
+        this.addTableRowToTableB();
 
         this.resizeHeaderHeight();
 
@@ -78,7 +91,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // initalized components 
-    private void initComponents(){
+    private void initComponents() {
 
         this.tableA = new TableLayout(this.context);
         this.tableB = new TableLayout(this.context);
@@ -97,7 +110,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // set essential component IDs
-    private void setComponentsId(){
+    private void setComponentsId() {
         this.tableA.setId(1);
         this.horizontalScrollViewB.setId(2);
         this.scrollViewC.setId(3);
@@ -105,7 +118,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // set tags for some horizontal and vertical scroll view
-    private void setScrollViewAndHorizontalScrollViewTag(){
+    private void setScrollViewAndHorizontalScrollViewTag() {
 
         this.horizontalScrollViewB.setTag("horizontal scroll view b");
         this.horizontalScrollViewD.setTag("horizontal scroll view d");
@@ -115,17 +128,17 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // we add the components here in our TableMainLayout
-    private void addComponentToMainLayout(){
+    private void addComponentToMainLayout() {
 
         // RelativeLayout params were very useful here
         // the addRule method is the key to arrange the components properly
-        RelativeLayout.LayoutParams componentB_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams componentB_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         componentB_Params.addRule(RelativeLayout.RIGHT_OF, this.tableA.getId());
 
-        RelativeLayout.LayoutParams componentC_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams componentC_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         componentC_Params.addRule(RelativeLayout.BELOW, this.tableA.getId());
 
-        RelativeLayout.LayoutParams componentD_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams componentD_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         componentD_Params.addRule(RelativeLayout.RIGHT_OF, this.scrollViewC.getId());
         componentD_Params.addRule(RelativeLayout.BELOW, this.horizontalScrollViewB.getId());
 
@@ -139,35 +152,34 @@ public class TableMainLayout extends RelativeLayout {
     }
 
 
-
-    private void addTableRowToTableA(){
+    private void addTableRowToTableA() {
         this.tableA.addView(this.componentATableRow());
     }
 
-    private void addTableRowToTableB(){
+    private void addTableRowToTableB() {
         this.tableB.addView(this.componentBTableRow());
     }
 
     // generate table row of table A
-    TableRow componentATableRow(){
+    TableRow componentATableRow() {
 
         TableRow componentATableRow = new TableRow(this.context);
-        TextView textView = this.headerTextView(dummySpace + "ID" + dummySpace);
+        TextView textView = this.headerTextView(dummySpace + "TICKET" + dummySpace);
         componentATableRow.addView(textView);
 
         return componentATableRow;
     }
 
     // generate table row of table B
-    TableRow componentBTableRow(){
+    TableRow componentBTableRow() {
 
         TableRow componentBTableRow = new TableRow(this.context);
         int headerFieldCount = this.headers.length;
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.MATCH_PARENT);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
         params.setMargins(2, 0, 0, 0);
 
-        for(int x = 0; x < headerFieldCount; x++){
+        for (int x = 0; x < headerFieldCount; x++) {
             TextView textView = this.headerTextView(dummySpace + this.headers[x].toString() + dummySpace);
             textView.setLayoutParams(params);
             componentBTableRow.addView(textView);
@@ -177,10 +189,10 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // generate table row of table C and table D
-    private void generateTableC_AndTable_D(){
+    private void generateTableC_AndTable_D() {
 
         int evenOddAux = 0;
-        for(TicketsResponseDto sampleObject : this.ticketListData){
+        for (TicketsResponseDto sampleObject : this.ticketListData) {
 
             TableRow tableRowForTableC = this.tableRowForTableC(sampleObject, evenOddAux);
             TableRow taleRowForTableD = this.taleRowForTableD(sampleObject, evenOddAux);
@@ -190,34 +202,34 @@ public class TableMainLayout extends RelativeLayout {
 
             this.tableC.addView(tableRowForTableC);
             this.tableD.addView(taleRowForTableD);
-           evenOddAux++;
+            evenOddAux++;
 
         }
     }
 
     // a TableRow for table C
-    TableRow tableRowForTableC(TicketsResponseDto sampleObject, int evenOddAux){
+    TableRow tableRowForTableC(TicketsResponseDto sampleObject, int evenOddAux) {
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams(this.headerCellsWidth[0],LayoutParams.MATCH_PARENT);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(this.headerCellsWidth[0], LayoutParams.MATCH_PARENT);
         params.setMargins(0, 2, 0, 0);
 
         TableRow tableRowForTableC = new TableRow(this.context);
         TextView textView = this.bodyTextView(sampleObject.getTicketID(), evenOddAux);
-        tableRowForTableC.addView(textView,params);
+        tableRowForTableC.addView(textView, params);
 
         return tableRowForTableC;
     }
 
-    TableRow taleRowForTableD(TicketsResponseDto sampleObject, int evenOddAux){
+    TableRow taleRowForTableD(TicketsResponseDto sampleObject, int evenOddAux) {
 
         TableRow taleRowForTableD = new TableRow(this.context);
 
-        for(int x = 0 ; x < sampleObject.getTicketDataList().size(); x++){
-            TableRow.LayoutParams params = new TableRow.LayoutParams(headerCellsWidth[x+1],LayoutParams.MATCH_PARENT);
+        for (int x = 0; x < sampleObject.getTicketDataList().size(); x++) {
+            TableRow.LayoutParams params = new TableRow.LayoutParams(headerCellsWidth[x + 1], LayoutParams.MATCH_PARENT);
             params.setMargins(2, 2, 0, 0);
 
             TextView textViewB = this.bodyTextView(sampleObject.getTicketDataList().get(headers[x]).toString(), evenOddAux);
-            taleRowForTableD.addView(textViewB,params);
+            taleRowForTableD.addView(textViewB, params);
         }
 
         return taleRowForTableD;
@@ -225,7 +237,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // table cell standard TextView
-    TextView bodyTextView(String label, int k){
+    TextView bodyTextView(String label, int k) {
 
         TextView bodyTextView = (TextView) context.getLayoutInflater()
                 .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
@@ -235,7 +247,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // header standard TextView
-    TextView headerTextView(String label){
+    TextView headerTextView(String label) {
 
         TextView headerTextView = (TextView) context.getLayoutInflater().inflate(R.layout.row_header, null);
         headerTextView.setText(label);
@@ -247,7 +259,7 @@ public class TableMainLayout extends RelativeLayout {
     void resizeHeaderHeight() {
 
         TableRow productNameHeaderTableRow = (TableRow) this.tableA.getChildAt(0);
-        TableRow productInfoTableRow = (TableRow)  this.tableB.getChildAt(0);
+        TableRow productInfoTableRow = (TableRow) this.tableB.getChildAt(0);
 
         int rowAHeight = this.viewHeight(productNameHeaderTableRow);
         int rowBHeight = this.viewHeight(productInfoTableRow);
@@ -258,27 +270,27 @@ public class TableMainLayout extends RelativeLayout {
         this.matchLayoutHeight(tableRow, finalHeight);
     }
 
-    void getTableRowHeaderCellWidth(){
+    void getTableRowHeaderCellWidth() {
 
         //int tableAChildCount = ((TableRow)this.tableA.getChildAt(0)).getChildCount();
-        int tableBChildCount = ((TableRow)this.tableB.getChildAt(0)).getChildCount();
+        int tableBChildCount = ((TableRow) this.tableB.getChildAt(0)).getChildCount();
 
-        this.headerCellsWidth[0] = this.viewWidth(((TableRow)this.tableA.getChildAt(0)).getChildAt(0));
+        this.headerCellsWidth[0] = this.viewWidth(((TableRow) this.tableA.getChildAt(0)).getChildAt(0));
 
-        for(int x = 0; x < tableBChildCount; x++){
-            this.headerCellsWidth[x+1] = this.viewWidth(((TableRow)this.tableB.getChildAt(0)).getChildAt(x));
+        for (int x = 0; x < tableBChildCount; x++) {
+            this.headerCellsWidth[x + 1] = this.viewWidth(((TableRow) this.tableB.getChildAt(0)).getChildAt(x));
         }
     }
 
     // resize body table row height
-    void resizeBodyTableRowHeight(){
+    void resizeBodyTableRowHeight() {
 
         int tableC_ChildCount = this.tableC.getChildCount();
 
-        for(int x=0; x<tableC_ChildCount; x++){
+        for (int x = 0; x < tableC_ChildCount; x++) {
 
             TableRow productNameHeaderTableRow = (TableRow) this.tableC.getChildAt(x);
-            TableRow productInfoTableRow = (TableRow)  this.tableD.getChildAt(x);
+            TableRow productInfoTableRow = (TableRow) this.tableD.getChildAt(x);
 
             int rowAHeight = this.viewHeight(productNameHeaderTableRow);
             int rowBHeight = this.viewHeight(productInfoTableRow);
@@ -298,13 +310,13 @@ public class TableMainLayout extends RelativeLayout {
         int tableRowChildCount = tableRow.getChildCount();
 
         // if a TableRow has only 1 child
-        if(tableRow.getChildCount()==1){
+        if (tableRow.getChildCount() == 1) {
 
             View view = tableRow.getChildAt(0);
             TableRow.LayoutParams params = (TableRow.LayoutParams) view.getLayoutParams();
             params.height = height - (params.bottomMargin + params.topMargin);
 
-            return ;
+            return;
         }
 
         // if a TableRow has more than 1 child
@@ -355,7 +367,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // horizontal scroll view custom class
-    class MyHorizontalScrollView extends HorizontalScrollView{
+    class MyHorizontalScrollView extends HorizontalScrollView {
 
         public MyHorizontalScrollView(Context context) {
             super(context);
@@ -365,9 +377,9 @@ public class TableMainLayout extends RelativeLayout {
         protected void onScrollChanged(int l, int t, int oldl, int oldt) {
             String tag = (String) this.getTag();
 
-            if(tag.equalsIgnoreCase("horizontal scroll view b")){
+            if (tag.equalsIgnoreCase("horizontal scroll view b")) {
                 horizontalScrollViewD.scrollTo(l, 0);
-            }else{
+            } else {
                 horizontalScrollViewB.scrollTo(l, 0);
             }
         }
@@ -375,7 +387,7 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // scroll view custom class
-    class MyScrollView extends ScrollView{
+    class MyScrollView extends ScrollView {
 
         public MyScrollView(Context context) {
             super(context);
@@ -386,10 +398,10 @@ public class TableMainLayout extends RelativeLayout {
 
             String tag = (String) this.getTag();
 
-            if(tag.equalsIgnoreCase("scroll view c")){
+            if (tag.equalsIgnoreCase("scroll view c")) {
                 scrollViewD.scrollTo(0, t);
-            }else{
-                scrollViewC.scrollTo(0,t);
+            } else {
+                scrollViewC.scrollTo(0, t);
             }
         }
     }

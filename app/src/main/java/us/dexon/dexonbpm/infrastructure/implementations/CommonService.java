@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.TableLayout;
@@ -31,31 +33,36 @@ public class CommonService {
     public static void AddRowToTable(Activity context, TableLayout tableLayout,
                                      ArrayList<TicketsResponseDto> ticketListData) {
 
-        Object[] titles = ticketListData.get(0).getTicketDataList().keySet().toArray();
+        if (ticketListData != null && !ticketListData.isEmpty()) {
 
-        TableRow rowToAddH = new TableRow(context);
-        TableRow.LayoutParams rowParamsH = new TableRow.LayoutParams();
-        rowParamsH.height = TableLayout.LayoutParams.WRAP_CONTENT;
-        rowParamsH.width = TableLayout.LayoutParams.WRAP_CONTENT;
+            Object[] titles = ticketListData.get(0).getTicketDataList().keySet().toArray();
 
-        for(int i = -1; i < titles.length; i++){
-            TextView txtColumn = (TextView) context.getLayoutInflater().inflate(R.layout.row_header, null);
-            txtColumn.setText(i == -1 ? "ID" : titles[i].toString());
-            rowToAddH.addView(txtColumn, rowParamsH);
-        }
-        tableLayout.addView(rowToAddH, rowParamsH);
+            TableRow rowToAddH = new TableRow(context);
+            TableRow.LayoutParams rowParamsH = new TableRow.LayoutParams();
+            rowParamsH.height = TableLayout.LayoutParams.WRAP_CONTENT;
+            rowParamsH.width = TableLayout.LayoutParams.WRAP_CONTENT;
+            /*rowParamsH.height = TableLayout.LayoutParams.WRAP_CONTENT;
+            rowParamsH.width = TableLayout.LayoutParams.WRAP_CONTENT;*/
 
-        for(int k = 0; k < ticketListData.size();k++){
-            TableRow rowToAdd = new TableRow(context);
-            TicketsResponseDto ticket = ticketListData.get(k);
-            for(int l = -1; l <ticket.getTicketDataList().size(); l++){
-                TextView txtColumn = (TextView) context.getLayoutInflater()
-                        .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
-                txtColumn.setText(l == -1 ? ticket.getTicketID() :
-                        ticket.getTicketDataList().get(titles[l]).toString());
-                rowToAdd.addView(txtColumn, rowParamsH);
+            for (int i = -1; i < titles.length; i++) {
+                TextView txtColumn = (TextView) context.getLayoutInflater().inflate(R.layout.row_header, null);
+                txtColumn.setText(i == -1 ? "TICKET" : titles[i].toString());
+                rowToAddH.addView(txtColumn, rowParamsH);
             }
-            tableLayout.addView(rowToAdd, rowParamsH);
+            tableLayout.addView(rowToAddH, rowParamsH);
+
+            for (int k = 0; k < ticketListData.size(); k++) {
+                TableRow rowToAdd = new TableRow(context);
+                TicketsResponseDto ticket = ticketListData.get(k);
+                for (int l = -1; l < ticket.getTicketDataList().size(); l++) {
+                    TextView txtColumn = (TextView) context.getLayoutInflater()
+                            .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
+                    txtColumn.setText(l == -1 ? ticket.getTicketID() :
+                            ticket.getTicketDataList().get(titles[l]).toString());
+                    rowToAdd.addView(txtColumn, rowParamsH);
+                }
+                tableLayout.addView(rowToAdd, rowParamsH);
+            }
         }
     }
 
@@ -118,6 +125,20 @@ public class CommonService {
         //dialog.setContentView(android.support.v7.appcompat.R.drawable);
         dialog.setMessage(context.getString(R.string.general_loading));
         return dialog;
+    }
+
+    public static float convertDpToPixel(float dp, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return px;
+    }
+
+    public static float convertPixelsToDp(float px, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / (metrics.densityDpi / 160f);
+        return dp;
     }
     //endregion
 

@@ -164,6 +164,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
     public void inidentsCallBack(){
         LinearLayout tableContainer = (LinearLayout) findViewById(R.id.table_container);
+        tableContainer.removeAllViews();
         tableContainer.addView(new TableMainLayout(this, ticketListData));
     }
 }

@@ -93,12 +93,9 @@ public class TicketService implements ITicketService {
             if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
-                loginService.loginUser(context, loginRequestData);
-                IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
-                databaseWrapper.setContext(context);
-                LoginResponseDto loggedUser = databaseWrapper.getLoggedUser();
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 ticketFilter.setLoggedUser(loggedUser);
-                this.getTicketData(context, ticketFilter);
+                finalResponse = this.getTicketData(context, ticketFilter);
             }
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
@@ -128,8 +125,9 @@ public class TicketService implements ITicketService {
                 TicketsResponseDto ticketResponseData = new TicketsResponseDto();
                 HashMap<String, Object> ticketDataList = new HashMap<>();
                 ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
-                ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));
-                ticketDataList.remove("HD_INCIDENT_ID");
+                ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("TICKET")));
+                ticketResponseData.setIncidentID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));
+                ticketDataList.remove("TICKET");
                 ticketResponseData.setTicketDataList(ticketDataList);
                 finalResponse.add(ticketResponseData);
             }
