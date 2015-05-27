@@ -47,7 +47,10 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:width">140dp</item>
         <item name="android:textColor">@color/gray_darker</item>
+        <item name="android:ellipsize">end</item>
         <!--<item name="android:layout_marginBottom">1dip</item>
         <item name="android:layout_marginRight">1dip</item>-->
     </style>
@@ -57,6 +60,9 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/gray_darker</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:width">140dp</item>
+        <item name="android:ellipsize">end</item>
         <!--<item name="android:layout_marginBottom">1dip</item>
         <item name="android:layout_marginRight">1dip</item>-->
     </style>
@@ -66,6 +72,9 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/gray_darker</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:width">140dp</item>
+        <item name="android:ellipsize">end</item>
         <!--<item name="android:layout_marginBottom">1dip</item>
         <item name="android:layout_marginRight">1dip</item>-->
     </style>

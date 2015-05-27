@@ -2,7 +2,9 @@ package us.dexon.dexonbpm.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.RelativeLayout;
@@ -14,10 +16,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
+import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 
-public class TableMainLayout extends RelativeLayout {
+public class TableMainLayout extends RelativeLayout implements View.OnClickListener {
 
     Object headers[];
 
@@ -37,7 +39,7 @@ public class TableMainLayout extends RelativeLayout {
     Activity context;
     int headerCellsWidth[];
 
-    String dummySpace = "        ";
+    String dummySpace = "";
 
     String emptyHeaders[] = {
             "",
@@ -183,7 +185,7 @@ public class TableMainLayout extends RelativeLayout {
 
         TableRow.LayoutParams params = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
         //TableRow.LayoutParams params = new TableRow.LayoutParams(200, 44);
-        params.setMargins(2, 0, 0, 0);
+        params.setMargins(0, 0, 0, 0);
 
         for (int x = 0; x < headerFieldCount; x++) {
             TextView textView = this.headerTextView(dummySpace + this.headers[x].toString() + dummySpace);
@@ -206,10 +208,15 @@ public class TableMainLayout extends RelativeLayout {
             tableRowForTableC.setBackgroundColor(Color.LTGRAY);
             taleRowForTableD.setBackgroundColor(Color.LTGRAY);
 
+            tableRowForTableC.setTag(R.id.title, sampleObject.getTicketID());
+            tableRowForTableC.setOnClickListener(TableMainLayout.this);
+
+            taleRowForTableD.setTag(R.id.title, sampleObject.getTicketID());
+            taleRowForTableD.setOnClickListener(TableMainLayout.this);
+
             this.tableC.addView(tableRowForTableC);
             this.tableD.addView(taleRowForTableD);
             evenOddAux++;
-
         }
     }
 
@@ -217,12 +224,11 @@ public class TableMainLayout extends RelativeLayout {
     TableRow tableRowForTableC(TicketsResponseDto sampleObject, int evenOddAux) {
 
         TableRow.LayoutParams params = new TableRow.LayoutParams(this.headerCellsWidth[0], LayoutParams.MATCH_PARENT);
-        params.setMargins(0, 2, 0, 0);
+        params.setMargins(0, 0, 0, 0);
 
         TableRow tableRowForTableC = new TableRow(this.context);
         TextView textView = this.bodyTextView(sampleObject.getTicketID(), evenOddAux);
         tableRowForTableC.addView(textView, params);
-
         return tableRowForTableC;
     }
 
@@ -232,13 +238,12 @@ public class TableMainLayout extends RelativeLayout {
 
         for (int x = 0; x < sampleObject.getTicketDataList().size(); x++) {
             TableRow.LayoutParams params = new TableRow.LayoutParams(headerCellsWidth[x + 1], LayoutParams.MATCH_PARENT);
-            params.setMargins(2, 2, 0, 0);
+            params.setMargins(0, 0, 0, 0);
 
             String dataValue = sampleObject.getTicketDataList().containsKey(headers[x]) ? sampleObject.getTicketDataList().get(headers[x]).toString() : dummySpace;
             TextView textViewB = this.bodyTextView(dataValue, evenOddAux);
             taleRowForTableD.addView(textViewB, params);
         }
-
         return taleRowForTableD;
 
     }
@@ -371,6 +376,24 @@ public class TableMainLayout extends RelativeLayout {
     private int viewWidth(View view) {
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         return view.getMeasuredWidth();
+    }
+
+    @Override
+    public void onClick(View v) {
+        //Log.i("TABLE_LAYOUT_EVENTS", "OnClickMethod");
+        try {
+            String id = (String) v.getTag(R.id.title);
+            Intent ticketDetail = new Intent(context, TicketDetail.class);
+            ticketDetail.putExtra("TICKET_ID", id);
+            context.startActivity(ticketDetail);
+            context.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+            Log.i("TABLE_LAYOUT_EVENTS", "Clicking on : " + id);
+        }catch(NullPointerException e){
+            e.printStackTrace();
+        }
+
+
     }
 
     // horizontal scroll view custom class
