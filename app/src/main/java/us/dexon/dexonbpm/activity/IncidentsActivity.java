@@ -169,7 +169,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ticketTotalData.setTicketsPerPage(0); // Get all the tickets
 
         ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
-        //totalTicketService.execute(ticketTotalData);
+        totalTicketService.execute(ticketTotalData);
     }
 
     public void inidentsCallBack(){

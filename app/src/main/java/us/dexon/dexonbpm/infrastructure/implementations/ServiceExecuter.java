@@ -170,7 +170,7 @@ public class ServiceExecuter {
         @Override
         protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
-            return ticketService.getTicketData(this.currentContext, params[0]);
+            return ticketService.getTicketData(this.currentContext, params[0], 1);
         }
 
         protected void onPostExecute(TicketWrapperResponseDto responseData) {
@@ -193,7 +193,7 @@ public class ServiceExecuter {
                         incidentsActivity.ticketListData = null;
                         incidentsActivity.inidentsCallBack();
                     }
-                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_incident_error_title, responseData.getErrorMessage(), MessageTypeIcon.Error, false);
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
                 }
             }
         }
@@ -215,7 +215,7 @@ public class ServiceExecuter {
         @Override
         protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
-            return ticketService.getTicketData(this.currentContext, params[0]);
+            return ticketService.getTicketData(this.currentContext, params[0], 1);
         }
 
         protected void onPostExecute(TicketWrapperResponseDto responseData) {

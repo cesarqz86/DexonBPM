@@ -68,7 +68,7 @@ public class TicketService implements ITicketService {
 
     //region Public Methods
     @Override
-    public TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter) {
+    public TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter, int reloginCount) {
         TicketWrapperResponseDto finalResponse = new TicketWrapperResponseDto();
         Gson gsonSerializer = new Gson();
         try {
@@ -90,14 +90,15 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 ticketFilter.setLoggedUser(loggedUser);
-                finalResponse = this.getTicketData(context, ticketFilter);
+                finalResponse = this.getTicketData(context, ticketFilter, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             }
-            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
@@ -118,12 +119,14 @@ public class TicketService implements ITicketService {
         TypeReference<HashMap<String, Object>> typeReference = new TypeReference<HashMap<String, Object>>() {
         };
         if (jsonElement != null && jsonElement.isJsonArray()) {
-            finalResponse = new ArrayList<>();
             JsonArray arrayData = jsonElement.getAsJsonArray();
+            String ticketString;
+            TicketsResponseDto ticketResponseData;
+            HashMap<String, Object> ticketDataList;
+            finalResponse = new ArrayList<>(arrayData.size());
             for (JsonElement ticketData : arrayData) {
-                String ticketString = gsonSerializer.toJson(ticketData);
-                TicketsResponseDto ticketResponseData = new TicketsResponseDto();
-                HashMap<String, Object> ticketDataList = new HashMap<>();
+                ticketString =gsonSerializer.toJson(ticketData);
+                ticketResponseData =new TicketsResponseDto();
                 ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
                 ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("TICKET")));
                 ticketResponseData.setIncidentID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));

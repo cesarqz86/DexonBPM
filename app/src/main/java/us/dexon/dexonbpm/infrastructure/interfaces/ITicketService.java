@@ -13,7 +13,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
  */
 public interface ITicketService {
 
-    TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter);
+    TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter, int reloginCount);
 
     //void getTicketInfo (String ticketID);
 

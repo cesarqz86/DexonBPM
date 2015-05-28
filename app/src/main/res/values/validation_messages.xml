@@ -5,6 +5,8 @@
     <string name="validation_general_error_required">Por favor diligencie todos los campos requeridos.</string>
     <string name="validation_general_error_fieldrequired">Campo requerido.</string>
     <string name="general_loading">Procesando...</string>
+    <string name="validation_general_connection_title">Error de conexión</string>
+    <string name="validation_general_connection_message">Error al consultar informacion</string>
 
     <!-- Login -->
     <string name="validation_login_error_title">Error de autenticación</string>
@@ -21,4 +23,5 @@
 
     <!-- Incident -->
     <string name="validation_incident_error_title">Incidentes</string>
+
 </resources>
