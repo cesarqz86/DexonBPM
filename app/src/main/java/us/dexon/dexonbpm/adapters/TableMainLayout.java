@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -27,6 +28,7 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
     TableLayout tableB;
     TableLayout tableC;
     TableLayout tableD;
+    View shadow;
 
     HorizontalScrollView horizontalScrollViewB;
     HorizontalScrollView horizontalScrollViewD;
@@ -104,6 +106,7 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
         this.tableB = new TableLayout(this.context);
         this.tableC = new TableLayout(this.context);
         this.tableD = new TableLayout(this.context);
+        this.shadow = new View(context);
 
         this.horizontalScrollViewB = new MyHorizontalScrollView(this.context);
         this.horizontalScrollViewD = new MyHorizontalScrollView(this.context);
@@ -111,8 +114,12 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
         this.scrollViewC = new MyScrollView(this.context);
         this.scrollViewD = new MyScrollView(this.context);
 
-        this.tableA.setBackgroundColor(Color.GREEN);
-        this.horizontalScrollViewB.setBackgroundColor(Color.LTGRAY);
+        this.tableA.setBackgroundColor(Color.WHITE);
+        this.horizontalScrollViewB.setBackgroundColor(Color.WHITE);
+
+        this.shadow.setBackgroundResource(R.drawable.drawer_shadow);
+
+
 
     }
 
@@ -147,7 +154,15 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
 
         RelativeLayout.LayoutParams componentD_Params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         componentD_Params.addRule(RelativeLayout.RIGHT_OF, this.scrollViewC.getId());
+        //componentD_Params.addRule(RelativeLayout.MAR, this.scrollViewC.getId());
+        //componentD_Params.leftMargin = -5;
         componentD_Params.addRule(RelativeLayout.BELOW, this.horizontalScrollViewB.getId());
+
+        RelativeLayout.LayoutParams shadowParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+        shadowParams.addRule(RelativeLayout.RIGHT_OF, this.tableA.getId());
+        shadowParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        shadowParams.width = 50;
+
 
         // 'this' is a relative layout, 
         // we extend this table layout as relative layout as seen during the creation of this class
@@ -155,6 +170,7 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
         this.addView(this.horizontalScrollViewB, componentB_Params);
         this.addView(this.scrollViewC, componentC_Params);
         this.addView(this.scrollViewD, componentD_Params);
+        this.addView(this.shadow, shadowParams);
 
     }
 
@@ -205,8 +221,8 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
             TableRow tableRowForTableC = this.tableRowForTableC(sampleObject, evenOddAux);
             TableRow taleRowForTableD = this.taleRowForTableD(sampleObject, evenOddAux);
 
-            tableRowForTableC.setBackgroundColor(Color.LTGRAY);
-            taleRowForTableD.setBackgroundColor(Color.LTGRAY);
+            tableRowForTableC.setBackgroundColor(Color.WHITE);
+            taleRowForTableD.setBackgroundColor(Color.WHITE);
 
             tableRowForTableC.setTag(R.id.title, sampleObject.getTicketID());
             tableRowForTableC.setOnClickListener(TableMainLayout.this);
@@ -252,7 +268,7 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
     TextView bodyTextView(String label, int k) {
 
         TextView bodyTextView = (TextView) context.getLayoutInflater()
-                .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
+                .inflate(((k & 1) == 0) ?   R.layout.row_odd :  R.layout.row_even, null);
         bodyTextView.setText(label);
 
         return bodyTextView;
