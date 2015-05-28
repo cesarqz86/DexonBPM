@@ -166,7 +166,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ticketTotalData.setIncludeClosedTickets(false);
         ticketTotalData.setLoggedUser(loggedUser);
         ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
-        ticketTotalData.setTicketsPerPage(0); // Get all the tickets
+        ticketTotalData.setTicketsPerPage(1000); // Get all the tickets
 
         ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
         totalTicketService.execute(ticketTotalData);
