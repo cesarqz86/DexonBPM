@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.infrastructure.interfaces;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
@@ -23,7 +24,11 @@ public interface IDexonDatabaseWrapper {
 
     void saveTicketData(ArrayList<TicketsResponseDto> ticketDataList);
 
+    void saveTicketData(String ticketID, String incidentID, HashMap<String, Object> dataToSave);
+
     TicketsResponseDto getTicketData(String ticketID);
 
     ArrayList<TicketsResponseDto> getTicketData (String filterWord, TicketFilter ticketFilter);
+
+    void deleteTicketTable();
 }

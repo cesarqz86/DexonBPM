@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
@@ -76,12 +77,13 @@ public class DexonDatabaseWrapper implements IDexonDatabaseWrapper {
         } else {
             database.update(dexonDatabase.USER_TABLE, loggedUserValues, "user_id == " + isRecordSaved.getUserID(), null);
         }
+        //dexonDatabase.close();
     }
 
     public LoginResponseDto getLoggedUser() {
         LoginResponseDto finalResult = null;
 
-        SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        SQLiteDatabase database = dexonDatabase.getReadableDatabase();
         SQLiteQueryBuilder userQuery = new SQLiteQueryBuilder();
         userQuery.setTables(dexonDatabase.USER_TABLE);
         Cursor cursor = userQuery.query(database, null, null, null, null, null, null, null);
@@ -100,13 +102,17 @@ public class DexonDatabaseWrapper implements IDexonDatabaseWrapper {
             finalResult.setSessionToken(cursor.getString(cursor.getColumnIndex("token")));
             finalResult.setSessionID(cursor.getString(cursor.getColumnIndex("sessionId")));
             finalResult.setUniqueCode(cursor.getString(cursor.getColumnIndex("uniqueCode")));
+            cursor.close();
         }
+
+        //dexonDatabase.close();
         return finalResult;
     }
 
     public void deleteUserTable() {
         SQLiteDatabase database = dexonDatabase.getWritableDatabase();
         database.delete(dexonDatabase.USER_TABLE, null, null);
+        //dexonDatabase.close();
     }
 
     public void saveTicketData(ArrayList<TicketsResponseDto> ticketDataList) {
@@ -131,19 +137,47 @@ public class DexonDatabaseWrapper implements IDexonDatabaseWrapper {
                     }
                 }
             }
+            //dexonDatabase.close();
         }
     }
 
-    public TicketsResponseDto getTicketData(String ticketID) {
+    public void saveTicketData(String ticketID, String incidentID, HashMap<String, Object> dataToSave) {
+        if (dataToSave != null && !dataToSave.isEmpty()) {
+            SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+
+            for (String keyID : dataToSave.keySet()) {
+
+                //TicketsResponseDto existingTicket = this.getTicketData(ticketID);
+
+                ContentValues sqlTicketData = new ContentValues();
+                sqlTicketData.put("TicketID", ticketID);
+                sqlTicketData.put("IncidentID", incidentID);
+                sqlTicketData.put("ColumnKey", keyID);
+                sqlTicketData.put("ColumnValue", String.valueOf(dataToSave.get(keyID)));
+
+                /*if (existingTicket != null && existingTicket.getTicketDataList() != null && existingTicket.getTicketDataList().containsKey(keysValues)) {
+                    database.update(dexonDatabase.TICKET_TABLE, sqlTicketData, "TicketID == '" + ticketData.getTicketID() + "' AND ColumnKey == '" + keysValues + "'", null);
+
+                } else {*/
+                database.insert(dexonDatabase.TICKET_TABLE, null, sqlTicketData);
+                //}
+
+            }
+            //dexonDatabase.close();
+        }
+    }
+
+    public TicketsResponseDto getTicketData(String incidentID) {
         TicketsResponseDto finalResult = null;
 
-        SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        SQLiteDatabase database = dexonDatabase.getReadableDatabase();
         SQLiteQueryBuilder userQuery = new SQLiteQueryBuilder();
         userQuery.setTables(dexonDatabase.TICKET_TABLE);
-        Cursor cursor = userQuery.query(database, null, "TicketID == '" + ticketID + "'", null, null, null, null, null);
+        Cursor cursor = userQuery.query(database, null, "IncidentID == '" + incidentID + "'", null, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             finalResult = new TicketsResponseDto();
-            finalResult.setTicketID(ticketID);
+            finalResult.setTicketID(cursor.getString(cursor.getColumnIndex("TicketID")));
+            finalResult.setIncidentID(incidentID);
             HashMap<String, Object> ticketDataList = new HashMap<>();
             ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
 
@@ -151,31 +185,48 @@ public class DexonDatabaseWrapper implements IDexonDatabaseWrapper {
                 ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
             }
             finalResult.setTicketDataList(ticketDataList);
+            cursor.close();
         }
+        //dexonDatabase.close();
         return finalResult;
     }
 
     public ArrayList<TicketsResponseDto> getTicketData(String filterWord, TicketFilter ticketFilter) {
-        ArrayList<TicketsResponseDto> finalResult = new ArrayList<>();
+        ArrayList<TicketsResponseDto> finalResult = null;
 
-        /*SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        SQLiteDatabase database = dexonDatabase.getReadableDatabase();
         SQLiteQueryBuilder userQuery = new SQLiteQueryBuilder();
         userQuery.setTables(dexonDatabase.TICKET_TABLE);
-        Cursor cursor = userQuery.query(database, null, null, null, null, null, null, null);
+        filterWord = filterWord == null ? "" : filterWord;
+        userQuery.appendWhere("ColumnValue LIKE '%" + filterWord + "%'");
+        Cursor cursor = userQuery.query(
+                database,
+                null,
+                null,
+                null,
+                "IncidentID",
+                null,
+                null,
+                null);
         if (cursor != null && cursor.moveToFirst()) {
-            TicketsResponseDto temporalTicket = new TicketsResponseDto();
-            temporalTicket.setTicketID(ticketID);
-            HashMap<String, Object> ticketDataList = new HashMap<>();
-            ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+            int arraySize = cursor.getCount();
+            finalResult = new ArrayList<>(arraySize);
+
+            finalResult.add(this.getTicketData(cursor.getString(cursor.getColumnIndex("IncidentID"))));
 
             while (cursor.moveToNext()) {
-                ticketDataList.put(cursor.getString(cursor.getColumnIndex("ColumnKey")), cursor.getString(cursor.getColumnIndex("ColumnValue")));
+                finalResult.add(this.getTicketData(cursor.getString(cursor.getColumnIndex("IncidentID"))));
             }
-            temporalTicket.setTicketDataList(ticketDataList);
-            finalResult.add(temporalTicket);
-        }*/
-
+            cursor.close();
+        }
+        //dexonDatabase.close();
         return finalResult;
+    }
+
+    public void deleteTicketTable() {
+        SQLiteDatabase database = dexonDatabase.getWritableDatabase();
+        database.delete(dexonDatabase.TICKET_TABLE, null, null);
+        //dexonDatabase.close();
     }
     //endregion
 

@@ -15,6 +15,9 @@ public interface ITicketService {
 
     TicketWrapperResponseDto getTicketData(Context context, TicketsRequestDto ticketFilter, int reloginCount);
 
+    void getTicketDataDB(Context context, TicketsRequestDto ticketFilter);
+
+
     //void getTicketInfo (String ticketID);
 
 }

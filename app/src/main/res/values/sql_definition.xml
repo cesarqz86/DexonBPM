@@ -21,9 +21,11 @@
     </string>
     <string name="sql_table_ticket">
         CREATE TABLE TicketInfo (
-            TicketID            NUMERIC PRIMARY KEY,
+            TicketID            TEXT,
+            IncidentID          TEXT,
             ColumnKey           TEXT,
-            ColumnValue         TEXT
+            ColumnValue         TEXT,
+            PRIMARY KEY (IncidentID, ColumnKey)
         );
     </string>
 

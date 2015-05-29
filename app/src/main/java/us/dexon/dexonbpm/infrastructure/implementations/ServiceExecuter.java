@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
@@ -155,6 +157,7 @@ public class ServiceExecuter {
 
         private Context currentContext;
         private ProgressDialog progressDialog;
+        private TicketsRequestDto ticketRequest;
 
         public ExecuteTicketService(Context context) {
             this.currentContext = context;
@@ -170,7 +173,8 @@ public class ServiceExecuter {
         @Override
         protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
-            return ticketService.getTicketData(this.currentContext, params[0], 1);
+            this.ticketRequest = params[0];
+            return ticketService.getTicketData(this.currentContext, this.ticketRequest, 1);
         }
 
         protected void onPostExecute(TicketWrapperResponseDto responseData) {
@@ -199,7 +203,7 @@ public class ServiceExecuter {
         }
     }
 
-    public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, TicketWrapperResponseDto> {
+    public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, Void> {
 
         private Context currentContext;
 
@@ -209,28 +213,18 @@ public class ServiceExecuter {
 
         @Override
         protected void onPreExecute() {
-
+            Log.i("GrabadoDB", "Inicio el proceso de guardado de la DB");
         }
 
         @Override
-        protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
+        protected Void doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
-            return ticketService.getTicketData(this.currentContext, params[0], 1);
+            ticketService.getTicketDataDB(this.currentContext, params[0]);
+            return null;
         }
 
-        protected void onPostExecute(TicketWrapperResponseDto responseData) {
-
-            if (responseData != null) {
-
-                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
-
-                if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
-                    if (incidentsActivity != null) {
-                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
-                        incidentsActivity.inidentsCallBack();
-                    }
-                }
-            }
+        protected void onPostExecute(Void result) {
+            Log.i("GrabadoDB", "Finalizo el proceso de guardado de la DB");
         }
     }
 }

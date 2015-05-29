@@ -7,13 +7,16 @@ import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,6 +35,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
     //private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter;
+    private boolean includeClose;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
     public ArrayList<TicketsResponseDto> ticketListData;
@@ -48,15 +52,24 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         registerForContextMenu(menuButton);
         menuButton.setOnClickListener(this);
 
-        currentTicketFilter = TicketFilter.AssignedTickets;
-
-        this.executeSearch();
+        this.currentTicketFilter = TicketFilter.AssignedTickets;
+        this.executeSearch(null);
 
         TextView asignadosBtn = (TextView) findViewById(R.id.asignados_btn);
         asignadosBtn.setOnClickListener(this);
 
         final EditText findDaemon = (EditText) findViewById(R.id.search_field);
-        findDaemon.addTextChangedListener(new TextWatcher() {
+        findDaemon.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    executeSearch(v.getText().toString());
+                }
+                return false;
+            }
+        });
+
+        /*findDaemon.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String wordTyped = findDaemon.getText().toString().trim();
                 //Hacer tratamiento ala palabra digitada
@@ -68,7 +81,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
 
-        });
+        });*/
+
 
     }
 
@@ -119,6 +133,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             case R.id.asignados_btn:
                 Intent incidentFilterActivity = new Intent(this, HomeActivity.class);
                 incidentFilterActivity.putExtra("CurrentFilter", this.currentTicketFilter.getCode());
+                incidentFilterActivity.putExtra("IncludeClose", this.includeClose);
                 this.startActivityForResult(incidentFilterActivity, FILTER_INCIDENT_CODE);
                 this.overridePendingTransition(R.anim.right_slide_in,
                         R.anim.right_slide_out);
@@ -132,9 +147,11 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         // check if the request code is same as what is passed here it is 1
         if (requestCode == FILTER_INCIDENT_CODE) {
             String filterText = data.getStringExtra("CurrentFilter");
+            boolean filterClose = data.getBooleanExtra("IncludeClose", false);
             this.currentTicketFilter = TicketFilter.GetValue(filterText);
             asignados_btn.setText(filterText);
-            this.executeSearch();
+            this.includeClose = filterClose;
+            this.executeSearch(null);
         }
     }
 
@@ -146,33 +163,38 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         this.startActivity(webIntent);
     }
 
-    private void executeSearch() {
+    private final void executeSearch(String filterText) {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
-        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-        TicketsRequestDto ticketFirstData = new TicketsRequestDto();
-        ticketFirstData.setIncludeClosedTickets(false);
-        ticketFirstData.setLoggedUser(loggedUser);
-        ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
-        ticketFirstData.setTicketsPerPage(50); // First type we will get only 100 tickets
-        //ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
+        if(filterText == null) {
+            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
-        ticketService.execute(ticketFirstData);
+            TicketsRequestDto ticketFirstData = new TicketsRequestDto();
+            ticketFirstData.setIncludeClosedTickets(this.includeClose);
+            ticketFirstData.setLoggedUser(loggedUser);
+            ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
+            ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
 
-        TicketsRequestDto ticketTotalData = new TicketsRequestDto();
-        ticketTotalData.setIncludeClosedTickets(false);
-        ticketTotalData.setLoggedUser(loggedUser);
-        ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
-        ticketTotalData.setTicketsPerPage(100); // Get all the tickets
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
+            ticketService.execute(ticketFirstData);
 
-        ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
-        totalTicketService.execute(ticketTotalData);
+            TicketsRequestDto ticketTotalData = new TicketsRequestDto();
+            ticketTotalData.setIncludeClosedTickets(this.includeClose);
+            ticketTotalData.setLoggedUser(loggedUser);
+            ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
+            ticketTotalData.setTicketsPerPage(0); // Get all the tickets
+            ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
+            totalTicketService.execute(ticketTotalData);
+        }
+        else {
+            this.ticketListData = dexonDatabase.getTicketData(filterText, null);
+            this.inidentsCallBack();
+        }
     }
 
-    public void inidentsCallBack(){
+    public void inidentsCallBack() {
         LinearLayout tableContainer = (LinearLayout) findViewById(R.id.table_container);
         tableContainer.removeAllViews();
         tableContainer.addView(new TableMainLayout(this, ticketListData));

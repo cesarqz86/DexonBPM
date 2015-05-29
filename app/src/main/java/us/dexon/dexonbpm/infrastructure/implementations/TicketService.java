@@ -107,6 +107,39 @@ public class TicketService implements ITicketService {
 
         return finalResponse;
     }
+
+    @Override
+    public void getTicketDataDB(Context context, TicketsRequestDto ticketFilter) {
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += TICKETS_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(ticketFilter, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            this.saveJsonToDB(jsonData);
+        } catch (HttpServerErrorException ex) {
+            Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                ticketFilter.setLoggedUser(loggedUser);
+                this.getTicketDataDB(context, ticketFilter);
+            }
+            Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            Log.e("CallingService: " + TICKETS_URL, ex.getMessage(), ex);
+        }
+    }
     //endregion
 
     //region Private Methods
@@ -125,8 +158,8 @@ public class TicketService implements ITicketService {
             HashMap<String, Object> ticketDataList;
             finalResponse = new ArrayList<>(arrayData.size());
             for (JsonElement ticketData : arrayData) {
-                ticketString =gsonSerializer.toJson(ticketData);
-                ticketResponseData =new TicketsResponseDto();
+                ticketString = gsonSerializer.toJson(ticketData);
+                ticketResponseData = new TicketsResponseDto();
                 ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
                 ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("TICKET")));
                 ticketResponseData.setIncidentID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));
@@ -136,6 +169,30 @@ public class TicketService implements ITicketService {
             }
         }
         return finalResponse;
+    }
+
+    private void saveJsonToDB(JsonElement jsonElement) throws IOException {
+        Gson gsonSerializer = new Gson();
+
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper jacksonSerializer = new ObjectMapper(factory);
+        TypeReference<HashMap<String, Object>> typeReference = new TypeReference<HashMap<String, Object>>() {
+        };
+        IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
+        if (jsonElement != null && jsonElement.isJsonArray()) {
+            JsonArray arrayData = jsonElement.getAsJsonArray();
+            String ticketString;
+            HashMap<String, Object> ticketDataList;
+            databaseWrapper.deleteTicketTable();
+            for (JsonElement ticketData : arrayData) {
+                ticketString = gsonSerializer.toJson(ticketData);
+                ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
+                String ticketID = String.valueOf(ticketDataList.get("TICKET"));
+                String incidentID = String.valueOf(ticketDataList.get("HD_INCIDENT_ID"));
+                ticketDataList.remove("TICKET");
+                databaseWrapper.saveTicketData(ticketID, incidentID, ticketDataList);
+            }
+        }
     }
     //endregion
 }
