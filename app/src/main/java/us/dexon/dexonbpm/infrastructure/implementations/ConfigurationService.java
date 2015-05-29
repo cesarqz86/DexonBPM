@@ -77,6 +77,7 @@ public class ConfigurationService {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(context);
         dexonDatabase.deleteUserTable();
+        dexonDatabase.deleteTicketTable();
     }
 
     //endregion

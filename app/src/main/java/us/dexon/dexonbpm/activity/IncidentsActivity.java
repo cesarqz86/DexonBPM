@@ -33,6 +33,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     //private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter;
     private boolean includeClose;
+    ServiceExecuter.ExecuteTicketTotalService totalTicketService;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
     public ArrayList<TicketsResponseDto> ticketListData;
@@ -84,6 +85,15 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();  // Always call the superclass method first
+
+        if (this.totalTicketService != null && !this.totalTicketService.isCancelled()) {
+            this.totalTicketService.cancel(true);
+        }
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -108,6 +118,9 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                 return true;
             case R.id.button2_menu_opt2:
                 // Delete the user info.
+                if (this.totalTicketService != null && !this.totalTicketService.isCancelled()) {
+                    this.totalTicketService.cancel(true);
+                }
                 ConfigurationService.deleteUserInfo(this);
                 Intent loginIntent = new Intent(this, LoginActivity.class);
                 this.startActivity(loginIntent);
@@ -182,8 +195,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             ticketTotalData.setLoggedUser(loggedUser);
             ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
             ticketTotalData.setTicketsPerPage(0); // Get all the tickets
-            ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
-            totalTicketService.execute(ticketTotalData);
+            this.totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
+            this.totalTicketService.execute(ticketTotalData);
         } else {
             this.ticketListData = dexonDatabase.getTicketData(filterText, null);
             this.inidentsCallBack();

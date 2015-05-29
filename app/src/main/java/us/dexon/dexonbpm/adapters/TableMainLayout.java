@@ -211,8 +211,8 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
     // generate table row of table C and table D
     private void generateTableC_AndTable_D() {
 
-        //int topCount = this.ticketListData.size() > 1000 ? 1000 : this.ticketListData.size();
-        int topCount = this.ticketListData.size();
+        int topCount = this.ticketListData.size() > 1000 ? 1000 : this.ticketListData.size();
+        //int topCount = this.ticketListData.size();
         int evenOddAux = 0;
         //for (TicketsResponseDto sampleObject : this.ticketListData) {
         while (evenOddAux < topCount) {
