@@ -118,9 +118,6 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
         this.horizontalScrollViewB.setBackgroundColor(Color.WHITE);
 
         this.shadow.setBackgroundResource(R.drawable.drawer_shadow);
-
-
-
     }
 
     // set essential component IDs
@@ -162,7 +159,6 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
         shadowParams.addRule(RelativeLayout.RIGHT_OF, this.tableA.getId());
         shadowParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         shadowParams.width = 50;
-
 
         // 'this' is a relative layout, 
         // we extend this table layout as relative layout as seen during the creation of this class
@@ -215,19 +211,21 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
     // generate table row of table C and table D
     private void generateTableC_AndTable_D() {
 
+        int topCount = this.ticketListData.size() > 500 ? 500 : this.ticketListData.size();
         int evenOddAux = 0;
-        for (TicketsResponseDto sampleObject : this.ticketListData) {
-
+        //for (TicketsResponseDto sampleObject : this.ticketListData) {
+        while (evenOddAux < topCount) {
+            TicketsResponseDto sampleObject = this.ticketListData.get(evenOddAux);
             TableRow tableRowForTableC = this.tableRowForTableC(sampleObject, evenOddAux);
             TableRow taleRowForTableD = this.taleRowForTableD(sampleObject, evenOddAux);
 
             tableRowForTableC.setBackgroundColor(Color.WHITE);
             taleRowForTableD.setBackgroundColor(Color.WHITE);
 
-            tableRowForTableC.setTag(R.id.title, sampleObject.getTicketID());
+            tableRowForTableC.setTag(R.id.title, sampleObject.getIncidentID());
             tableRowForTableC.setOnClickListener(TableMainLayout.this);
 
-            taleRowForTableD.setTag(R.id.title, sampleObject.getTicketID());
+            taleRowForTableD.setTag(R.id.title, sampleObject.getIncidentID());
             taleRowForTableD.setOnClickListener(TableMainLayout.this);
 
             this.tableC.addView(tableRowForTableC);
@@ -268,7 +266,7 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
     TextView bodyTextView(String label, int k) {
 
         TextView bodyTextView = (TextView) context.getLayoutInflater()
-                .inflate(((k & 1) == 0) ?   R.layout.row_odd :  R.layout.row_even, null);
+                .inflate(((k & 1) == 0) ? R.layout.row_odd : R.layout.row_even, null);
         bodyTextView.setText(label);
 
         return bodyTextView;
@@ -396,20 +394,17 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        //Log.i("TABLE_LAYOUT_EVENTS", "OnClickMethod");
         try {
             String id = (String) v.getTag(R.id.title);
             Intent ticketDetail = new Intent(context, TicketDetail.class);
-            ticketDetail.putExtra("TICKET_ID", id);
+            ticketDetail.putExtra("INCIDENT_ID", id);
             context.startActivity(ticketDetail);
             context.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
             Log.i("TABLE_LAYOUT_EVENTS", "Clicking on : " + id);
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
-
     }
 
     // horizontal scroll view custom class
@@ -451,6 +446,4 @@ public class TableMainLayout extends RelativeLayout implements View.OnClickListe
             }
         }
     }
-
-
 }

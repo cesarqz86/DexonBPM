@@ -12,6 +12,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
@@ -224,6 +225,13 @@ public class ServiceExecuter {
         }
 
         protected void onPostExecute(Void result) {
+            IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+            if (incidentsActivity != null) {
+                IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
+                incidentsActivity.ticketListData = databaseWrapper.getTicketData(null, null);
+                incidentsActivity.inidentsCallBack();
+            }
+
             Log.i("GrabadoDB", "Finalizo el proceso de guardado de la DB");
         }
     }

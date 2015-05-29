@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
@@ -16,7 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -145,7 +142,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // check if the request code is same as what is passed here it is 1
-        if (requestCode == FILTER_INCIDENT_CODE) {
+        if (requestCode == FILTER_INCIDENT_CODE && data != null) {
             String filterText = data.getStringExtra("CurrentFilter");
             boolean filterClose = data.getBooleanExtra("IncludeClose", false);
             this.currentTicketFilter = TicketFilter.GetValue(filterText);
@@ -167,7 +164,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
 
-        if(filterText == null) {
+        if (filterText == null) {
             LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
             TicketsRequestDto ticketFirstData = new TicketsRequestDto();
@@ -187,8 +184,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             ticketTotalData.setTicketsPerPage(0); // Get all the tickets
             ServiceExecuter.ExecuteTicketTotalService totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
             totalTicketService.execute(ticketTotalData);
-        }
-        else {
+        } else {
             this.ticketListData = dexonDatabase.getTicketData(filterText, null);
             this.inidentsCallBack();
         }
