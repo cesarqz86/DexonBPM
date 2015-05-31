@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -20,6 +22,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -233,6 +236,48 @@ public class ServiceExecuter {
             }
 
             Log.i("GrabadoDB", "Finalizo el proceso de guardado de la DB");
+        }
+    }
+
+    public class ExecuteFilter extends AsyncTask<String, Void, ArrayList<TicketsResponseDto>> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+
+        public ExecuteFilter(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<TicketsResponseDto> doInBackground(String... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            String filterText = params[0];
+            IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
+            databaseWrapper.setContext(this.currentContext);
+            return databaseWrapper.getTicketData(filterText, null);
+        }
+
+        protected void onPostExecute(ArrayList<TicketsResponseDto> responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+                if (incidentsActivity != null) {
+                    incidentsActivity.ticketListData = responseData;
+                    incidentsActivity.inidentsCallBack();
+                }
+            }
         }
     }
 }

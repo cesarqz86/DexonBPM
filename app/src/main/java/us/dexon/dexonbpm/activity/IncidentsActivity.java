@@ -61,7 +61,11 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    executeSearch(v.getText().toString());
+                    ServiceExecuter serviceExecuter = new ServiceExecuter();
+                    ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(v.getContext());
+                    filterService.execute(v.getText().toString());
+                    //executeSearch(v.getText().toString());
+                    //return true;
                 }
                 return false;
             }
@@ -173,7 +177,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         this.startActivity(webIntent);
     }
 
-    private final void executeSearch(String filterText) {
+    public final void executeSearch(String filterText) {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
 

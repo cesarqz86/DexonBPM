@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 /**
@@ -18,6 +19,6 @@ public interface ITicketService {
     void getTicketDataDB(Context context, TicketsRequestDto ticketFilter);
 
 
-    //void getTicketInfo (String ticketID);
+    void getTicketInfo (Context context, TicketDetailRequestDto ticketDetail, int reloginCount);
 
 }
