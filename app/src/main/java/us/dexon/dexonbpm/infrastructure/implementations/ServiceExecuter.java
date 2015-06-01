@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
@@ -269,17 +270,34 @@ public class ServiceExecuter {
                     this.incidentsActivity.originalTicketListData = originalList;
                 }
                 String filterText = params[0];
-                int indexSize = 0;
-                /*String[][] finalResult = new String[originalList.length][];
-                for (String[] dataValue : originalList) {
-                    if (indexSize != 0 && Arrays.asList(dataValue).contains(filterText)) {
-                        finalResult[indexSize] = dataValue;
-                        indexSize++;
-                    } else if (indexSize == 0) {
+                filterText = filterText == null ? "" : filterText.toLowerCase();
+                if (filterText.compareTo("") != 0) {
+                    List<String[]> tempResult = new ArrayList<>();
+                    int indexSize = 0;
+                    for (String[] dataValue : originalList) {
+                        if (indexSize != 0 && dataValue != null) {
+                            for (String dataTextValue : dataValue) {
+                                if (dataTextValue != null && dataTextValue.toLowerCase().contains(filterText)) {
+                                    tempResult.add(dataValue);
+                                    break;
+                                }
+                            }
+                            indexSize++;
+                        } else if (indexSize == 0) {
+                            tempResult.add(dataValue);
+                            indexSize++;
+                        }
+                    }
+                    String[][] finalResult = new String[tempResult.size()][];
+                    indexSize = 0;
+                    for (String[] dataValue : tempResult) {
                         finalResult[indexSize] = dataValue;
                         indexSize++;
                     }
-                }*/
+                    return finalResult;
+                } else {
+                    return originalList;
+                }
             }
             return null;
         }
@@ -290,11 +308,9 @@ public class ServiceExecuter {
                 this.progressDialog.dismiss();
             }
 
-            if (responseData != null) {
-                if (incidentsActivity != null) {
-                    incidentsActivity.ticketListData = responseData;
-                    incidentsActivity.inidentsCallBack();
-                }
+            if (responseData != null && incidentsActivity != null) {
+                incidentsActivity.ticketListData = responseData;
+                incidentsActivity.inidentsCallBack();
             }
         }
     }

@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     public String[][] originalTicketListData;
 
     private TextView asignados_btn;
+    public final Context currentContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +61,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     ServiceExecuter serviceExecuter = new ServiceExecuter();
-                    ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(v.getContext());
+                    ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(currentContext);
                     filterService.execute(v.getText().toString());
-                    //executeSearch(v.getText().toString());
-                    //return true;
                 }
                 return false;
             }
