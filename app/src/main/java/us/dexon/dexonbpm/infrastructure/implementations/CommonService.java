@@ -117,7 +117,7 @@ public class CommonService {
     public static ProgressDialog getCustomProgressDialog(Context context) {
         ProgressDialog dialog = new ProgressDialog(context);
         try {
-            dialog.show();
+            //dialog.show();
         } catch (WindowManager.BadTokenException e) {
 
         }

@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
@@ -193,12 +195,14 @@ public class ServiceExecuter {
 
                 if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
                     if (incidentsActivity != null) {
+                        incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
                         incidentsActivity.ticketListData = responseData.getTicketArrayData();
                         incidentsActivity.inidentsCallBack();
                     }
                 } else {
                     if (incidentsActivity != null) {
-                        incidentsActivity.ticketListData = null;
+                        incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
+                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
                         incidentsActivity.inidentsCallBack();
                     }
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
@@ -207,7 +211,7 @@ public class ServiceExecuter {
         }
     }
 
-    public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, Void> {
+    /*public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, Void> {
 
         private Context currentContext;
 
@@ -231,22 +235,24 @@ public class ServiceExecuter {
             IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
             if (incidentsActivity != null) {
                 IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
-                incidentsActivity.ticketListData = databaseWrapper.getTicketData(null, null);
+                //incidentsActivity.ticketListData = databaseWrapper.getTicketData(null, null);
                 incidentsActivity.inidentsCallBack();
             }
 
             Log.i("GrabadoDB", "Finalizo el proceso de guardado de la DB");
         }
-    }
+    }*/
 
-    public class ExecuteFilter extends AsyncTask<String, Void, ArrayList<TicketsResponseDto>> {
+    public class ExecuteFilter extends AsyncTask<String, Void, String[][]> {
 
         private Context currentContext;
         private ProgressDialog progressDialog;
+        private IncidentsActivity incidentsActivity;
 
         public ExecuteFilter(Context context) {
             this.currentContext = context;
             this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            this.incidentsActivity = (IncidentsActivity) this.currentContext;
             //this.progressDialog = new ProgressDialog(this.currentContext);
         }
 
@@ -256,23 +262,35 @@ public class ServiceExecuter {
         }
 
         @Override
-        protected ArrayList<TicketsResponseDto> doInBackground(String... params) {
-            ITicketService ticketService = TicketService.getInstance();
-            String filterText = params[0];
-            IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
-            databaseWrapper.setContext(this.currentContext);
-            return databaseWrapper.getTicketData(filterText, null);
+        protected String[][] doInBackground(String... params) {
+            if (this.incidentsActivity != null) {
+                String[][] originalList = this.incidentsActivity.originalTicketListData == null ? this.incidentsActivity.ticketListData : this.incidentsActivity.originalTicketListData;
+                if (this.incidentsActivity.originalTicketListData == null) {
+                    this.incidentsActivity.originalTicketListData = originalList;
+                }
+                String filterText = params[0];
+                int indexSize = 0;
+                /*String[][] finalResult = new String[originalList.length][];
+                for (String[] dataValue : originalList) {
+                    if (indexSize != 0 && Arrays.asList(dataValue).contains(filterText)) {
+                        finalResult[indexSize] = dataValue;
+                        indexSize++;
+                    } else if (indexSize == 0) {
+                        finalResult[indexSize] = dataValue;
+                        indexSize++;
+                    }
+                }*/
+            }
+            return null;
         }
 
-        protected void onPostExecute(ArrayList<TicketsResponseDto> responseData) {
+        protected void onPostExecute(String[][] responseData) {
 
             if (this.progressDialog != null && this.progressDialog.isShowing()) {
                 this.progressDialog.dismiss();
             }
 
             if (responseData != null) {
-
-                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
                 if (incidentsActivity != null) {
                     incidentsActivity.ticketListData = responseData;
                     incidentsActivity.inidentsCallBack();

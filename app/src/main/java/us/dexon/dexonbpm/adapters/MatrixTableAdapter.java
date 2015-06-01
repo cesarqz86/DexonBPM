@@ -15,9 +15,8 @@ import us.dexon.dexonbpm.R;
 
 public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
-	private final static int WIDTH_DIP = 200;
+	private final static int WIDTH_DIP = 150;
 	private final static int HEIGHT_DIP = 45;
-
 
 	private final LayoutInflater inflater;
 
@@ -27,8 +26,6 @@ public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
 	private final int width;
 	private final int height;
-
-
 
 	public MatrixTableAdapter(Context context) {
 		this(context, null);

@@ -15,7 +15,7 @@ public class TicketWrapperResponseDto {
     private String errorMessage;
 
     @Expose(serialize = false, deserialize = false)
-    private ArrayList<TicketsResponseDto> ticketArrayData;
+    private String[][] ticketArrayData;
     //endregion
 
     //region Properties
@@ -27,11 +27,11 @@ public class TicketWrapperResponseDto {
         this.errorMessage = errorMessage;
     }
 
-    public ArrayList<TicketsResponseDto> getTicketArrayData() {
+    public String[][] getTicketArrayData() {
         return ticketArrayData;
     }
 
-    public void setTicketArrayData(ArrayList<TicketsResponseDto> ticketArrayData) {
+    public void setTicketArrayData(String[][] ticketArrayData) {
         this.ticketArrayData = ticketArrayData;
     }
     //endregion

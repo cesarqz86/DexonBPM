@@ -14,8 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
@@ -25,7 +23,6 @@ import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
-import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
@@ -33,10 +30,10 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     //private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter;
     private boolean includeClose;
-    ServiceExecuter.ExecuteTicketTotalService totalTicketService;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
-    public ArrayList<TicketsResponseDto> ticketListData;
+    public String[][] ticketListData;
+    public String[][] originalTicketListData;
 
     private TextView asignados_btn;
 
@@ -76,10 +73,6 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     @Override
     protected void onStop() {
         super.onStop();  // Always call the superclass method first
-
-        if (this.totalTicketService != null && !this.totalTicketService.isCancelled()) {
-            this.totalTicketService.cancel(true);
-        }
     }
 
     @Override
@@ -107,9 +100,6 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                 return true;
             case R.id.button2_menu_opt2:
                 // Delete the user info.
-                if (this.totalTicketService != null && !this.totalTicketService.isCancelled()) {
-                    this.totalTicketService.cancel(true);
-                }
                 ConfigurationService.deleteUserInfo(this);
                 Intent loginIntent = new Intent(this, LoginActivity.class);
                 this.startActivity(loginIntent);
@@ -173,92 +163,20 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             ticketFirstData.setIncludeClosedTickets(this.includeClose);
             ticketFirstData.setLoggedUser(loggedUser);
             ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
-            ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
+            ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
 
             ServiceExecuter serviceExecuter = new ServiceExecuter();
             ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
             ticketService.execute(ticketFirstData);
-
-            TicketsRequestDto ticketTotalData = new TicketsRequestDto();
-            ticketTotalData.setIncludeClosedTickets(this.includeClose);
-            ticketTotalData.setLoggedUser(loggedUser);
-            ticketTotalData.setTicketFilterType(currentTicketFilter.getCode());
-            ticketTotalData.setTicketsPerPage(0); // Get all the tickets
-            this.totalTicketService = serviceExecuter.new ExecuteTicketTotalService(this);
-            this.totalTicketService.execute(ticketTotalData);
         } else {
-            this.ticketListData = dexonDatabase.getTicketData(filterText, null);
+            //this.ticketListData = dexonDatabase.getTicketData(filterText, null);
             this.inidentsCallBack();
         }
     }
 
     public void inidentsCallBack() {
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
-        MatrixTableAdapter<String> matrixTableAdapter = new MatrixTableAdapter<String>(this, new String[][] {
-                {
-                        "Header 1",
-                        "Header 2",
-                        "Header 3",
-                        "Header 4",
-                        "Header 5",
-                        "Header 6" },
-                {
-                        "Lorem",
-                        "sed",
-                        "do",
-                        "eiusmod",
-                        "tempor",
-                        "incididunt" },
-                {
-                        "ipsum",
-                        "irure",
-                        "occaecat",
-                        "enim",
-                        "laborum",
-                        "reprehenderit" },
-                {
-                        "dolor",
-                        "fugiat",
-                        "nulla",
-                        "reprehenderit",
-                        "laborum",
-                        "consequat" },
-                {
-                        "sit",
-                        "consequat",
-                        "laborum",
-                        "fugiat",
-                        "eiusmod",
-                        "enim" },
-                {
-                        "amet",
-                        "nulla",
-                        "Excepteur",
-                        "voluptate",
-                        "occaecat",
-                        "et" },
-                {
-                        "consectetur",
-                        "occaecat",
-                        "fugiat",
-                        "dolore",
-                        "consequat",
-                        "eiusmod" },
-                {
-                        "adipisicing",
-                        "fugiat",
-                        "Excepteur",
-                        "occaecat",
-                        "fugiat",
-                        "laborum" },
-                {
-                        "elit",
-                        "voluptate",
-                        "reprehenderit",
-                        "Excepteur",
-                        "fugiat",
-                        "nulla" },
-        });
+        MatrixTableAdapter<String> matrixTableAdapter = new MatrixTableAdapter<>(this, this.ticketListData);
         tableFixHeaders.setAdapter(matrixTableAdapter);
     }
 }

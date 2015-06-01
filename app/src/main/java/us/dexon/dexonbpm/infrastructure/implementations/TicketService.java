@@ -2,6 +2,7 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,6 +27,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
@@ -89,6 +95,7 @@ public class TicketService implements ITicketService {
             finalResponse.setTicketArrayData(this.convertJsonToTicketArray(jsonData));
         } catch (HttpServerErrorException ex) {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
+            finalResponse.setTicketArrayData(this.getEmptyData());
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
@@ -100,9 +107,11 @@ public class TicketService implements ITicketService {
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             }
+            finalResponse.setTicketArrayData(this.getEmptyData());
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
+            finalResponse.setTicketArrayData(this.getEmptyData());
             Log.e("CallingService: " + TICKETS_URL, ex.getMessage(), ex);
         }
 
@@ -142,8 +151,7 @@ public class TicketService implements ITicketService {
         }
     }
 
-    public void getTicketInfo (Context context, TicketDetailRequestDto ticketDetail, int reloginCount)
-    {
+    public void getTicketInfo(Context context, TicketDetailRequestDto ticketDetail, int reloginCount) {
         Gson gsonSerializer = new Gson();
         try {
             String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
@@ -182,29 +190,54 @@ public class TicketService implements ITicketService {
     //endregion
 
     //region Private Methods
-    private ArrayList<TicketsResponseDto> convertJsonToTicketArray(JsonElement jsonElement) throws IOException {
-        ArrayList<TicketsResponseDto> finalResponse = null;
+    private String[][] convertJsonToTicketArray(JsonElement jsonElement) throws IOException {
+        String[][] finalResponse = null;
         Gson gsonSerializer = new Gson();
 
         JsonFactory factory = new JsonFactory();
         ObjectMapper jacksonSerializer = new ObjectMapper(factory);
-        TypeReference<HashMap<String, Object>> typeReference = new TypeReference<HashMap<String, Object>>() {
+        TypeReference<LinkedHashMap<String, String>> typeReference = new TypeReference<LinkedHashMap<String, String>>() {
         };
         if (jsonElement != null && jsonElement.isJsonArray()) {
             JsonArray arrayData = jsonElement.getAsJsonArray();
             String ticketString;
-            TicketsResponseDto ticketResponseData;
-            HashMap<String, Object> ticketDataList;
-            finalResponse = new ArrayList<>(arrayData.size());
+            String[] ticketResponseData;
+            LinkedHashMap<String, String> ticketDataList;
+            LinkedHashMap<String, String> ticketDataListTemp;
+            int finalSize = arrayData.size() + 1;
+            finalResponse = new String[finalSize][];
+            int indexPosition = 0;
             for (JsonElement ticketData : arrayData) {
                 ticketString = gsonSerializer.toJson(ticketData);
-                ticketResponseData = new TicketsResponseDto();
-                ticketDataList = jacksonSerializer.readValue(ticketString, typeReference);
-                ticketResponseData.setTicketID(String.valueOf(ticketDataList.get("TICKET")));
-                ticketResponseData.setIncidentID(String.valueOf(ticketDataList.get("HD_INCIDENT_ID")));
-                ticketDataList.remove("TICKET");
-                ticketResponseData.setTicketDataList(ticketDataList);
-                finalResponse.add(ticketResponseData);
+                ticketDataListTemp = jacksonSerializer.readValue(ticketString, typeReference);
+
+                String ticketID = ticketDataListTemp.get("TICKET");
+                ticketDataListTemp.remove("TICKET");
+                ticketDataList = new LinkedHashMap<>();
+                ticketDataList.put("TICKET", ticketID);
+                ticketDataList.putAll(ticketDataListTemp);
+
+                ticketResponseData = ticketDataList.values().toArray(new String[0]);
+                if (indexPosition == 0) {
+                    finalResponse[indexPosition] = ticketDataList.keySet().toArray(new String[0]);
+                } else {
+                    finalResponse[indexPosition] = ticketResponseData;
+                }
+                indexPosition++;
+            }
+        }
+        return finalResponse;
+    }
+
+    private String[][] getEmptyData() {
+        String[][] finalResponse = new String[10][];
+        String[] headerRow = {"TICKET", "", "", "", ""};
+        String[] dataRow = {"", "", "", "", ""};
+        for (int index = 0; index < 10; index++) {
+            if (index == 0) {
+                finalResponse[index] = headerRow;
+            } else {
+                finalResponse[index] = dataRow;
             }
         }
         return finalResponse;
