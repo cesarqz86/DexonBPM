@@ -12,13 +12,13 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.adapters.TableMainLayout;
+import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
@@ -66,21 +66,6 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                 return false;
             }
         });
-
-        /*findDaemon.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {
-                String wordTyped = findDaemon.getText().toString().trim();
-                //Hacer tratamiento ala palabra digitada
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-        });*/
-
 
     }
 
@@ -204,8 +189,72 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     }
 
     public void inidentsCallBack() {
-        LinearLayout tableContainer = (LinearLayout) findViewById(R.id.table_container);
-        tableContainer.removeAllViews();
-        tableContainer.addView(new TableMainLayout(this, ticketListData));
+        TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
+        MatrixTableAdapter<String> matrixTableAdapter = new MatrixTableAdapter<String>(this, new String[][] {
+                {
+                        "Header 1",
+                        "Header 2",
+                        "Header 3",
+                        "Header 4",
+                        "Header 5",
+                        "Header 6" },
+                {
+                        "Lorem",
+                        "sed",
+                        "do",
+                        "eiusmod",
+                        "tempor",
+                        "incididunt" },
+                {
+                        "ipsum",
+                        "irure",
+                        "occaecat",
+                        "enim",
+                        "laborum",
+                        "reprehenderit" },
+                {
+                        "dolor",
+                        "fugiat",
+                        "nulla",
+                        "reprehenderit",
+                        "laborum",
+                        "consequat" },
+                {
+                        "sit",
+                        "consequat",
+                        "laborum",
+                        "fugiat",
+                        "eiusmod",
+                        "enim" },
+                {
+                        "amet",
+                        "nulla",
+                        "Excepteur",
+                        "voluptate",
+                        "occaecat",
+                        "et" },
+                {
+                        "consectetur",
+                        "occaecat",
+                        "fugiat",
+                        "dolore",
+                        "consequat",
+                        "eiusmod" },
+                {
+                        "adipisicing",
+                        "fugiat",
+                        "Excepteur",
+                        "occaecat",
+                        "fugiat",
+                        "laborum" },
+                {
+                        "elit",
+                        "voluptate",
+                        "reprehenderit",
+                        "Excepteur",
+                        "fugiat",
+                        "nulla" },
+        });
+        tableFixHeaders.setAdapter(matrixTableAdapter);
     }
 }
