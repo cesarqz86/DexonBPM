@@ -654,9 +654,9 @@ public class TableFixHeaders extends ViewGroup {
 				right = Math.min(width, sumArray(widths));
 				bottom = Math.min(height, sumArray(heights));
 				addShadow(shadows[0], widths[0], 0, widths[0] + shadowSize, bottom);
-				addShadow(shadows[1], 0, heights[0], right, heights[0] + shadowSize);
-				addShadow(shadows[2], right - shadowSize, 0, right, bottom);
-				addShadow(shadows[3], 0, bottom - shadowSize, right, bottom);
+				//addShadow(shadows[1], 0, heights[0], right, heights[0] + shadowSize);
+				//addShadow(shadows[2], right - shadowSize, 0, right, bottom);
+				//addShadow(shadows[3], 0, bottom - shadowSize, right, bottom);
 
 				headView = makeAndSetup(-1, -1, 0, 0, widths[0], heights[0]);
 

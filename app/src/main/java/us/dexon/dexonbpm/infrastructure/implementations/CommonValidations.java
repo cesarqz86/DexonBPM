@@ -45,5 +45,22 @@ public final class CommonValidations {
         finalResult = networkInfo != null && networkInfo.isConnected();
         return finalResult;
     }
+
+    public static boolean validateArrayNullOrEmpty(String[][] arrayData) {
+        boolean finalResult = false;
+        if (arrayData != null) {
+            if (arrayData.length <= 0) {
+                finalResult = true;
+            } else {
+                for (String[] internalData : arrayData) {
+                    if (internalData == null || (internalData != null && internalData.length <= 0)) {
+                        finalResult = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return finalResult;
+    }
     //endregion
 }

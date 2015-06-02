@@ -14,15 +14,19 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -37,7 +41,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     public String[][] originalTicketListData;
 
     private TextView asignados_btn;
-    private MatrixTableAdapter<String> matrixTableAdapter;
+    private MatrixTableAdapter matrixTableAdapter;
     public final Context currentContext = this;
 
     @Override
@@ -172,9 +176,13 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     }
 
     public void inidentsCallBack(String[][] dataList) {
+        if (CommonValidations.validateArrayNullOrEmpty(dataList)) {
+            ITicketService ticketService = TicketService.getInstance();
+            dataList = ticketService.getEmptyData();
+            //Toast.makeText(this, "EO Esta null", Toast.LENGTH_LONG).show();
+        }
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
-        this.matrixTableAdapter = new MatrixTableAdapter<>(this, dataList);
+        this.matrixTableAdapter = new MatrixTableAdapter(this, dataList);
         tableFixHeaders.setAdapter(this.matrixTableAdapter);
-        //tableFixHeaders.scrollBy(0, Integer.MAX_VALUE);
     }
 }

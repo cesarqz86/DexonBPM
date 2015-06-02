@@ -12,10 +12,8 @@ import android.widget.TextView;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
-import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
-public class MatrixTableAdapter<T> extends BaseTableAdapter {
+public class MatrixTableAdapter extends BaseTableAdapter {
 
     private final static int WIDTH_DIP = 150;
     private final static int HEIGHT_DIP = 45;
@@ -23,6 +21,14 @@ public class MatrixTableAdapter<T> extends BaseTableAdapter {
     private final LayoutInflater inflater;
 
     private final Context context;
+
+    private String headers[] = {
+            "TICKET",
+            "",
+            "",
+            "",
+            ""
+    };
 
     private String[][] table;
 
@@ -46,7 +52,11 @@ public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
     @Override
     public int getColumnCount() {
-        return this.table[0].length - 1;
+        if (this.table != null && this.table.length > 0) {
+            return this.table[0].length - 1;
+        } else {
+            return this.headers.length - 1; //this.table[0].length - 1;
+        }
     }
 
     @Override
