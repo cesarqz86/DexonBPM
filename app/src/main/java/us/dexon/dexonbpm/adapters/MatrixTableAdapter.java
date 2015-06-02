@@ -3,7 +3,6 @@ package us.dexon.dexonbpm.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,6 +12,8 @@ import android.widget.TextView;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
 public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
@@ -23,19 +24,19 @@ public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
     private final Context context;
 
-    private final T[][] table;
+    private String[][] table;
 
     private final int width;
     private final int height;
 
-    public MatrixTableAdapter(Context context, T[][] table) {
+    public MatrixTableAdapter(Context context, String[][] table) {
         this.context = context;
-        Resources r = context.getResources();
+        Resources r = this.context.getResources();
 
-        width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH_DIP, r.getDisplayMetrics()));
-        height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT_DIP, r.getDisplayMetrics()));
+        this.width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH_DIP, r.getDisplayMetrics()));
+        this.height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT_DIP, r.getDisplayMetrics()));
         this.table = table;
-        inflater = LayoutInflater.from(context);
+        this.inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -53,7 +54,6 @@ public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
         if (convertView == null) {
             convertView = inflater.inflate(getLayoutResource(row, column), parent, false);
-
             ((TextView) convertView).setGravity(Gravity.CENTER_VERTICAL);
         }
 

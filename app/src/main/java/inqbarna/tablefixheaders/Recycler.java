@@ -1,13 +1,13 @@
 package inqbarna.tablefixheaders;
 
-import android.view.View;
-
 import java.util.Stack;
+
+import android.view.View;
 
 /**
  * The Recycler facilitates reuse of views across layouts.
- * 
- * @author Brais Gab�n (InQBarna)
+ *
+ * @author Brais Gabín (InQBarna)
  */
 public class Recycler {
 
@@ -15,7 +15,7 @@ public class Recycler {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param size
 	 *            The number of types of view to recycle.
 	 */
@@ -30,7 +30,7 @@ public class Recycler {
 	/**
 	 * Add a view to the Recycler. This view may be reused in the function
 	 * {@link #getRecycledView(int)}
-	 * 
+	 *
 	 * @param view
 	 *            A view to add to the Recycler. It can no longer be used.
 	 * @param type
@@ -42,7 +42,7 @@ public class Recycler {
 
 	/**
 	 * Returns, if exists, a view of the type <code>typeView</code>.
-	 * 
+	 *
 	 * @param typeView
 	 *            the type of view that you want.
 	 * @return a view of the type <code>typeView</code>. <code>null</code> if

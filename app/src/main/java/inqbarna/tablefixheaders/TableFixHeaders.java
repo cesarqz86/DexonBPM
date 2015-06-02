@@ -1,8 +1,12 @@
 package inqbarna.tablefixheaders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.os.Build;
@@ -15,17 +19,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Scroller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import inqbarna.tablefixheaders.adapters.TableAdapter;
+
 import us.dexon.dexonbpm.R;
 
 /**
  * This view shows a table which can scroll in both directions. Also still
  * leaves the headers fixed.
- * 
- * @author Brais Gab�n (InQBarna)
+ *
+ * @author Brais Gabín (InQBarna)
  */
 public class TableFixHeaders extends ViewGroup {
 	private int currentX;
@@ -70,7 +72,7 @@ public class TableFixHeaders extends ViewGroup {
 
 	/**
 	 * Simple constructor to use when creating a view from code.
-	 * 
+	 *
 	 * @param context
 	 *            The Context the view is running in, through which it can
 	 *            access the current theme, resources, etc.
@@ -85,10 +87,10 @@ public class TableFixHeaders extends ViewGroup {
 	 * that were specified in the XML file. This version uses a default style of
 	 * 0, so the only attribute values applied are those in the Context's Theme
 	 * and the given AttributeSet.
-	 * 
+	 *
 	 * The method onFinishInflate() will be called after all children have been
 	 * added.
-	 * 
+	 *
 	 * @param context
 	 *            The Context the view is running in, through which it can
 	 *            access the current theme, resources, etc.
@@ -122,11 +124,25 @@ public class TableFixHeaders extends ViewGroup {
 		this.touchSlop = configuration.getScaledTouchSlop();
 		this.minimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		this.maximumVelocity = configuration.getScaledMaximumFlingVelocity();
+
+		this.setWillNotDraw(false);
+
+		final TypedArray a = context.obtainStyledAttributes(R.styleable.View);
+		try {
+			//initializeScrollbars(a);
+		} finally {
+			if (a != null) {
+				a.recycle();
+			}
+		}
+
+		this.setHorizontalScrollBarEnabled(true);
+		this.setVerticalScrollBarEnabled(true);
 	}
 
 	/**
 	 * Returns the adapter currently associated with this widget.
-	 * 
+	 *
 	 * @return The adapter used to provide this view's content.
 	 */
 	public TableAdapter getAdapter() {
@@ -135,7 +151,7 @@ public class TableFixHeaders extends ViewGroup {
 
 	/**
 	 * Sets the data behind this TableFixHeaders.
-	 * 
+	 *
 	 * @param adapter
 	 *            The TableAdapter which is responsible for maintaining the data
 	 *            backing this list and for producing a view to represent an
@@ -330,6 +346,72 @@ public class TableFixHeaders extends ViewGroup {
 		repositionViews();
 
 		shadowsVisibility();
+
+		awakenScrollBars();
+	}
+
+	/*
+	 * The expected value is: percentageOfViewScrolled * computeHorizontalScrollRange()
+	 */
+	@Override
+	protected int computeHorizontalScrollExtent() {
+		final float tableSize = width - widths[0];
+		final float contentSize = sumArray(widths) - widths[0];
+		final float percentageOfVisibleView = tableSize / contentSize;
+
+		return Math.round(percentageOfVisibleView * tableSize);
+	}
+
+	/*
+	 * The expected value is between 0 and computeHorizontalScrollRange() - computeHorizontalScrollExtent()
+	 */
+	@Override
+	protected int computeHorizontalScrollOffset() {
+		final float maxScrollX = sumArray(widths) - width;
+		final float percentageOfViewScrolled = getActualScrollX() / maxScrollX;
+		final int maxHorizontalScrollOffset = width - widths[0] - computeHorizontalScrollExtent();
+
+		return widths[0] + Math.round(percentageOfViewScrolled * maxHorizontalScrollOffset);
+	}
+
+	/*
+	 * The base measure
+	 */
+	@Override
+	protected int computeHorizontalScrollRange() {
+		return width;
+	}
+
+	/*
+	 * The expected value is: percentageOfViewScrolled * computeVerticalScrollRange()
+	 */
+	@Override
+	protected int computeVerticalScrollExtent() {
+		final float tableSize = height - heights[0];
+		final float contentSize = sumArray(heights) - heights[0];
+		final float percentageOfVisibleView = tableSize / contentSize;
+
+		return Math.round(percentageOfVisibleView * tableSize);
+	}
+
+	/*
+	 * The expected value is between 0 and computeVerticalScrollRange() - computeVerticalScrollExtent()
+	 */
+	@Override
+	protected int computeVerticalScrollOffset() {
+		final float maxScrollY = sumArray(heights) - height;
+		final float percentageOfViewScrolled = getActualScrollY() / maxScrollY;
+		final int maxHorizontalScrollOffset = height - heights[0] - computeVerticalScrollExtent();
+
+		return heights[0] + Math.round(percentageOfViewScrolled * maxHorizontalScrollOffset);
+	}
+
+	/*
+	 * The base measure
+	 */
+	@Override
+	protected int computeVerticalScrollRange() {
+		return height;
 	}
 
 	public int getActualScrollX() {

@@ -196,7 +196,7 @@ public class ServiceExecuter {
                 if (incidentsActivity != null) {
                     incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
                     incidentsActivity.ticketListData = responseData.getTicketArrayData();
-                    incidentsActivity.inidentsCallBack();
+                    incidentsActivity.inidentsCallBack(responseData.getTicketArrayData());
                 }
 
                 if ((responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty())) {
@@ -304,7 +304,7 @@ public class ServiceExecuter {
 
             if (responseData != null && incidentsActivity != null) {
                 incidentsActivity.ticketListData = responseData;
-                incidentsActivity.inidentsCallBack();
+                incidentsActivity.inidentsCallBack(responseData);
             }
         }
     }

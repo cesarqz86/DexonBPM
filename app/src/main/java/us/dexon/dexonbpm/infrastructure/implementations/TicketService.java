@@ -2,7 +2,6 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
 import android.util.Log;
-import android.util.Pair;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,21 +23,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
-import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -56,6 +49,7 @@ public class TicketService implements ITicketService {
 
     private static String TICKETS_URL = "api/Incident/GetTickets";
     private static String TICKET_URL = "api/Incident/GetTicket";
+    private int columnCount = 6;
     //endregion
 
     //region Properties
@@ -113,6 +107,10 @@ public class TicketService implements ITicketService {
             finalResponse.setErrorMessage(ex.getMessage());
             finalResponse.setTicketArrayData(this.getEmptyData());
             Log.e("CallingService: " + TICKETS_URL, ex.getMessage(), ex);
+        }
+
+        if (finalResponse.getTicketArrayData() == null) {
+            finalResponse.setTicketArrayData(this.getEmptyData());
         }
 
         return finalResponse;
@@ -220,6 +218,7 @@ public class TicketService implements ITicketService {
                 ticketResponseData = ticketDataList.values().toArray(new String[0]);
                 if (indexPosition == 0) {
                     finalResponse[indexPosition] = ticketDataList.keySet().toArray(new String[0]);
+                    columnCount = finalResponse[indexPosition].length;
                     indexPosition++;
                 }
                 finalResponse[indexPosition] = ticketResponseData;
@@ -231,13 +230,18 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    private String[][] getEmptyData() {
-        String[][] finalResponse = new String[][]{
-                {"", "", "", "", "", ""},
-                {"", "", "", "", "", ""},
-                {"", "", "", "", "", ""},
-        };
+    public String[][] getEmptyData() {
+        String[][] finalResponse = new String[10][];
+        String[] headerRow = {"TICKET", " ", " ", " ", " "};
+        String[] dataRow = {" ", " ", " ", " ", " "};
 
+        for (int index = 0; index < finalResponse.length; index++) {
+            if (index == 0) {
+                finalResponse[index] = headerRow;
+            } else {
+                finalResponse[index] = dataRow;
+            }
+        }
         return finalResponse;
     }
 

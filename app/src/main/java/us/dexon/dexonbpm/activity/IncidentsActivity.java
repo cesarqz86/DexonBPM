@@ -29,7 +29,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
 
     //private TableLayout tbl_incidents;
-    private TicketFilter currentTicketFilter;
+    private TicketFilter currentTicketFilter = TicketFilter.AssignedTickets;
     private boolean includeClose;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
 
@@ -37,6 +37,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     public String[][] originalTicketListData;
 
     private TextView asignados_btn;
+    private MatrixTableAdapter<String> matrixTableAdapter;
     public final Context currentContext = this;
 
     @Override
@@ -50,7 +51,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         menuButton.setOnClickListener(this);
 
         this.currentTicketFilter = TicketFilter.AssignedTickets;
-        this.executeSearch(null);
+        this.executeSearch();
 
         TextView asignadosBtn = (TextView) findViewById(R.id.asignados_btn);
         asignadosBtn.setOnClickListener(this);
@@ -136,11 +137,12 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         // check if the request code is same as what is passed here it is 1
         if (requestCode == FILTER_INCIDENT_CODE && data != null) {
             String filterText = data.getStringExtra("CurrentFilter");
+            asignados_btn.setText(filterText);
+
             boolean filterClose = data.getBooleanExtra("IncludeClose", false);
             this.currentTicketFilter = TicketFilter.GetValue(filterText);
-            asignados_btn.setText(filterText);
             this.includeClose = filterClose;
-            this.executeSearch(null);
+            this.executeSearch();
         }
     }
 
@@ -152,31 +154,27 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         this.startActivity(webIntent);
     }
 
-    public final void executeSearch(String filterText) {
+    public final void executeSearch() {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
 
-        if (filterText == null) {
-            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-            TicketsRequestDto ticketFirstData = new TicketsRequestDto();
-            ticketFirstData.setIncludeClosedTickets(this.includeClose);
-            ticketFirstData.setLoggedUser(loggedUser);
-            ticketFirstData.setTicketFilterType(currentTicketFilter.getCode());
-            ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
+        TicketsRequestDto ticketFirstData = new TicketsRequestDto();
+        ticketFirstData.setIncludeClosedTickets(this.includeClose);
+        ticketFirstData.setLoggedUser(loggedUser);
+        ticketFirstData.setTicketFilterType(this.currentTicketFilter.getCode());
+        ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
 
-            ServiceExecuter serviceExecuter = new ServiceExecuter();
-            ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
-            ticketService.execute(ticketFirstData);
-        } else {
-            //this.ticketListData = dexonDatabase.getTicketData(filterText, null);
-            this.inidentsCallBack();
-        }
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
+        ticketService.execute(ticketFirstData);
     }
 
-    public void inidentsCallBack() {
+    public void inidentsCallBack(String[][] dataList) {
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
-        MatrixTableAdapter<String> matrixTableAdapter = new MatrixTableAdapter<>(this, this.ticketListData);
-        tableFixHeaders.setAdapter(matrixTableAdapter);
+        this.matrixTableAdapter = new MatrixTableAdapter<>(this, dataList);
+        tableFixHeaders.setAdapter(this.matrixTableAdapter);
+        //tableFixHeaders.scrollBy(0, Integer.MAX_VALUE);
     }
 }
