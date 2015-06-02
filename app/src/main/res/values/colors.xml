@@ -17,5 +17,8 @@
 
     <color name="shadow_start">#80000000</color>
     <color name="shadow_end">#00000000</color>
+    <color name="gray_tab_button">#89878b</color>
+    <color name="light_green">#4baa2b</color>
+    <color name="light_green_tranparent">#664baa2b</color>
 
 </resources>
