@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -201,7 +202,7 @@ public class ServiceExecuter {
         }
     }
 
-    /*public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, Void> {
+    public class ExecuteTicketTotalService extends AsyncTask<TicketsRequestDto, Void, TicketWrapperResponseDto> {
 
         private Context currentContext;
 
@@ -211,27 +212,27 @@ public class ServiceExecuter {
 
         @Override
         protected void onPreExecute() {
-            Log.i("GrabadoDB", "Inicio el proceso de guardado de la DB");
         }
 
         @Override
-        protected Void doInBackground(TicketsRequestDto... params) {
+        protected TicketWrapperResponseDto doInBackground(TicketsRequestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
-            ticketService.getTicketDataDB(this.currentContext, params[0]);
-            return null;
+            return ticketService.getTicketData(this.currentContext, params[0], 1);
         }
 
-        protected void onPostExecute(Void result) {
-            IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
-            if (incidentsActivity != null) {
-                IDexonDatabaseWrapper databaseWrapper = DexonDatabaseWrapper.getInstance();
-                //incidentsActivity.ticketListData = databaseWrapper.getTicketData(null, null);
-                incidentsActivity.inidentsCallBack();
+        protected void onPostExecute(TicketWrapperResponseDto responseData) {
+
+            if (responseData != null) {
+
+                IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+                if (incidentsActivity != null && !CommonValidations.validateArrayNullOrEmpty(responseData.getTicketArrayData())) {
+                    incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
+                    incidentsActivity.ticketListData = responseData.getTicketArrayData();
+                    incidentsActivity.inidentsCallBack(responseData.getTicketArrayData());
+                }
             }
-
-            Log.i("GrabadoDB", "Finalizo el proceso de guardado de la DB");
         }
-    }*/
+    }
 
     public class ExecuteFilter extends AsyncTask<String, Void, String[][]> {
 
