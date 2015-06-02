@@ -193,19 +193,13 @@ public class ServiceExecuter {
             if (responseData != null) {
 
                 IncidentsActivity incidentsActivity = (IncidentsActivity) this.currentContext;
+                if (incidentsActivity != null) {
+                    incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
+                    incidentsActivity.ticketListData = responseData.getTicketArrayData();
+                    incidentsActivity.inidentsCallBack();
+                }
 
-                if (responseData.getErrorMessage() == null || (responseData.getErrorMessage() != null && responseData.getErrorMessage().isEmpty())) {
-                    if (incidentsActivity != null) {
-                        incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
-                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
-                        incidentsActivity.inidentsCallBack();
-                    }
-                } else {
-                    if (incidentsActivity != null) {
-                        incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
-                        incidentsActivity.ticketListData = responseData.getTicketArrayData();
-                        incidentsActivity.inidentsCallBack();
-                    }
+                if ((responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty())) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
                 }
             }

@@ -220,26 +220,24 @@ public class TicketService implements ITicketService {
                 ticketResponseData = ticketDataList.values().toArray(new String[0]);
                 if (indexPosition == 0) {
                     finalResponse[indexPosition] = ticketDataList.keySet().toArray(new String[0]);
-                } else {
-                    finalResponse[indexPosition] = ticketResponseData;
+                    indexPosition++;
                 }
+                finalResponse[indexPosition] = ticketResponseData;
                 indexPosition++;
             }
+        } else {
+            finalResponse = this.getEmptyData();
         }
         return finalResponse;
     }
 
     private String[][] getEmptyData() {
-        String[][] finalResponse = new String[10][];
-        String[] headerRow = {"TICKET", "", "", "", ""};
-        String[] dataRow = {"", "", "", "", ""};
-        for (int index = 0; index < 10; index++) {
-            if (index == 0) {
-                finalResponse[index] = headerRow;
-            } else {
-                finalResponse[index] = dataRow;
-            }
-        }
+        String[][] finalResponse = new String[][]{
+                {"", "", "", "", "", ""},
+                {"", "", "", "", "", ""},
+                {"", "", "", "", "", ""},
+        };
+
         return finalResponse;
     }
 

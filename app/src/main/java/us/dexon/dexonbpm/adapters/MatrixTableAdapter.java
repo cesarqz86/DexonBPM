@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,99 +16,90 @@ import us.dexon.dexonbpm.R;
 
 public class MatrixTableAdapter<T> extends BaseTableAdapter {
 
-	private final static int WIDTH_DIP = 150;
-	private final static int HEIGHT_DIP = 45;
+    private final static int WIDTH_DIP = 150;
+    private final static int HEIGHT_DIP = 45;
 
-	private final LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
-	private final Context context;
+    private final Context context;
 
-	private T[][] table;
+    private final T[][] table;
 
-	private final int width;
-	private final int height;
+    private final int width;
+    private final int height;
 
-	public MatrixTableAdapter(Context context) {
-		this(context, null);
-	}
+    public MatrixTableAdapter(Context context, T[][] table) {
+        this.context = context;
+        Resources r = context.getResources();
 
-	public MatrixTableAdapter(Context context, T[][] table) {
-		this.context = context;
-		Resources r = context.getResources();
+        width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH_DIP, r.getDisplayMetrics()));
+        height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT_DIP, r.getDisplayMetrics()));
+        this.table = table;
+        inflater = LayoutInflater.from(context);
+    }
 
-		width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WIDTH_DIP, r.getDisplayMetrics()));
-		height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT_DIP, r.getDisplayMetrics()));
+    @Override
+    public int getRowCount() {
+        return this.table.length - 1;
+    }
 
-		setInformation(table);
-		inflater = LayoutInflater.from(context);
-	}
+    @Override
+    public int getColumnCount() {
+        return this.table[0].length - 1;
+    }
 
-	public void setInformation(T[][] table) {
-		this.table = table;
-	}
+    @Override
+    public View getView(int row, int column, View convertView, ViewGroup parent) {
 
-	@Override
-	public int getRowCount() {
-		return table.length - 1;
-	}
+        if (convertView == null) {
+            convertView = inflater.inflate(getLayoutResource(row, column), parent, false);
 
-	@Override
-	public int getColumnCount() {
-		return table[0].length - 1;
-	}
+            ((TextView) convertView).setGravity(Gravity.CENTER_VERTICAL);
+        }
 
-	@Override
-	public View getView(int row, int column, View convertView, ViewGroup parent) {
+        ((TextView) convertView).setText(table[row + 1][column + 1].toString());
+        return convertView;
+    }
 
-		if (convertView == null) {
-			convertView = inflater.inflate(getLayoutResource(row, column), parent, false);
+    @Override
+    public int getHeight(int row) {
+        return height;
+    }
 
-			((TextView) convertView).setGravity(Gravity.CENTER_VERTICAL);
-		}
+    @Override
+    public int getWidth(int column) {
+        return width;
+    }
 
-		((TextView) convertView).setText(table[row + 1][column + 1].toString());
-		return convertView;
-	}
+    public int getLayoutResource(int row, int column) {
+        final int layoutResource;
+        switch (getItemViewType(row, column)) {
+            case 0:
+                layoutResource = R.layout.row_header;
+                break;
+            case 1:
+                layoutResource = R.layout.row_odd;
+                break;
+            case 2:
+                layoutResource = R.layout.row_even;
+                break;
+            default:
+                throw new RuntimeException("");
+        }
+        return layoutResource;
+    }
 
-	@Override
-	public int getHeight(int row) {
-		return height;
-	}
+    @Override
+    public int getItemViewType(int row, int column) {
+        if (row < 0) {
+            return 0;
+        } else {
+            return (row & 1) == 0 ? 1 : 2;
+        }
+    }
 
-	@Override
-	public int getWidth(int column) {
-		return width;
-	}
-
-	public int getLayoutResource(int row, int column) {
-		final int layoutResource;
-		switch (getItemViewType(row, column)) {
-			case 0:
-				layoutResource = R.layout.row_header;
-				break;
-			case 1:
-				layoutResource = R.layout.row_odd;
-				break;
-			case 2:
-				layoutResource = R.layout.row_even;
-				break;
-			default:
-				throw new RuntimeException("");
-		}
-		return layoutResource;
-	}
-
-	@Override
-	public int getItemViewType(int row, int column) {
-		if (row < 0) {
-			return 0;
-		} else {
-			return (row & 1) == 0 ? 1 : 2;
-		}
-	}
-
-	@Override
-	public int getViewTypeCount() {
-		return 3;
-	}
+    @Override
+    public int getViewTypeCount() {
+        return 3;
+    }
 }
