@@ -5,19 +5,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
-import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
@@ -25,7 +20,6 @@ import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
-import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -169,6 +163,7 @@ public class ServiceExecuter {
         public ExecuteTicketService(Context context) {
             this.currentContext = context;
             this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
             //this.progressDialog = new ProgressDialog(this.currentContext);
         }
 
@@ -196,10 +191,10 @@ public class ServiceExecuter {
                 if (incidentsActivity != null) {
                     incidentsActivity.originalTicketListData = responseData.getTicketArrayData();
                     incidentsActivity.ticketListData = responseData.getTicketArrayData();
-                    incidentsActivity.inidentsCallBack();
+                    incidentsActivity.inidentsCallBack(responseData.getTicketArrayData());
                 }
 
-                if ((responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty())) {
+                if ((responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) || CommonValidations.validateArrayNullOrEmpty(responseData.getTicketArrayData())) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
                 }
             }
@@ -304,7 +299,7 @@ public class ServiceExecuter {
 
             if (responseData != null && incidentsActivity != null) {
                 incidentsActivity.ticketListData = responseData;
-                incidentsActivity.inidentsCallBack();
+                incidentsActivity.inidentsCallBack(responseData);
             }
         }
     }

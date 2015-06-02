@@ -18,6 +18,7 @@ public interface ITicketService {
 
     void getTicketDataDB(Context context, TicketsRequestDto ticketFilter);
 
+    String[][] getEmptyData();
 
     void getTicketInfo (Context context, TicketDetailRequestDto ticketDetail, int reloginCount);
 
