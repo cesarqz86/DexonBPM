@@ -5,10 +5,11 @@ package us.dexon.dexonbpm.infrastructure.enums;
  */
 public enum TicketFilter {
 
-    ColaboratedTickets(1, "Colaborando"),
-    CreatedTickets(2, "Creados"),
-    RelatedTickets(3, "Relacionados"),
-    AssignedTickets(4, "Asignados"),
+    ColaboratedTickets(0, "Colaborando"),
+    CreatedTickets(1, "Creados"),
+    RelatedTickets(2, "Relacionados"),
+    AssignedTickets(3, "Asignados"),
+    WorkflowTickets (4, "Flujos"),
     None(5, "Ninguno");
 
     private int code;
