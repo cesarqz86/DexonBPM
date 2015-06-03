@@ -1,7 +1,8 @@
 package us.dexon.dexonbpm.adapters;
 
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -12,15 +13,16 @@ import android.widget.TextView;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.ForgotPasswordActivity;
 
-public class MatrixTableAdapter extends BaseTableAdapter {
+public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClickListener{
 
     private final static int WIDTH_DIP = 150;
     private final static int HEIGHT_DIP = 45;
 
     private final LayoutInflater inflater;
 
-    private final Context context;
+    private final Activity context;
 
     private String headers[] = {
             "TICKET",
@@ -35,7 +37,7 @@ public class MatrixTableAdapter extends BaseTableAdapter {
     private final int width;
     private final int height;
 
-    public MatrixTableAdapter(Context context, String[][] table) {
+    public MatrixTableAdapter(Activity context, String[][] table) {
         this.context = context;
         Resources r = this.context.getResources();
 
@@ -111,5 +113,15 @@ public class MatrixTableAdapter extends BaseTableAdapter {
     @Override
     public int getViewTypeCount() {
         return 3;
+    }
+
+    @Override
+    public void onClick(View v) {
+        String idTag = (String)v.getTag(R.string.tag_id_ticket);
+        Intent forgotPassIntent = new Intent(context, ForgotPasswordActivity.class);
+        forgotPassIntent.putExtra("TICKET_ID", idTag);
+        context.startActivity(forgotPassIntent);
+        context.overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
     }
 }

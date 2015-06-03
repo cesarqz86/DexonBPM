@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
@@ -168,11 +167,20 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ticketFirstData.setIncludeClosedTickets(this.includeClose);
         ticketFirstData.setLoggedUser(loggedUser);
         ticketFirstData.setTicketFilterType(this.currentTicketFilter.getCode());
-        ticketFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
+        ticketFirstData.setTicketsPerPage(100); // First type we will get only 100 tickets
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketService ticketService = serviceExecuter.new ExecuteTicketService(this);
         ticketService.execute(ticketFirstData);
+
+        TicketsRequestDto ticketTotalFirstData = new TicketsRequestDto();
+        ticketTotalFirstData.setIncludeClosedTickets(this.includeClose);
+        ticketTotalFirstData.setLoggedUser(loggedUser);
+        ticketTotalFirstData.setTicketFilterType(this.currentTicketFilter.getCode());
+        ticketTotalFirstData.setTicketsPerPage(0); // First type we will get only 100 tickets
+
+        ServiceExecuter.ExecuteTicketTotalService ticketTotalService = serviceExecuter.new ExecuteTicketTotalService(this);
+        ticketTotalService.execute(ticketTotalFirstData);
     }
 
     public void inidentsCallBack(String[][] dataList) {
