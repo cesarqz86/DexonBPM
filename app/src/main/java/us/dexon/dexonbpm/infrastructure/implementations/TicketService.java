@@ -321,6 +321,9 @@ public class TicketService implements ITicketService {
                     if (tempData.has("is_hidden") && !tempData.get("is_hidden").getAsBoolean()) {
                         TicketDetailDataDto tempDataList = new TicketDetailDataDto();
                         RenderControlType controlType = RenderControlType.values()[tempData.get("render_ctl").getAsInt()];
+                        if (headerInfoData.getKey().equals("current_technician")) {
+                            controlType = RenderControlType.DXControlsGridWithOptions;
+                        }
                         tempDataList.setFieldType(controlType);
                         tempDataList.setFieldName(tempData.get("display_name").getAsString());
                         tempDataList.setFieldKey(headerInfoData.getKey());

@@ -18,6 +18,9 @@
     <string name="btn_changepass_text">ACEPTAR</string>
     <string name="btn_cancel_text">Cancelar</string>
     <string name="btn_ok_text">Aceptar</string>
+    <string name="btn_setmanual_technician_text">Manual</string>
+    <string name="btn_setautomatic_technician_text">Automatic</string>
+    <string name="btn_settome_technician_text">To me</string>
 
     <!-- Label Texts -->
     <string name="txt_forgot_password_label">Digite su usuario o email, se le enviará un correo con su contraseña nueva.</string>

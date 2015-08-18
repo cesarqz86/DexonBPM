@@ -40,8 +40,7 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
         RenderControlType controlType = values.get(position).getFieldType();
         switch (controlType) {
             case DXControlsGrid:
-            case DXControlsTree:
-            case DXControlsGridWithOptions: {
+            case DXControlsTree: {
                 rowView = inflater.inflate(R.layout.item_detailticket_tree, parent, false);
                 TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                 TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
@@ -66,6 +65,16 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(values.get(position).getFieldName());
                 txt_fieldvalue.setText(dateString);
+                break;
+            }
+            case DXControlsGridWithOptions: {
+                rowView = inflater.inflate(R.layout.item_detailticket_technician, parent, false);
+
+                TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+
+                txt_fieldtitle.setText(values.get(position).getFieldName());
+                txt_fieldvalue.setText(values.get(position).getFieldValue());
                 break;
             }
             default: {
