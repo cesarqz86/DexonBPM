@@ -47,7 +47,7 @@
 
         <Button
             android:id="@+id/btn_setmanual_technician"
-            style="@style/buttons_style_technician"
+            style="@style/buttons_style_technician_left"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -55,7 +55,7 @@
 
         <Button
             android:id="@+id/btn_setautomatic_technician"
-            style="@style/buttons_style_technician"
+            style="@style/buttons_style_technician_middle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -63,7 +63,7 @@
 
         <Button
             android:id="@+id/btn_settome_technician"
-            style="@style/buttons_style_technician"
+            style="@style/buttons_style_technician_right"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

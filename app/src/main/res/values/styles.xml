@@ -22,8 +22,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-
-
     <style name="textfield_style_1">
         <item name="android:background">@drawable/txt_border_style</item>
         <item name="android:textColor">@color/white</item>
@@ -42,10 +40,28 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="buttons_style_technician">
-        <item name="android:background">@drawable/whiteblue_btn_style2</item>
+    <style name="buttons_style_technician_left">
+        <item name="android:background">@drawable/technician_btn_style</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/blue_buttons</item>
+        <item name="android:textColor">@color/btn_technician_color</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="buttons_style_technician_middle">
+        <item name="android:background">@drawable/technician_btn_style2</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/btn_technician_color</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="buttons_style_technician_right">
+        <item name="android:background">@drawable/technician_btn_style3</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/btn_technician_color</item>
         <item name="android:textSize">10sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
