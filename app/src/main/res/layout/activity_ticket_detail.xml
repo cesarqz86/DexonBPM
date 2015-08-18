@@ -1,86 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/white_btn_style"
+    android:orientation="vertical">
 
-
-
-    <LinearLayout
-        android:id="@+id/update_btns"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="25dp"
-        android:weightSum="2"
-        android:padding="2dp"
-        android:background="@drawable/whiteblue_btn_style"
-        android:layout_marginRight="25dp">
-
-        <Button
-            android:id="@+id/detalle_btn"
-            android:layout_width="0dp"
-            android:text="Detalle"
-            android:maxLines="1"
-            android:gravity="center"
-            android:textColor="@drawable/textcolorblue_white_selector"
-            android:layout_height="wrap_content"
-            android:background="@drawable/blue_btn_style_2"
-            android:layout_weight="1"/>
-
-        <Button
-            android:id="@+id/historial_btn"
-            android:layout_width="0dp"
-            android:text="Historial"
-            android:gravity="center"
-            android:maxLines="1"
-            android:textColor="@drawable/textcolorblue_white_selector"
-            android:layout_height="wrap_content"
-            android:background="@drawable/blue_btn_style_2"
-            android:layout_weight="1"/>
-
-
-    </LinearLayout>
-
-    <View
-        android:layout_marginTop="10dp"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/blue_buttons"/>
 
     <ScrollView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
-        
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <RelativeLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"  >
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_above="@+id/circularProgressBar"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:background="@color/blue_buttons" />
 
             <ProgressBar
                 android:id="@+id/circularProgressBar"
-                android:layout_centerInParent="true"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="100dip"
                 android:layout_height="100dip"
+                android:layout_centerInParent="true"
                 android:indeterminate="false"
                 android:max="100"
                 android:progress="30"
                 android:progressDrawable="@drawable/progressbar" />
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/txt_progresstext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
+                android:text="30%"
                 android:textColor="@color/light_green"
-                android:textStyle="bold"
                 android:textSize="28sp"
-                android:text="30%" />
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/circularProgressBar"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@color/blue_buttons" />
 
         </RelativeLayout>
 
     </ScrollView>
 
+    <ListView
+        android:id="@+id/lstvw_ticketdetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/white_btn_style"
+        android:dividerHeight="1.5sp"
+        android:footerDividersEnabled="true">
+
+    </ListView>
 </LinearLayout>

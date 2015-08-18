@@ -52,7 +52,6 @@
         android:layout_above="@+id/footer_container"
         android:layout_below="@+id/blue_separator"
         android:orientation="vertical">
-
     </inqbarna.tablefixheaders.TableFixHeaders>
 
 

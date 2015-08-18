@@ -40,12 +40,7 @@ public class HomeActivity extends FragmentActivity {
 
     private void LoadMenu() {
         String[] menuOptionList;
-        Boolean isTechUser = this.getIntent().getBooleanExtra("isTech", false);
-        if (isTechUser) {
-            menuOptionList = this.getResources().getStringArray(R.array.array_menu_techuser);
-        } else {
-            menuOptionList = this.getResources().getStringArray(R.array.array_menu_finaluser);
-        }
+        menuOptionList = this.getResources().getStringArray(R.array.array_menu_finaluser);
 
         ArrayAdapter<String> menuAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, menuOptionList);
         final ListView lstvw_menu = (ListView) this.findViewById(R.id.lstvw_menu);

@@ -187,10 +187,23 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         if (CommonValidations.validateArrayNullOrEmpty(dataList)) {
             ITicketService ticketService = TicketService.getInstance();
             dataList = ticketService.getEmptyData();
-            //Toast.makeText(this, "EO Esta null", Toast.LENGTH_LONG).show();
+        }
+        int indexColumnID = -1;
+        if(dataList.length > 0)
+        {
+            int tempIndex = 0;
+            for (String columnData: dataList[0])
+            {
+                if(columnData != null && columnData.equals("HD_INCIDENT_ID"))
+                {
+                    indexColumnID = tempIndex;
+                    break;
+                }
+                tempIndex++;
+            }
         }
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
-        this.matrixTableAdapter = new MatrixTableAdapter(this, dataList);
+        this.matrixTableAdapter = new MatrixTableAdapter(this, dataList, indexColumnID);
         tableFixHeaders.setAdapter(this.matrixTableAdapter);
     }
 }

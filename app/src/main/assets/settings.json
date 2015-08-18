@@ -1,5 +1,5 @@
 {
-    "URLBase": "http://200.119.44.138/Restful_Services/",
+    "URLBase": "http://200.119.44.138:8085/",
     "URLIntegracion": "app_integration.asmx",
     "Serial": "jdheGYklRTpeG788r4HJ877904JJHfgKLOFGHjIJMtGHBN-20150120-Android_App",
     "Get_my_app_PCUID": "Get_my_app_PCUID",

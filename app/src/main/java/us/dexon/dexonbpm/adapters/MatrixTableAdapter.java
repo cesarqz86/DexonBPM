@@ -10,10 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ForgotPasswordActivity;
+import us.dexon.dexonbpm.activity.TicketDetail;
 
 public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClickListener{
 
@@ -33,11 +35,12 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
     };
 
     private String[][] table;
+    private int indexColumnID;
 
     private final int width;
     private final int height;
 
-    public MatrixTableAdapter(Activity context, String[][] table) {
+    public MatrixTableAdapter(Activity context, String[][] table, int columnID) {
         this.context = context;
         Resources r = this.context.getResources();
 
@@ -45,6 +48,7 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
         this.height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, HEIGHT_DIP, r.getDisplayMetrics()));
         this.table = table;
         this.inflater = LayoutInflater.from(context);
+        this.indexColumnID = columnID;
     }
 
     @Override
@@ -64,12 +68,17 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
     @Override
     public View getView(int row, int column, View convertView, ViewGroup parent) {
 
+        int rowType = getLayoutResource(row, column);
         if (convertView == null) {
-            convertView = inflater.inflate(getLayoutResource(row, column), parent, false);
+            convertView = inflater.inflate(rowType, parent, false);
             ((TextView) convertView).setGravity(Gravity.CENTER_VERTICAL);
         }
 
         ((TextView) convertView).setText(table[row + 1][column + 1].toString());
+        if(rowType != R.layout.row_header && this.indexColumnID > -1) {
+            convertView.setTag(R.string.tag_id_ticket, table[row + 1][this.indexColumnID].toString());
+            convertView.setOnClickListener(this);
+        }
         return convertView;
     }
 
@@ -117,10 +126,12 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
 
     @Override
     public void onClick(View v) {
+        //Toast.makeText(context, idTag, Toast.LENGTH_SHORT).show();
+
         String idTag = (String)v.getTag(R.string.tag_id_ticket);
-        Intent forgotPassIntent = new Intent(context, ForgotPasswordActivity.class);
-        forgotPassIntent.putExtra("TICKET_ID", idTag);
-        context.startActivity(forgotPassIntent);
+        Intent incidentDetail = new Intent(context, TicketDetail.class);
+        incidentDetail.putExtra("TICKET_ID", idTag);
+        context.startActivity(incidentDetail);
         context.overridePendingTransition(R.anim.right_slide_in,
                 R.anim.right_slide_out);
     }
