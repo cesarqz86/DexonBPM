@@ -66,7 +66,7 @@ public class TicketDetail extends FragmentActivity implements View.OnClickListen
     public void inidentsCallBack(TicketResponseDto responseDto) {
         ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
 
-        TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList());
+        TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList(), responseDto);
         lstvw_ticketdetail.setAdapter(detailAdapter);
 
         StringBuilder progressText = new StringBuilder();

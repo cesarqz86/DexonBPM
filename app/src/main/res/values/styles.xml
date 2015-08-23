@@ -69,8 +69,8 @@
 
     <style name="buttons_style_technician_radio">
         <item name="android:textColor">@drawable/technician_btn_style4</item>
-        <item name="android:minHeight">33dp</item>
-        <item name="android:minWidth">70dp</item>
+        <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">50dp</item>
         <item name="android:gravity">center</item>
         <item name="android:button">@null</item>
         <item name="android:paddingLeft">5dp</item>

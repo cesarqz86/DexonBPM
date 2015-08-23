@@ -2,13 +2,17 @@ package us.dexon.dexonbpm.infrastructure.interfaces;
 
 import android.content.Context;
 
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -28,4 +32,8 @@ public interface ITicketService {
     RecordHeaderResponseDto getAllRecordsHeaderTree (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
 
     RecordHeaderResponseDto getAllRecordsHeaderTable (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
+
+    TechnicianResponseDto getTechnician(Context context, TechnicianRequestDto headerInfo);
+
+    TicketResponseDto convertToTicketData(JsonObject ticketObject, int selectedTechnician, JsonObject currentTechnician);
 }

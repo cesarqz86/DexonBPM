@@ -33,18 +33,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -62,6 +65,7 @@ public class TicketService implements ITicketService {
     private static String TICKETS_URL = "api/Incident/GetTickets";
     private static String TICKET_URL = "api/Incident/GetTicket";
     private static String RECORD_HEADER_URL = "api/Header/GetAllRecordsControlHeader";
+    private static String TECHNICIAN_URL = "api/Incident/GetLessUsedTechnician";
     private int columnCount = 6;
     //endregion
 
@@ -295,6 +299,118 @@ public class TicketService implements ITicketService {
         }
         return finalResponse;
     }
+
+    public TechnicianResponseDto getTechnician(Context context, TechnicianRequestDto headerInfo) {
+        TechnicianResponseDto finalResponse = new TechnicianResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += TECHNICIAN_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(headerInfo, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToTechnicianData(jsonData);
+
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TechnicianResponseDto.class);
+            Log.e("CallingService: " + TECHNICIAN_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TechnicianResponseDto.class);
+            Log.e("CallingService: " + TECHNICIAN_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + TECHNICIAN_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public TicketResponseDto convertToTicketData(JsonObject ticketObject, int selectedTechnician, JsonObject currentTechnician) {
+        TicketResponseDto finalResult = new TicketResponseDto();
+        Gson gsonSerializer = new Gson();
+
+        if (ticketObject != null) {
+            finalResult.setTicketInfo(ticketObject);
+            JsonObject headerInfo = ticketObject.getAsJsonObject("headerInfo");
+            JsonObject taskProgress = headerInfo.getAsJsonObject("taskProgress");
+            finalResult.setCircularPercentDone(headerInfo.get("percent").getAsDouble());
+            if (currentTechnician == null) {
+                currentTechnician = headerInfo.getAsJsonObject("current_technician");
+            }
+            finalResult.setCurrentTechnician(currentTechnician);
+            finalResult.setTechnicianSelected(selectedTechnician);
+
+            JsonArray taskProgressFields = taskProgress.getAsJsonArray("fields");
+            if (taskProgressFields != null && taskProgressFields.size() > 0) {
+                for (JsonElement fields : taskProgressFields) {
+                    JsonObject tempField = fields.getAsJsonObject();
+                    String fieldName = tempField.get("field_name").getAsString();
+                    if (CommonValidations.validateEmpty(fieldName) && fieldName.equals("PERCENT_DONE")) {
+                        if (tempField.get("Value") != null && !tempField.get("Value").isJsonNull()) {
+                            finalResult.setBarPercentDone(tempField.get("Value").getAsDouble());
+                        } else {
+                            finalResult.setBarPercentDone(-1d);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            finalResult.setIsOpen(ticketObject.get("isOpen").getAsBoolean());
+            finalResult.setIsEditable(ticketObject.get("editable").getAsBoolean());
+
+            List<TicketDetailDataDto> finalDataList = new ArrayList<>();
+            //Object[] test = headerInfo.entrySet().toArray();
+
+            for (Map.Entry<String, JsonElement> headerInfoData : headerInfo.entrySet()) {
+                if (headerInfoData.getValue() != null && headerInfoData.getValue().isJsonObject() && !headerInfoData.getValue().isJsonPrimitive()) {
+                    JsonObject tempData = headerInfoData.getValue().getAsJsonObject();
+                    if (tempData.has("is_hidden") && !tempData.get("is_hidden").getAsBoolean()) {
+                        TicketDetailDataDto tempDataList = new TicketDetailDataDto();
+                        RenderControlType controlType = RenderControlType.values()[tempData.get("render_ctl").getAsInt()];
+                        if (headerInfoData.getKey().equals("current_technician")) {
+                            controlType = RenderControlType.DXControlsGridWithOptions;
+                        }
+                        tempDataList.setFieldType(controlType);
+                        tempDataList.setFieldName(tempData.get("display_name").getAsString());
+                        tempDataList.setFieldKey(headerInfoData.getKey());
+                        tempDataList.setOrder(tempData.get("order").getAsInt());
+                        tempDataList.setFieldValue(this.getValueFromTicketField(tempData, controlType));
+
+                        if (tempData.has("son")) {
+                            JsonElement sonElement = tempData.get("son");
+                            tempDataList.setFieldSonData(gsonSerializer.toJson(sonElement));
+                        }
+                        finalDataList.add(tempDataList);
+                    }
+                }
+            }
+
+            if (!finalDataList.isEmpty()) {
+                Collections.sort(finalDataList, new Comparator<TicketDetailDataDto>() {
+                    @Override
+                    public int compare(TicketDetailDataDto c1, TicketDetailDataDto c2) {
+                        int compareResult = 0;
+                        if (c1.getOrder() < c2.getOrder())
+                            compareResult = -1;
+                        else if (c1.getOrder() > c2.getOrder())
+                            compareResult = 1;
+
+                        return compareResult;
+                    }
+                });
+            }
+            finalResult.setDataList(finalDataList);
+        }
+        return finalResult;
+    }
     //endregion
 
     //region Private Methods
@@ -376,6 +492,7 @@ public class TicketService implements ITicketService {
             JsonObject taskProgress = headerInfo.getAsJsonObject("taskProgress");
             finalResult.setCircularPercentDone(headerInfo.get("percent").getAsDouble());
             finalResult.setCurrentTechnician(currentTechnician);
+            finalResult.setTechnicianSelected(R.id.btn_setmanual_technician);
 
             JsonArray taskProgressFields = taskProgress.getAsJsonArray("fields");
             if (taskProgressFields != null && taskProgressFields.size() > 0) {
@@ -589,6 +706,15 @@ public class TicketService implements ITicketService {
             finalResult.setTableDataList(finalData);
         } else {
             finalResult.setTableDataList(this.getEmptyData(""));
+        }
+        return finalResult;
+    }
+
+    private TechnicianResponseDto convertToTechnicianData(JsonElement jsonElement) {
+        TechnicianResponseDto finalResult = new TechnicianResponseDto();
+
+        if (jsonElement != null) {
+            finalResult.setTechnicianInfo(jsonElement.getAsJsonObject());
         }
         return finalResult;
     }

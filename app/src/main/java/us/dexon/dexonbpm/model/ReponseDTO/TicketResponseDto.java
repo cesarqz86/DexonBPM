@@ -21,6 +21,7 @@ public class TicketResponseDto {
     private JsonObject ticketInfo;
     private Boolean isOpen;
     private Boolean isEditable;
+    private int technicianSelected;
     private List<TicketDetailDataDto> dataList;
     //endregion
 
@@ -95,6 +96,14 @@ public class TicketResponseDto {
 
     public void setDataList(List<TicketDetailDataDto> dataList) {
         this.dataList = dataList;
+    }
+
+    public int getTechnicianSelected() {
+        return technicianSelected;
+    }
+
+    public void setTechnicianSelected(int technicianSelected) {
+        this.technicianSelected = technicianSelected;
     }
     //endregion
 
