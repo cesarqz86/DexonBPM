@@ -24,6 +24,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 
 /**
@@ -33,6 +34,7 @@ public class TicketDetail extends FragmentActivity {
 
     private String ticketId = "";
     private Menu menu;
+    private TicketResponseDto ticketData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,18 @@ public class TicketDetail extends FragmentActivity {
                 break;
             }
             case R.id.action_reopen: {
-                Toast.makeText(this, "I'm clicked reopen!", Toast.LENGTH_SHORT).show();
+                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+                dexonDatabase.setContext(this);
+
+                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+                ReopenRequestDto ticketData = new ReopenRequestDto();
+                ticketData.setLoggedUser(loggedUser);
+                ticketData.setTicketInfo(this.ticketData.getTicketInfo());
+
+                ServiceExecuter serviceExecuter = new ServiceExecuter();
+                ServiceExecuter.ExecuteReopenTicket reopenService = serviceExecuter.new ExecuteReopenTicket(this);
+                reopenService.execute(ticketData);
                 break;
             }
         }
@@ -83,8 +96,10 @@ public class TicketDetail extends FragmentActivity {
     }
 
     public void inidentsCallBack(TicketResponseDto responseDto) {
-        ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
 
+        this.ticketData = responseDto;
+
+        ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
         TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList(), responseDto);
         lstvw_ticketdetail.setAdapter(detailAdapter);
 

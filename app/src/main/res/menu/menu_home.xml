@@ -1,7 +1,6 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="us.dexon.dexonbpm.activity.HomeActivity">
-    <item android:id="@+id/action_settings" android:title="Temp"
-        android:orderInCategory="100" app:showAsAction="never" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_reloadincidents"
+        android:icon="@drawable/ic_action_tickets_updatebutton3x"
+        android:showAsAction="always" />
 </menu>

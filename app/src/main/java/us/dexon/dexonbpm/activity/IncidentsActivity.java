@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,6 +78,27 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     @Override
     protected void onStop() {
         super.onStop();  // Always call the superclass method first
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        //this.menu = menu;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_reloadincidents:{
+                this.executeSearch();
+                break;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -189,13 +211,10 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             dataList = ticketService.getEmptyData("TICKET");
         }
         int indexColumnID = -1;
-        if(dataList.length > 0)
-        {
+        if (dataList.length > 0) {
             int tempIndex = 0;
-            for (String columnData: dataList[0])
-            {
-                if(columnData != null && columnData.equals("HD_INCIDENT_ID"))
-                {
+            for (String columnData : dataList[0]) {
+                if (columnData != null && columnData.equals("HD_INCIDENT_ID")) {
                     indexColumnID = tempIndex;
                     break;
                 }

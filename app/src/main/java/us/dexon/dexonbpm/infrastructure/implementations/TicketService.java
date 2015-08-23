@@ -40,6 +40,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
@@ -47,6 +48,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -66,6 +68,7 @@ public class TicketService implements ITicketService {
     private static String TICKET_URL = "api/Incident/GetTicket";
     private static String RECORD_HEADER_URL = "api/Header/GetAllRecordsControlHeader";
     private static String TECHNICIAN_URL = "api/Incident/GetLessUsedTechnician";
+    private static String REOPEN_TICKET_URL = "api/Incident/ReopenTicket";
     private int columnCount = 6;
     //endregion
 
@@ -411,6 +414,45 @@ public class TicketService implements ITicketService {
         }
         return finalResult;
     }
+
+    public ReopenResponseDto reopenTicket(Context context, ReopenRequestDto reopenInfo, int reloginCount) {
+        ReopenResponseDto finalResponse = new ReopenResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += REOPEN_TICKET_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(reopenInfo, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToReopenTicket(jsonData);
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ReopenResponseDto.class);
+            Log.e("CallingService: " + REOPEN_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                reopenInfo.setLoggedUser(loggedUser);
+                this.reopenTicket(context, reopenInfo, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ReopenResponseDto.class);
+            }
+            Log.e("CallingService: " + REOPEN_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + REOPEN_TICKET_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
     //endregion
 
     //region Private Methods
@@ -715,6 +757,15 @@ public class TicketService implements ITicketService {
 
         if (jsonElement != null) {
             finalResult.setTechnicianInfo(jsonElement.getAsJsonObject());
+        }
+        return finalResult;
+    }
+
+    private ReopenResponseDto convertToReopenTicket(JsonElement jsonElement) {
+        ReopenResponseDto finalResult = new ReopenResponseDto();
+
+        if (jsonElement != null) {
+            finalResult.setTicketData(this.convertToTicketData(jsonElement));
         }
         return finalResult;
     }
