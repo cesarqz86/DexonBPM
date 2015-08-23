@@ -33,6 +33,8 @@
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Cerrar Sesión</string>
     <string name="menu_cancel_label">Cancelar</string>
+    <string name="menu_save_ticket">Save</string>
+    <string name="menu_reopen_ticket">Reopen</string>
 
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>

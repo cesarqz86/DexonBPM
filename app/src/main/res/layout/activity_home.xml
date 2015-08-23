@@ -18,11 +18,23 @@
             android:text="@string/chk_include_close"
             android:textSize="20sp" />
 
-        <CheckBox
+        <!--<Switch
             android:id="@+id/chk_include_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentRight="true"
+            android:text=""
+            android:textOff=""
+            android:textOn="" />-->
+
+        <ToggleButton
+            android:id="@+id/chk_include_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text=""
+            android:textOff="No"
+            android:textOn="Si" />
 
     </RelativeLayout>
 

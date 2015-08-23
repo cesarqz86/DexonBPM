@@ -52,7 +52,9 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(this.values.get(position).getFieldName());
                 txt_fieldvalue.setText(this.values.get(position).getFieldValue());
-                rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                    rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                }
                 break;
             }
             case DXControlsGrid: {
@@ -62,7 +64,9 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(this.values.get(position).getFieldName());
                 txt_fieldvalue.setText(this.values.get(position).getFieldValue());
-                rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                    rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                }
                 break;
             }
             case DXControlsDate: {
@@ -96,12 +100,14 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                 RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
                 RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(this.getContext(),
-                        this.ticketData.getCurrentTechnician(),
-                        this.ticketData);
-                btn_setmanual_technician.setOnClickListener(technicianClickListener);
-                btn_setautomatic_technician.setOnClickListener(technicianClickListener);
-                btn_settome_technician.setOnClickListener(technicianClickListener);
+                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                    DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(this.getContext(),
+                            this.ticketData.getCurrentTechnician(),
+                            this.ticketData);
+                    btn_setmanual_technician.setOnClickListener(technicianClickListener);
+                    btn_setautomatic_technician.setOnClickListener(technicianClickListener);
+                    btn_settome_technician.setOnClickListener(technicianClickListener);
+                }
 
                 switch (this.ticketData.getTechnicianSelected()) {
                     case R.id.btn_setmanual_technician: {
@@ -111,7 +117,9 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                                 0, //top
                                 R.drawable.ic_arrow, //right
                                 0);//bottom
-                        rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), values.get(position).getFieldSonData()));
+                        if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                            rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), values.get(position).getFieldSonData()));
+                        }
                         break;
                     }
                     case R.id.btn_setautomatic_technician: {
