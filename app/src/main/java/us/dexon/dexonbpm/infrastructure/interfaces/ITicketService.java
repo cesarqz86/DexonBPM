@@ -21,10 +21,11 @@ public interface ITicketService {
 
     void getTicketDataDB(Context context, TicketsRequestDto ticketFilter);
 
-    String[][] getEmptyData();
+    String[][] getEmptyData(String firstColumnTitle);
 
     TicketResponseDto getTicketInfo (Context context, TicketDetailRequestDto ticketDetail, int reloginCount);
 
-    RecordHeaderResponseDto getAllRecordsHeader (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
+    RecordHeaderResponseDto getAllRecordsHeaderTree (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
 
+    RecordHeaderResponseDto getAllRecordsHeaderTable (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
 }

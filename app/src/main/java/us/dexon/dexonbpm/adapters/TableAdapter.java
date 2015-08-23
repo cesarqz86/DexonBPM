@@ -1,6 +1,5 @@
 package us.dexon.dexonbpm.adapters;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -10,14 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.activity.ForgotPasswordActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 
-public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClickListener{
+/**
+ * Created by Cesar Quiroz on 8/23/15.
+ */
+public class TableAdapter extends BaseTableAdapter implements View.OnClickListener {
 
     private final static int WIDTH_DIP = 150;
     private final static int HEIGHT_DIP = 45;
@@ -27,7 +27,7 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
     private final Activity context;
 
     private String headers[] = {
-            "TICKET",
+            "",
             "",
             "",
             "",
@@ -40,7 +40,7 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
     private final int width;
     private final int height;
 
-    public MatrixTableAdapter(Activity context, String[][] table, int columnID) {
+    public TableAdapter(Activity context, String[][] table, int columnID) {
         this.context = context;
         Resources r = this.context.getResources();
 

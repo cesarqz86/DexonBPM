@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import org.springframework.http.HttpEntity;
@@ -103,7 +102,7 @@ public class TicketService implements ITicketService {
             finalResponse.setTicketArrayData(this.convertJsonToTicketArray(jsonData));
         } catch (HttpServerErrorException ex) {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
-            finalResponse.setTicketArrayData(this.getEmptyData());
+            finalResponse.setTicketArrayData(this.getEmptyData("TICKET"));
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
@@ -115,16 +114,16 @@ public class TicketService implements ITicketService {
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             }
-            finalResponse.setTicketArrayData(this.getEmptyData());
+            finalResponse.setTicketArrayData(this.getEmptyData("TICKET"));
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
-            finalResponse.setTicketArrayData(this.getEmptyData());
+            finalResponse.setTicketArrayData(this.getEmptyData("TICKET"));
             Log.e("CallingService: " + TICKETS_URL, ex.getMessage(), ex);
         }
 
         if (finalResponse.getTicketArrayData() == null) {
-            finalResponse.setTicketArrayData(this.getEmptyData());
+            finalResponse.setTicketArrayData(this.getEmptyData("TICKET"));
         }
 
         return finalResponse;
@@ -163,9 +162,9 @@ public class TicketService implements ITicketService {
         }
     }
 
-    public String[][] getEmptyData() {
+    public String[][] getEmptyData(String firstColumnTitle) {
         String[][] finalResponse = new String[10][];
-        String[] headerRow = {"TICKET", " ", " ", " ", " "};
+        String[] headerRow = {firstColumnTitle, " ", " ", " ", " "};
         String[] dataRow = {" ", " ", " ", " ", " "};
 
         for (int index = 0; index < finalResponse.length; index++) {
@@ -218,7 +217,7 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    public RecordHeaderResponseDto getAllRecordsHeader(Context context, RecordHeaderResquestDto recordDetail, int reloginCount) {
+    public RecordHeaderResponseDto getAllRecordsHeaderTree(Context context, RecordHeaderResquestDto recordDetail, int reloginCount) {
         RecordHeaderResponseDto finalResponse = new RecordHeaderResponseDto();
         Gson gsonSerializer = new Gson();
         try {
@@ -235,7 +234,7 @@ public class TicketService implements ITicketService {
             ResponseEntity<JsonElement> response;
             response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
             JsonElement jsonData = response.getBody();
-            finalResponse = this.convertToRecordHeader(jsonData, recordDetail.getFieldInformation());
+            finalResponse = this.convertToRecordHeaderTree(jsonData, recordDetail.getFieldInformation());
 
         } catch (HttpServerErrorException ex) {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
@@ -246,7 +245,46 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 recordDetail.setLoggedUser(loggedUser);
-                this.getAllRecordsHeader(context, recordDetail, reloginCount++);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            }
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public RecordHeaderResponseDto getAllRecordsHeaderTable(Context context, RecordHeaderResquestDto recordDetail, int reloginCount) {
+        RecordHeaderResponseDto finalResponse = new RecordHeaderResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += RECORD_HEADER_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(recordDetail, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToRecordHeaderTable(jsonData, recordDetail.getFieldInformation());
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                recordDetail.setLoggedUser(loggedUser);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             }
@@ -297,7 +335,7 @@ public class TicketService implements ITicketService {
                 indexPosition++;
             }
         } else {
-            finalResponse = this.getEmptyData();
+            finalResponse = this.getEmptyData("TICKET");
         }
         return finalResponse;
     }
@@ -448,7 +486,7 @@ public class TicketService implements ITicketService {
         return finalResult;
     }
 
-    private RecordHeaderResponseDto convertToRecordHeader(JsonElement jsonElement, JsonObject sonData) {
+    private RecordHeaderResponseDto convertToRecordHeaderTree(JsonElement jsonElement, JsonObject sonData) {
         RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
         if (jsonElement != null && sonData != null) {
             String keyName = sonData.get("main_field").getAsString();
@@ -498,6 +536,59 @@ public class TicketService implements ITicketService {
                 }
             }
             finalResult.setDataList(finalDataList);
+        }
+        return finalResult;
+    }
+
+    private RecordHeaderResponseDto convertToRecordHeaderTable(JsonElement jsonElement, JsonObject sonData) throws IOException {
+        RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
+        if (jsonElement != null && jsonElement.isJsonArray() && sonData != null) {
+            String keyName = sonData.get("main_field").getAsString();
+            String[][] finalData = null;
+            Gson gsonSerializer = new Gson();
+            JsonFactory factory = new JsonFactory();
+            ObjectMapper jacksonSerializer = new ObjectMapper(factory);
+            TypeReference<LinkedHashMap<String, String>> typeReference = new TypeReference<LinkedHashMap<String, String>>() {
+            };
+            JsonArray arrayData = jsonElement.getAsJsonArray();
+            String dataString;
+            String[] dataResponse;
+            LinkedHashMap<String, String> dataList;
+            LinkedHashMap<String, String> dataListTemp;
+            int finalSize = arrayData.size() + 1;
+            finalData = new String[finalSize][];
+            int indexPosition = 0;
+            for (JsonElement itemData : arrayData) {
+                dataString = gsonSerializer.toJson(itemData);
+                dataListTemp = jacksonSerializer.readValue(dataString, typeReference);
+
+                if (dataListTemp.containsKey("USER_N")) {
+                    String keyNameValue = dataListTemp.get("USER_N");
+                    dataListTemp.remove("USER_N");
+                    dataListTemp.remove(keyName);
+                    dataList = new LinkedHashMap<>();
+                    dataList.put("USER_N", keyNameValue);
+                    dataList.putAll(dataListTemp);
+                } else {
+                    String keyNameValue = dataListTemp.get(keyName);
+                    dataListTemp.remove(keyName);
+                    dataList = new LinkedHashMap<>();
+                    dataList.put(keyName, keyNameValue);
+                    dataList.putAll(dataListTemp);
+                }
+
+                dataResponse = dataList.values().toArray(new String[0]);
+                if (indexPosition == 0) {
+                    finalData[indexPosition] = dataList.keySet().toArray(new String[0]);
+                    columnCount = finalData[indexPosition].length;
+                    indexPosition++;
+                }
+                finalData[indexPosition] = dataResponse;
+                indexPosition++;
+            }
+            finalResult.setTableDataList(finalData);
+        } else {
+            finalResult.setTableDataList(this.getEmptyData(""));
         }
         return finalResult;
     }

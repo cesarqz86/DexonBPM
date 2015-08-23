@@ -1,39 +1,75 @@
 package us.dexon.dexonbpm.activity;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
+import com.google.gson.JsonParser;
+
+import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
+import us.dexon.dexonbpm.adapters.TableAdapter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
+import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 
-public class TableActivity extends ActionBarActivity {
+public class TableActivity extends FragmentActivity {
+
+    private String keyToSearch;
+    private String sonData;
+    private TableAdapter matrixTableAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
+
+        JsonParser gsonSerializer = new JsonParser();
+        Intent currentIntent = this.getIntent();
+        this.sonData = currentIntent.getStringExtra("sonData");
+        this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
+
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        RecordHeaderResquestDto recordHeader = new RecordHeaderResquestDto();
+        recordHeader.setLoggedUser(loggedUser);
+        recordHeader.setFieldInformation(gsonSerializer.parse(this.sonData).getAsJsonObject());
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteAllRecordHeaderTable getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTable(this);
+        getAllRecords.execute(recordHeader);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_table, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void inidentsCallBack(String[][] dataList) {
+        if (CommonValidations.validateArrayNullOrEmpty(dataList)) {
+            ITicketService ticketService = TicketService.getInstance();
+            dataList = ticketService.getEmptyData("");
         }
-
-        return super.onOptionsItemSelected(item);
+        int indexColumnID = -1;
+        /*if(dataList.length > 0)
+        {
+            int tempIndex = 0;
+            for (String columnData: dataList[0])
+            {
+                if(columnData != null && columnData.equals("HD_INCIDENT_ID"))
+                {
+                    indexColumnID = tempIndex;
+                    break;
+                }
+                tempIndex++;
+            }
+        }*/
+        TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_detail);
+        this.matrixTableAdapter = new TableAdapter(this, dataList, indexColumnID);
+        tableFixHeaders.setAdapter(this.matrixTableAdapter);
     }
 }

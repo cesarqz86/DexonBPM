@@ -12,6 +12,7 @@ import java.util.Map;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
+import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 
 /**
@@ -59,6 +60,27 @@ public final class DexonListeners {
             listViewDetailIntent.putExtra("sonData", this.sonData);
             listViewDetailIntent.putExtra("keyToSearch", this.keyToSearch);
             previousActivity.startActivity(listViewDetailIntent);
+            previousActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class TableClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final String sonData;
+
+        public TableClickListener(Context context, String sonElement) {
+            this.currentContext = context;
+            this.sonData = sonElement;
+        }
+
+        public void onClick(View v) {
+            Activity previousActivity = (Activity) this.currentContext;
+            //Toast.makeText(v.getContext(), "I'm clicked!", Toast.LENGTH_SHORT).show();
+            Intent tableDetailIntent = new Intent(previousActivity, TableActivity.class);
+            tableDetailIntent.putExtra("sonData", this.sonData);
+            previousActivity.startActivity(tableDetailIntent);
             previousActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }

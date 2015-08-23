@@ -58,6 +58,7 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(values.get(position).getFieldName());
                 txt_fieldvalue.setText(values.get(position).getFieldValue());
+                rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), values.get(position).getFieldSonData()));
                 break;
             }
             case DXControlsDate: {

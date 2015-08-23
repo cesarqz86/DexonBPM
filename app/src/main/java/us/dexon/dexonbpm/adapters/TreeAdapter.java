@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +27,10 @@ public class TreeAdapter extends ArrayAdapter<TreeDataDto> {
     private final String sonData;
 
     public TreeAdapter(Context context, Map<String, List<TreeDataDto>> fullList, String key, String sonData) {
-        super(context, R.layout.item_detailticket, fullList.get(key));
+        super(context, R.layout.item_detailticket, (fullList != null && fullList.containsKey(key)) ? fullList.get(key) : new ArrayList<TreeDataDto>());
         this.context = context;
         this.fullList = fullList;
-        this.values = fullList.get(key);
+        this.values = (fullList != null && fullList.containsKey(key)) ? fullList.get(key) : new ArrayList<TreeDataDto>();
         this.sonData = sonData;
     }
 

@@ -16,6 +16,7 @@ public class RecordHeaderResponseDto {
     @SerializedName("error")
     private String errorMessage;
     private Map<String, List<TreeDataDto>> dataList;
+    private String[][] tableDataList;
     //endregion
 
     //region Properties
@@ -41,6 +42,14 @@ public class RecordHeaderResponseDto {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public String[][] getTableDataList() {
+        return tableDataList;
+    }
+
+    public void setTableDataList(String[][] tableDataList) {
+        this.tableDataList = tableDataList;
     }
     //endregion
 

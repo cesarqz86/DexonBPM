@@ -4,4 +4,10 @@
     android:layout_height="match_parent"
     android:background="@drawable/white_btn_style">
 
+    <inqbarna.tablefixheaders.TableFixHeaders
+        android:id="@+id/table_detail"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
 </LinearLayout>

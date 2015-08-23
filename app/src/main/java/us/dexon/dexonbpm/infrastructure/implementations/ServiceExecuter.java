@@ -12,6 +12,7 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
+import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
@@ -377,7 +378,7 @@ public class ServiceExecuter {
         protected RecordHeaderResponseDto doInBackground(RecordHeaderResquestDto... params) {
             ITicketService ticketService = TicketService.getInstance();
             this.recordRequest = params[0];
-            return ticketService.getAllRecordsHeader(this.currentContext, this.recordRequest, 1);
+            return ticketService.getAllRecordsHeaderTree(this.currentContext, this.recordRequest, 1);
         }
 
         protected void onPostExecute(RecordHeaderResponseDto responseData) {
@@ -400,4 +401,48 @@ public class ServiceExecuter {
         }
     }
 
+    public class ExecuteAllRecordHeaderTable extends AsyncTask<RecordHeaderResquestDto, Void, RecordHeaderResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private RecordHeaderResquestDto recordRequest;
+
+        public ExecuteAllRecordHeaderTable(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected RecordHeaderResponseDto doInBackground(RecordHeaderResquestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.recordRequest = params[0];
+            return ticketService.getAllRecordsHeaderTable(this.currentContext, this.recordRequest, 1);
+        }
+
+        protected void onPostExecute(RecordHeaderResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                TableActivity tableView = (TableActivity) this.currentContext;
+                if (tableView != null) {
+                    tableView.inidentsCallBack(responseData.getTableDataList());
+                }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
 }

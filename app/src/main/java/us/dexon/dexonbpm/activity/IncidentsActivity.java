@@ -186,7 +186,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     public void inidentsCallBack(String[][] dataList) {
         if (CommonValidations.validateArrayNullOrEmpty(dataList)) {
             ITicketService ticketService = TicketService.getInstance();
-            dataList = ticketService.getEmptyData();
+            dataList = ticketService.getEmptyData("TICKET");
         }
         int indexColumnID = -1;
         if(dataList.length > 0)
