@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -88,11 +89,13 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                 txt_fieldtitle.setText(values.get(position).getFieldName());
                 txt_fieldvalue.setText(values.get(position).getFieldValue());
 
-                Button btn_setmanual_technician = (Button) rowView.findViewById(R.id.btn_setmanual_technician);
-                Button btn_setautomatic_technician = (Button) rowView.findViewById(R.id.btn_setautomatic_technician);
-                Button btn_settome_technician = (Button) rowView.findViewById(R.id.btn_settome_technician);
+                RadioButton btn_setmanual_technician = (RadioButton) rowView.findViewById(R.id.btn_setmanual_technician);
+                RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
+                RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                btn_setmanual_technician.setPressed(true);
+                btn_setmanual_technician.setChecked(true);
+
+                rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), values.get(position).getFieldSonData()));
                 break;
             }
             default: {

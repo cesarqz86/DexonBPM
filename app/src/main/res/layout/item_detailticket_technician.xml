@@ -37,37 +37,41 @@
             android:textSize="15sp" />
     </LinearLayout>
 
-    <LinearLayout
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/segment_technician_type"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:weightSum="5">
+        android:weightSum="5"
+        segmentedgroup:border_width="1dp"
+        segmentedgroup:corner_radius="5dp">
 
-        <Button
+        <RadioButton
             android:id="@+id/btn_setmanual_technician"
-            style="@style/buttons_style_technician_left"
-            android:layout_width="0dp"
+            style="@style/buttons_style_technician_radio"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/btn_setmanual_technician_text" />
 
-        <Button
+        <RadioButton
             android:id="@+id/btn_setautomatic_technician"
-            style="@style/buttons_style_technician_middle"
-            android:layout_width="0dp"
+            style="@style/buttons_style_technician_radio"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/btn_setautomatic_technician_text" />
 
-        <Button
+        <RadioButton
             android:id="@+id/btn_settome_technician"
-            style="@style/buttons_style_technician_right"
-            android:layout_width="0dp"
+            style="@style/buttons_style_technician_radio"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/btn_settome_technician_text" />
 
-    </LinearLayout>
+    </info.hoang8f.android.segmented.SegmentedGroup>
 </LinearLayout>
