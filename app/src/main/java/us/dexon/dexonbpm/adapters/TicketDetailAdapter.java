@@ -16,6 +16,7 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 
 /**
@@ -40,8 +41,17 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
         RenderControlType controlType = values.get(position).getFieldType();
         switch (controlType) {
-            case DXControlsGrid:
             case DXControlsTree: {
+                rowView = inflater.inflate(R.layout.item_detailticket_tree, parent, false);
+                TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+
+                txt_fieldtitle.setText(values.get(position).getFieldName());
+                txt_fieldvalue.setText(values.get(position).getFieldValue());
+                rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(), values.get(position).getFieldSonData()));
+                break;
+            }
+            case DXControlsGrid:{
                 rowView = inflater.inflate(R.layout.item_detailticket_tree, parent, false);
                 TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                 TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);

@@ -1,5 +1,7 @@
 package us.dexon.dexonbpm.model.ReponseDTO;
 
+import com.google.gson.JsonObject;
+
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 
 /**
@@ -12,6 +14,7 @@ public class TicketDetailDataDto {
     private int Order;
     private RenderControlType fieldType;
     private String fieldKey;
+    private String fieldSonData;
     //endregion
 
     //region Properties
@@ -53,6 +56,14 @@ public class TicketDetailDataDto {
 
     public void setFieldKey(String fieldKey) {
         this.fieldKey = fieldKey;
+    }
+
+    public String getFieldSonData() {
+        return fieldSonData;
+    }
+
+    public void setFieldSonData(String fieldSonData) {
+        this.fieldSonData = fieldSonData;
     }
     //endregion
 

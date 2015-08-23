@@ -5,13 +5,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
+import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
@@ -21,11 +21,13 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -344,6 +346,51 @@ public class ServiceExecuter {
                TicketDetail ticketDetail = (TicketDetail) this.currentContext;
                 if (ticketDetail != null) {
                     ticketDetail.inidentsCallBack(responseData);
+                }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteAllRecordHeaderTree extends AsyncTask<RecordHeaderResquestDto, Void, RecordHeaderResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private RecordHeaderResquestDto recordRequest;
+
+        public ExecuteAllRecordHeaderTree(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected RecordHeaderResponseDto doInBackground(RecordHeaderResquestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.recordRequest = params[0];
+            return ticketService.getAllRecordsHeader(this.currentContext, this.recordRequest, 1);
+        }
+
+        protected void onPostExecute(RecordHeaderResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                ListViewActivity treeView = (ListViewActivity) this.currentContext;
+                if (treeView != null) {
+                    treeView.inidentsCallBack(responseData);
                 }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {

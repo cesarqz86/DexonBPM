@@ -1,7 +1,6 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
-import android.os.DropBoxManager;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import org.springframework.http.HttpEntity;
@@ -39,10 +39,13 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -59,6 +62,7 @@ public class TicketService implements ITicketService {
 
     private static String TICKETS_URL = "api/Incident/GetTickets";
     private static String TICKET_URL = "api/Incident/GetTicket";
+    private static String RECORD_HEADER_URL = "api/Header/GetAllRecordsControlHeader";
     private int columnCount = 6;
     //endregion
 
@@ -159,6 +163,21 @@ public class TicketService implements ITicketService {
         }
     }
 
+    public String[][] getEmptyData() {
+        String[][] finalResponse = new String[10][];
+        String[] headerRow = {"TICKET", " ", " ", " ", " "};
+        String[] dataRow = {" ", " ", " ", " ", " "};
+
+        for (int index = 0; index < finalResponse.length; index++) {
+            if (index == 0) {
+                finalResponse[index] = headerRow;
+            } else {
+                finalResponse[index] = dataRow;
+            }
+        }
+        return finalResponse;
+    }
+
     public TicketResponseDto getTicketInfo(Context context, TicketDetailRequestDto ticketDetail, int reloginCount) {
         TicketResponseDto finalResponse = new TicketResponseDto();
         Gson gsonSerializer = new Gson();
@@ -195,6 +214,46 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + TICKET_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public RecordHeaderResponseDto getAllRecordsHeader(Context context, RecordHeaderResquestDto recordDetail, int reloginCount) {
+        RecordHeaderResponseDto finalResponse = new RecordHeaderResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += RECORD_HEADER_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(recordDetail, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToRecordHeader(jsonData, recordDetail.getFieldInformation());
+
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                recordDetail.setLoggedUser(loggedUser);
+                this.getAllRecordsHeader(context, recordDetail, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            }
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }
@@ -243,21 +302,6 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    public String[][] getEmptyData() {
-        String[][] finalResponse = new String[10][];
-        String[] headerRow = {"TICKET", " ", " ", " ", " "};
-        String[] dataRow = {" ", " ", " ", " ", " "};
-
-        for (int index = 0; index < finalResponse.length; index++) {
-            if (index == 0) {
-                finalResponse[index] = headerRow;
-            } else {
-                finalResponse[index] = dataRow;
-            }
-        }
-        return finalResponse;
-    }
-
     private void saveJsonToDB(JsonElement jsonElement) throws IOException {
         Gson gsonSerializer = new Gson();
 
@@ -284,6 +328,8 @@ public class TicketService implements ITicketService {
 
     private TicketResponseDto convertToTicketData(JsonElement jsonElement) {
         TicketResponseDto finalResult = new TicketResponseDto();
+        Gson gsonSerializer = new Gson();
+
         if (jsonElement != null) {
             JsonObject ticketObject = jsonElement.getAsJsonObject();
             finalResult.setTicketInfo(ticketObject);
@@ -329,6 +375,11 @@ public class TicketService implements ITicketService {
                         tempDataList.setFieldKey(headerInfoData.getKey());
                         tempDataList.setOrder(tempData.get("order").getAsInt());
                         tempDataList.setFieldValue(this.getValueFromTicketField(tempData, controlType));
+
+                        if (tempData.has("son")) {
+                            JsonElement sonElement = tempData.get("son");
+                            tempDataList.setFieldSonData(gsonSerializer.toJson(sonElement));
+                        }
                         finalDataList.add(tempDataList);
                     }
                 }
@@ -393,6 +444,60 @@ public class TicketService implements ITicketService {
         }
         if (finalNodeData != null && !finalNodeData.isJsonNull()) {
             finalResult = finalNodeData.getAsString();
+        }
+        return finalResult;
+    }
+
+    private RecordHeaderResponseDto convertToRecordHeader(JsonElement jsonElement, JsonObject sonData) {
+        RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
+        if (jsonElement != null && sonData != null) {
+            String keyName = sonData.get("main_field").getAsString();
+            String keyId = sonData.get("tb_name").getAsString() + "_ID";
+            JsonArray arrayData = jsonElement.getAsJsonArray();
+
+            Map<String, List<TreeDataDto>> finalDataList = new HashMap<>();
+
+            if (arrayData.size() > 0) {
+
+                List<TreeDataDto> tempDataList = new ArrayList<>();
+                for (JsonElement elementData : arrayData) {
+                    JsonObject tempElementData = elementData.getAsJsonObject();
+                    TreeDataDto dataTemp = new TreeDataDto();
+                    dataTemp.setElementName(tempElementData.get(keyName).getAsString());
+                    dataTemp.setElementId(tempElementData.get(keyId).getAsString());
+                    dataTemp.setParentId(tempElementData.get("PART_OF").getAsString());
+                    tempDataList.add(dataTemp);
+                }
+
+                /*Collections.sort(tempDataList, new Comparator<TreeDataDto>() {
+                    @Override
+                    public int compare(TreeDataDto c1, TreeDataDto c2) {
+                        if (c1.getElementId() == c1.getElementId()) {
+                            return 0;
+                        }
+                        if (c1.getElementId() == null) {
+                            return -1;
+                        }
+                        if (c2.getElementId() == null) {
+                            return 1;
+                        }
+                        return c1.getElementId().compareTo(c2.getElementId());
+                    }
+                });*/
+
+                for (TreeDataDto elementData : tempDataList) {
+                    List<TreeDataDto> tempList = null;
+                    if (finalDataList.containsKey(elementData.getParentId())) {
+                        tempList = finalDataList.get(elementData.getParentId());
+                        tempList.add(elementData);
+                    } else {
+                        tempList = new ArrayList<>();
+                        tempList.add(elementData);
+                        finalDataList.put(elementData.getParentId(), tempList);
+                    }
+                }
+            }
+            finalResult.setDataList(finalDataList);
         }
         return finalResult;
     }

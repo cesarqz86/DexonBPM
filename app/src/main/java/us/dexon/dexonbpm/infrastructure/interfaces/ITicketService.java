@@ -4,9 +4,11 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
+import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -22,5 +24,7 @@ public interface ITicketService {
     String[][] getEmptyData();
 
     TicketResponseDto getTicketInfo (Context context, TicketDetailRequestDto ticketDetail, int reloginCount);
+
+    RecordHeaderResponseDto getAllRecordsHeader (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
 
 }
