@@ -3,12 +3,15 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +37,22 @@ public final class DexonListeners {
 
         private final Context currentContext;
         private final String sonData;
+        private final String fieldKey;
 
-        public ListViewClickListener(Context context, String sonElement) {
+        public ListViewClickListener(Context context, String sonElement, String fieldKey) {
             this.currentContext = context;
             this.sonData = sonElement;
+            this.fieldKey = fieldKey;
         }
 
         public void onClick(View v) {
-            Activity previousActivity = (Activity) this.currentContext;
+            //Activity previousActivity = (Activity) this.currentContext;
             //Toast.makeText(v.getContext(), "I'm clicked!", Toast.LENGTH_SHORT).show();
-            Intent listViewDetailIntent = new Intent(previousActivity, ListViewActivity.class);
+            Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, ListViewActivity.class);
             listViewDetailIntent.putExtra("sonData", this.sonData);
-            previousActivity.startActivity(listViewDetailIntent);
-            previousActivity.overridePendingTransition(R.anim.right_slide_in,
+            listViewDetailIntent.putExtra("fieldKey", this.fieldKey);
+            CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }
     }
@@ -56,22 +62,78 @@ public final class DexonListeners {
         private final Context currentContext;
         private final String keyToSearch;
         private final String sonData;
+        private final String fieldKey;
 
-        public ListView2ClickListener(Context context, String key, String sonElement) {
+        public ListView2ClickListener(Context context, String key, String sonElement, String fieldKey) {
             this.currentContext = context;
             this.keyToSearch = key;
             this.sonData = sonElement;
+            this.fieldKey = fieldKey;
         }
 
         public void onClick(View v) {
-            Activity previousActivity = (Activity) this.currentContext;
             //Toast.makeText(v.getContext(), "I'm clicked!", Toast.LENGTH_SHORT).show();
-            Intent listViewDetailIntent = new Intent(previousActivity, ListViewActivity.class);
+            Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, ListViewActivity.class);
             listViewDetailIntent.putExtra("sonData", this.sonData);
             listViewDetailIntent.putExtra("keyToSearch", this.keyToSearch);
-            previousActivity.startActivity(listViewDetailIntent);
-            previousActivity.overridePendingTransition(R.anim.right_slide_in,
+            listViewDetailIntent.putExtra("fieldKey", this.fieldKey);
+            CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
+        }
+    }
+
+    public static class ListViewFinalClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final TreeDataDto nodeInfo;
+        private TicketResponseDto ticketInfo;
+        private final String fieldKey;
+
+        public ListViewFinalClickListener(Context context,
+                                          TreeDataDto treeData,
+                                          TicketResponseDto ticketInfo,
+                                          String fieldKey) {
+            this.currentContext = context;
+            this.nodeInfo = treeData;
+            this.ticketInfo = ticketInfo;
+            this.fieldKey = fieldKey;
+        }
+
+        public void onClick(View v) {
+            JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
+            JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
+            JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
+            JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+
+            fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
+            sonData.addProperty("short_description", this.nodeInfo.getElementName());
+
+            fieldInfo.add("son", sonData);
+            headerInfo.add(this.fieldKey, fieldInfo);
+            ticketJsonInfo.add("headerInfo", headerInfo);
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
+            CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+
+            Activity currentActivity = (Activity) this.currentContext;
+            /*currentActivity.setResult(currentActivity.RESULT_OK);
+            currentActivity.finish();*/
+
+            Intent ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
+            ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            currentActivity.startActivity(ticketDetailActivity);
+            currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+            Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+            if (isReloadRequired) {
+                Date currentDate = new Date();
+
+                SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+                CharSequence currentDateString  = dateFormater.format(currentDate);
+                ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
+                CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+            }
         }
     }
 

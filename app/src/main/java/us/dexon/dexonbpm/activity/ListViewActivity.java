@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.TreeAdapter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -21,6 +22,7 @@ public class ListViewActivity extends FragmentActivity {
 
     private String keyToSearch;
     private String sonData;
+    private String fieldKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class ListViewActivity extends FragmentActivity {
         Intent currentIntent = this.getIntent();
         this.sonData = currentIntent.getStringExtra("sonData");
         this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
+        this.fieldKey = currentIntent.getStringExtra("fieldKey");
 
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
@@ -53,7 +56,12 @@ public class ListViewActivity extends FragmentActivity {
             this.keyToSearch = "-1";
         }
 
-        TreeAdapter detailAdapter = new TreeAdapter(this, responseDto.getDataList(), this.keyToSearch, this.sonData);
+        TreeAdapter detailAdapter = new TreeAdapter(this,
+                responseDto.getDataList(),
+                this.keyToSearch,
+                this.sonData,
+                CommonSharedData.TicketInfo,
+                this.fieldKey);
         lstvw_tree_detail.setAdapter(detailAdapter);
     }
 }

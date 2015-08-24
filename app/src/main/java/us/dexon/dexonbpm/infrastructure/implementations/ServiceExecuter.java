@@ -33,6 +33,7 @@ import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
@@ -541,6 +542,48 @@ public class ServiceExecuter {
                 if (ticketDetail != null) {
                     ticketDetail.inidentsCallBack(responseData.getTicketData());
                 }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteReloadTicket extends AsyncTask<ReloadRequestDto, Void, TicketResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private ReloadRequestDto ticketRequest;
+
+        public ExecuteReloadTicket(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected TicketResponseDto doInBackground(ReloadRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.reloadTicket(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(TicketResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                CommonSharedData.TicketInfo = responseData;
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);

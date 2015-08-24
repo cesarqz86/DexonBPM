@@ -53,7 +53,9 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                 txt_fieldtitle.setText(this.values.get(position).getFieldName());
                 txt_fieldvalue.setText(this.values.get(position).getFieldValue());
                 if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                    rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                    rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(),
+                            this.values.get(position).getFieldSonData(),
+                            this.values.get(position).getFieldKey()));
                 }
                 break;
             }

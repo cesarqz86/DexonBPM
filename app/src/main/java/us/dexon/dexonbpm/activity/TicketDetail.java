@@ -14,9 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -24,6 +26,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 
@@ -58,6 +61,8 @@ public class TicketDetail extends FragmentActivity {
             ServiceExecuter.ExecuteTicketDetailService ticketService = serviceExecuter.new ExecuteTicketDetailService(this);
             ticketService.execute(ticketData);
         }
+
+        CommonSharedData.TicketActivity = this;
     }
 
     @Override
@@ -97,6 +102,8 @@ public class TicketDetail extends FragmentActivity {
 
     public void inidentsCallBack(TicketResponseDto responseDto) {
 
+        CommonSharedData.TicketInfo = responseDto;
+
         this.ticketData = responseDto;
 
         ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
@@ -134,5 +141,21 @@ public class TicketDetail extends FragmentActivity {
         } else {
             action_reopen.setVisible(true);
         }
+    }
+
+    public void reloadCallback(JsonObject ticketInfo) {
+
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        ReloadRequestDto reloadData = new ReloadRequestDto();
+        reloadData.setTicketInfo(ticketInfo);
+        reloadData.setLoggedUser(loggedUser);
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
+        ticketService.execute(reloadData);
     }
 }

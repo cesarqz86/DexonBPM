@@ -11,6 +11,7 @@ public class TreeDataDto {
     private String elementId;
     private String elementName;
     private String parentId;
+    private String headerId;
     //private List<TreeDataDto> childList;
     //endregion
 
@@ -45,6 +46,14 @@ public class TreeDataDto {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getHeaderId() {
+        return headerId;
+    }
+
+    public void setHeaderId(String headerId) {
+        this.headerId = headerId;
     }
     //endregion
 

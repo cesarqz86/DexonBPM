@@ -14,6 +14,7 @@ import java.util.Map;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 
 /**
@@ -25,13 +26,22 @@ public class TreeAdapter extends ArrayAdapter<TreeDataDto> {
     private final List<TreeDataDto> values;
     private final Map<String, List<TreeDataDto>> fullList;
     private final String sonData;
+    private final TicketResponseDto ticketData;
+    private final String fieldKey;
 
-    public TreeAdapter(Context context, Map<String, List<TreeDataDto>> fullList, String key, String sonData) {
+    public TreeAdapter(Context context,
+                       Map<String, List<TreeDataDto>> fullList,
+                       String key,
+                       String sonData,
+                       TicketResponseDto ticketInfo,
+                       String fieldKey) {
         super(context, R.layout.item_detailticket, (fullList != null && fullList.containsKey(key)) ? fullList.get(key) : new ArrayList<TreeDataDto>());
         this.context = context;
         this.fullList = fullList;
         this.values = (fullList != null && fullList.containsKey(key)) ? fullList.get(key) : new ArrayList<TreeDataDto>();
         this.sonData = sonData;
+        this.ticketData = ticketInfo;
+        this.fieldKey = fieldKey;
     }
 
     @Override
@@ -44,7 +54,14 @@ public class TreeAdapter extends ArrayAdapter<TreeDataDto> {
             rowView = inflater.inflate(R.layout.item_tree_more, parent, false);
             rowView.setOnClickListener(new DexonListeners.ListView2ClickListener(rowView.getContext(),
                     this.values.get(position).getElementId(),
-                    this.sonData));
+                    this.sonData,
+                    this.fieldKey));
+        }
+        else{
+            rowView.setOnClickListener(new DexonListeners.ListViewFinalClickListener(rowView.getContext(),
+                    this.values.get(position),
+                    this.ticketData,
+                    this.fieldKey));
         }
         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
         txt_fieldvalue.setText(values.get(position).getElementName());
