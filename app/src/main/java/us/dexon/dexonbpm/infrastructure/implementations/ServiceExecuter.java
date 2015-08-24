@@ -583,7 +583,7 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                CommonSharedData.TicketInfo = responseData;
+                CommonSharedData.TicketInfoUpdated = responseData;
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);

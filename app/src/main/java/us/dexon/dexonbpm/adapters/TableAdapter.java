@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.util.TypedValue;
@@ -10,9 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.TicketDetail;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
 /**
  * Created by Cesar Quiroz on 8/23/15.
@@ -36,11 +45,12 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
     private String[][] table;
     private int indexColumnID;
+    private String fieldKey;
 
     private final int width;
     private final int height;
 
-    public TableAdapter(Activity context, String[][] table, int columnID) {
+    public TableAdapter(Activity context, String[][] table, int columnID, String fieldKey) {
         this.context = context;
         Resources r = this.context.getResources();
 
@@ -49,6 +59,7 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         this.table = table;
         this.inflater = LayoutInflater.from(context);
         this.indexColumnID = columnID;
+        this.fieldKey = fieldKey;
     }
 
     @Override
@@ -75,8 +86,9 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         }
 
         ((TextView) convertView).setText(table[row + 1][column + 1]);
-        if(rowType != R.layout.row_header && this.indexColumnID > -1) {
-            convertView.setTag(R.string.tag_id_ticket, table[row + 1][this.indexColumnID].toString());
+        if (rowType != R.layout.row_header && this.indexColumnID > -1) {
+            int rowNumber = row + 1;
+            convertView.setTag(R.id.tag_column_table, String.valueOf(rowNumber));
             convertView.setOnClickListener(this);
         }
         return convertView;
@@ -126,13 +138,50 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        //Toast.makeText(context, idTag, Toast.LENGTH_SHORT).show();
 
-        String idTag = (String)v.getTag(R.string.tag_id_ticket);
-        Intent incidentDetail = new Intent(context, TicketDetail.class);
-        incidentDetail.putExtra("TICKET_ID", idTag);
-        context.startActivity(incidentDetail);
-        context.overridePendingTransition(R.anim.right_slide_in,
+        String rowNumberString = (String) v.getTag(R.id.tag_column_table);
+        int rowNumber = Integer.parseInt(rowNumberString);
+
+        JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
+        JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
+        JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
+        JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+
+        String valueKey = sonData.get("tb_name") + "_ID";
+        int columnValueID = this.indexColumnID;
+        int tempIndex = 0;
+        for (String columnName : this.table[0]){
+            if(columnName.equals(valueKey)){
+                columnValueID = tempIndex;
+                break;
+            }
+            tempIndex++;
+        }
+
+        fieldInfo.addProperty("Value", this.table[rowNumber][columnValueID]);
+        sonData.addProperty("short_description", this.table[rowNumber][this.indexColumnID]);
+
+        fieldInfo.add("son", sonData);
+        headerInfo.add(this.fieldKey, fieldInfo);
+        ticketJsonInfo.add("headerInfo", headerInfo);
+        ITicketService ticketService = TicketService.getInstance();
+        CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
+        CommonSharedData.TicketActivity.inidentsCallBack(CommonSharedData.TicketInfo);
+
+        Intent ticketDetailActivity = new Intent(this.context, TicketDetail.class);
+        ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.context.startActivity(ticketDetailActivity);
+        this.context.overridePendingTransition(R.anim.right_slide_in,
                 R.anim.right_slide_out);
+        Boolean isStatus = this.fieldKey.equals("status");
+        Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+        if (isReloadRequired || isStatus) {
+            Date currentDate = new Date();
+
+            SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+            CharSequence currentDateString = dateFormater.format(currentDate);
+            ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
+            CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+        }
     }
 }

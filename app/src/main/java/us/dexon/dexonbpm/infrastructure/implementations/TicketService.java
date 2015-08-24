@@ -174,7 +174,7 @@ public class TicketService implements ITicketService {
 
     public String[][] getEmptyData(String firstColumnTitle) {
         String[][] finalResponse = new String[10][];
-        String[] headerRow = {firstColumnTitle, " ", " ", " ", " "};
+        String[] headerRow = {firstColumnTitle, "", "", "", ""};
         String[] dataRow = {" ", " ", " ", " ", " "};
 
         for (int index = 0; index < finalResponse.length; index++) {

@@ -24,6 +24,7 @@ public class TableActivity extends FragmentActivity {
     private String keyToSearch;
     private String sonData;
     private TableAdapter matrixTableAdapter;
+    private String fieldKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class TableActivity extends FragmentActivity {
         Intent currentIntent = this.getIntent();
         this.sonData = currentIntent.getStringExtra("sonData");
         this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
+        this.fieldKey = currentIntent.getStringExtra("fieldKey");
 
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
@@ -55,21 +57,21 @@ public class TableActivity extends FragmentActivity {
             dataList = ticketService.getEmptyData("");
         }
         int indexColumnID = -1;
-        /*if(dataList.length > 0)
+        if(dataList.length > 0)
         {
             int tempIndex = 0;
             for (String columnData: dataList[0])
             {
-                if(columnData != null && columnData.equals("HD_INCIDENT_ID"))
+                if(CommonValidations.validateEmpty(columnData))
                 {
                     indexColumnID = tempIndex;
                     break;
                 }
                 tempIndex++;
             }
-        }*/
+        }
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_detail);
-        this.matrixTableAdapter = new TableAdapter(this, dataList, indexColumnID);
+        this.matrixTableAdapter = new TableAdapter(this, dataList, indexColumnID, this.fieldKey);
         tableFixHeaders.setAdapter(this.matrixTableAdapter);
     }
 }

@@ -24,6 +24,15 @@
                 android:layout_marginRight="40dp"
                 android:background="@color/blue_buttons" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/circularProgressBar"
+                android:text="@string/txt_progress_left"
+                android:textColor="@color/blue_buttons"
+                android:textSize="20sp" />
+
             <ProgressBar
                 android:id="@+id/circularProgressBar"
                 style="?android:attr/progressBarStyleHorizontal"
@@ -42,8 +51,17 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:textColor="@color/light_green"
-                android:textSize="28sp"
+                android:textSize="25sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/circularProgressBar"
+                android:text="@string/txt_progress_right"
+                android:textColor="@color/blue_buttons"
+                android:textSize="20sp" />
 
             <View
                 android:layout_width="fill_parent"

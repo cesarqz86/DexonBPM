@@ -52,8 +52,9 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(this.values.get(position).getFieldName());
                 txt_fieldvalue.setText(this.values.get(position).getFieldValue());
-                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                    rowView.setOnClickListener(new DexonListeners.ListViewClickListener(this.getContext(),
+                if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                    rowView.setOnClickListener(new DexonListeners.ListViewClickListener(
+                            this.getContext(),
                             this.values.get(position).getFieldSonData(),
                             this.values.get(position).getFieldKey()));
                 }
@@ -66,8 +67,11 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
 
                 txt_fieldtitle.setText(this.values.get(position).getFieldName());
                 txt_fieldvalue.setText(this.values.get(position).getFieldValue());
-                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                    rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), this.values.get(position).getFieldSonData()));
+                if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                    rowView.setOnClickListener(new DexonListeners.TableClickListener(
+                            this.getContext(),
+                            this.values.get(position).getFieldSonData(),
+                            this.values.get(position).getFieldKey()));
                 }
                 break;
             }
@@ -102,7 +106,7 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                 RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
                 RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
                     DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(this.getContext(),
                             this.ticketData.getCurrentTechnician(),
                             this.ticketData);
@@ -119,8 +123,11 @@ public class TicketDetailAdapter extends ArrayAdapter<TicketDetailDataDto> {
                                 0, //top
                                 R.drawable.ic_arrow, //right
                                 0);//bottom
-                        if(this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                            rowView.setOnClickListener(new DexonListeners.TableClickListener(this.getContext(), values.get(position).getFieldSonData()));
+                        if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
+                            rowView.setOnClickListener(new DexonListeners.TableClickListener(
+                                    this.getContext(),
+                                    this.values.get(position).getFieldSonData(),
+                                    this.values.get(position).getFieldKey()));
                         }
                         break;
                     }

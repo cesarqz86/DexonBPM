@@ -24,4 +24,7 @@
     <color name="radio_button_selected_color">#005bff</color>
     <color name="radio_button_unselected_color">#ffffff</color>
 
+    <color name="progress_red">#ff0000</color>
+    <color name="progress_red_transparent">#ac1f0c</color>
+
 </resources>

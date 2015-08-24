@@ -10,5 +10,7 @@ public class CommonSharedData {
 
     public static TicketResponseDto TicketInfo;
 
+    public static TicketResponseDto TicketInfoUpdated;
+
     public static TicketDetail TicketActivity;
 }

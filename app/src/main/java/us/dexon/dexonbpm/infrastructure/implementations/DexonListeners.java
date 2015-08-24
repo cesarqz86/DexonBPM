@@ -72,7 +72,6 @@ public final class DexonListeners {
         }
 
         public void onClick(View v) {
-            //Toast.makeText(v.getContext(), "I'm clicked!", Toast.LENGTH_SHORT).show();
             Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, ListViewActivity.class);
             listViewDetailIntent.putExtra("sonData", this.sonData);
             listViewDetailIntent.putExtra("keyToSearch", this.keyToSearch);
@@ -117,8 +116,6 @@ public final class DexonListeners {
             CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
 
             Activity currentActivity = (Activity) this.currentContext;
-            /*currentActivity.setResult(currentActivity.RESULT_OK);
-            currentActivity.finish();*/
 
             Intent ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
             ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -130,7 +127,7 @@ public final class DexonListeners {
                 Date currentDate = new Date();
 
                 SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-                CharSequence currentDateString  = dateFormater.format(currentDate);
+                CharSequence currentDateString = dateFormater.format(currentDate);
                 ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
                 CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
             }
@@ -141,19 +138,20 @@ public final class DexonListeners {
 
         private final Context currentContext;
         private final String sonData;
+        private final String fieldKey;
 
-        public TableClickListener(Context context, String sonElement) {
+        public TableClickListener(Context context, String sonElement, String fieldKey) {
             this.currentContext = context;
             this.sonData = sonElement;
+            this.fieldKey = fieldKey;
         }
 
         public void onClick(View v) {
-            Activity previousActivity = (Activity) this.currentContext;
-            //Toast.makeText(v.getContext(), "I'm clicked!", Toast.LENGTH_SHORT).show();
-            Intent tableDetailIntent = new Intent(previousActivity, TableActivity.class);
+            Intent tableDetailIntent = new Intent(CommonSharedData.TicketActivity, TableActivity.class);
             tableDetailIntent.putExtra("sonData", this.sonData);
-            previousActivity.startActivity(tableDetailIntent);
-            previousActivity.overridePendingTransition(R.anim.right_slide_in,
+            tableDetailIntent.putExtra("fieldKey", this.fieldKey);
+            CommonSharedData.TicketActivity.startActivityForResult(tableDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }
     }
