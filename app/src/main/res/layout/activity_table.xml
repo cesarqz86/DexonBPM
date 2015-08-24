@@ -1,8 +1,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/white_btn_style">
+    android:background="@drawable/white_btn_style"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/search_container"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_light"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/search_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_corners"
+            android:drawableLeft="@drawable/lupa"
+            android:drawablePadding="10dp"
+            android:inputType="textAutoComplete"
+            android:padding="5dp"
+            android:textColorHint="@color/gray_darker" />
+    </LinearLayout>
 
     <inqbarna.tablefixheaders.TableFixHeaders
         android:id="@+id/table_detail"

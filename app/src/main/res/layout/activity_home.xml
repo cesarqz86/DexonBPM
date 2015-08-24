@@ -6,15 +6,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingLeft="5dp"
-        android:paddingTop="20dp">
+        android:paddingLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:text="@string/chk_include_close"
             android:textSize="20sp" />
 
@@ -32,9 +35,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/toggle_selector_ios"
             android:text=""
-            android:textOff="No"
-            android:textOn="Si" />
+            android:textOff=""
+            android:textOn="" />
 
     </RelativeLayout>
 
@@ -43,10 +49,11 @@
         android:id="@+id/lstvw_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
         android:choiceMode="singleChoice"
         android:footerDividersEnabled="true"
-        android:listSelector="@color/blue_light"
-        android:paddingTop="20dp">
+        android:listSelector="@color/blue_light">
 
     </ListView>
 

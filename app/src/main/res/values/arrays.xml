@@ -4,7 +4,7 @@
     <array name="array_menu_finaluser">
         <item>Colaborando</item>
         <item>Creados</item>
-        <item>Relacionados</item>
+        <!--<item>Relacionados</item>-->
         <item>Asignados</item>
         <item>Flujos</item>
         <item>Ninguno</item>
@@ -13,7 +13,7 @@
     <array name="array_menu_techuser">
         <item>Colaborando</item>
         <item>Creados</item>
-        <item>Relacionados</item>
+        <!--<item>Relacionados</item>-->
         <item>Asignados</item>
         <item>Flujos</item>
         <item>Ninguno</item>
@@ -22,7 +22,7 @@
     <array name="array_column_incidents">
         <item>Colaborando</item>
         <item>Creados</item>
-        <item>Relacionados</item>
+        <!--<item>Relacionados</item>-->
         <item>Asignados</item>
         <item>Flujos</item>
         <item>Ninguno</item>
