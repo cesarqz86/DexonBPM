@@ -35,6 +35,7 @@ import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -587,6 +588,58 @@ public class ServiceExecuter {
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteSaveTicket extends AsyncTask<SaveTicketRequestDto, Void, TicketResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private SaveTicketRequestDto ticketRequest;
+
+        public ExecuteSaveTicket(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected TicketResponseDto doInBackground(SaveTicketRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.saveTicket(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(TicketResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                CommonSharedData.TicketInfoUpdated = responseData;
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext,
+                            R.string.validation_general_error_title,
+                            R.string.validation_general_connection_message,
+                            MessageTypeIcon.Error,
+                            false);
+                } else {
+                    CommonService.ShowAlertDialog(this.currentContext,
+                            R.string.validation_ticket_success_title,
+                            R.string.validation_ticket_success_message,
+                            MessageTypeIcon.Error,
+                            false);
                 }
             }
         }

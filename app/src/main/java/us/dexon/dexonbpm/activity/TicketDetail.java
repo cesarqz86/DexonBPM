@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.Map;
+
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
@@ -29,6 +31,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 
 /**
@@ -79,7 +82,30 @@ public class TicketDetail extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save: {
-                Toast.makeText(this, "I'm clicked save!", Toast.LENGTH_SHORT).show();
+                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+                dexonDatabase.setContext(this);
+
+                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+                JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+                JsonObject tempHeaderInfo = saveTicketInfo.get("headerInfo").getAsJsonObject();
+                JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
+                saveTicketInfo.add("headerInfo", headerInfo);
+
+                Boolean isClosed = tempHeaderInfo.get("closureStatus").getAsBoolean();
+
+                if(!isClosed) {
+                    SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+                    ticketData.setLoggedUser(loggedUser);
+                    ticketData.setTicketInfo(saveTicketInfo);
+
+                    ServiceExecuter serviceExecuter = new ServiceExecuter();
+                    ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
+                    saveTicketService.execute(ticketData);
+                }
+                else {
+                    //TODO Workflow process.
+                }
                 break;
             }
             case R.id.action_reopen: {

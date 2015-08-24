@@ -24,4 +24,8 @@
     <!-- Incident -->
     <string name="validation_incident_error_title">Incidentes</string>
 
+    <!-- Ticket -->
+    <string name="validation_ticket_success_title">Ticket</string>
+    <string name="validation_ticket_success_message">El ticket ha sido guardado.</string>
+
 </resources>

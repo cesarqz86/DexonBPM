@@ -15,6 +15,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
@@ -43,4 +44,6 @@ public interface ITicketService {
     ReopenResponseDto reopenTicket(Context context, ReopenRequestDto reopenInfo, int reloginCount);
 
     TicketResponseDto reloadTicket(Context context, ReloadRequestDto reloadInfo, int reloginCount);
+
+    TicketResponseDto saveTicket(Context context, SaveTicketRequestDto saveInfo, int reloginCount);
 }
