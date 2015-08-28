@@ -62,6 +62,14 @@
             android:name=".activity.TableActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.NewTicketActivity"
+            android:label="@string/activity_newincident_title"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PlantillaListViewActivity"
+            android:label="@string/activity_plantilla_title" />
     </application>
 
 </manifest>

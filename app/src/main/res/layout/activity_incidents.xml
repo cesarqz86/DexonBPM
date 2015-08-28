@@ -89,6 +89,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="25dp"
             android:background="@android:color/transparent"
+            android:onClick="newTicketClick"
             android:src="@drawable/ic_plus" />
 
     </RelativeLayout>

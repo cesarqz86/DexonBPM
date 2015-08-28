@@ -46,6 +46,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
+import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
@@ -73,6 +74,7 @@ public class TicketService implements ITicketService {
     private static String REOPEN_TICKET_URL = "api/Incident/ReopenTicket";
     private static String RELOAD_TICKET_URL = "api/Incident/LoadTicket";
     private static String SAVE_TICKET_URL = "api/Incident/SaveTicket";
+    private static String ALL_LAYOUT_URL = "api/Header/GetAllLayouts";
 
     private int columnCount = 6;
     //endregion
@@ -459,8 +461,7 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    public TicketResponseDto reloadTicket(Context context, ReloadRequestDto reloadInfo, int reloginCount)
-    {
+    public TicketResponseDto reloadTicket(Context context, ReloadRequestDto reloadInfo, int reloginCount) {
         TicketResponseDto finalResponse = new TicketResponseDto();
         Gson gsonSerializer = new Gson();
         try {
@@ -500,8 +501,7 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    public TicketResponseDto saveTicket(Context context, SaveTicketRequestDto saveInfo, int reloginCount)
-    {
+    public TicketResponseDto saveTicket(Context context, SaveTicketRequestDto saveInfo, int reloginCount) {
         TicketResponseDto finalResponse = new TicketResponseDto();
         Gson gsonSerializer = new Gson();
         try {
@@ -536,6 +536,46 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + SAVE_TICKET_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public RecordHeaderResponseDto getAllLayouts(Context context, AllLayoutRequestDto layoutRequestDto, int reloginCount) {
+        RecordHeaderResponseDto finalResponse = new RecordHeaderResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += ALL_LAYOUT_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(layoutRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToRecordHeaderTree(jsonData, "LAYOUT_NAME", "HD_INCIDENT_LAYOUT_ID");
+
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            Log.e("CallingService: " + ALL_LAYOUT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() != HttpStatus.INTERNAL_SERVER_ERROR && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                layoutRequestDto.setLoggedUser(loggedUser);
+                this.getAllLayouts(context, layoutRequestDto, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            }
+            Log.e("CallingService: " + ALL_LAYOUT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + ALL_LAYOUT_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }
@@ -784,6 +824,61 @@ public class TicketService implements ITicketService {
         }
         return finalResult;
     }
+
+    private RecordHeaderResponseDto convertToRecordHeaderTree(JsonElement jsonElement, String mainField, String idField) {
+        RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
+        if (jsonElement != null && CommonValidations.validateEmpty(mainField) && CommonValidations.validateEmpty(idField)) {
+            String keyName = mainField;
+            String keyId = idField;
+            JsonArray arrayData = jsonElement.getAsJsonArray();
+
+            Map<String, List<TreeDataDto>> finalDataList = new HashMap<>();
+
+            if (arrayData.size() > 0) {
+
+                List<TreeDataDto> tempDataList = new ArrayList<>();
+                for (JsonElement elementData : arrayData) {
+                    JsonObject tempElementData = elementData.getAsJsonObject();
+                    TreeDataDto dataTemp = new TreeDataDto();
+                    dataTemp.setElementName(tempElementData.get(keyName).getAsString());
+                    dataTemp.setElementId(tempElementData.get(keyId).getAsString());
+                    dataTemp.setParentId(tempElementData.get("PART_OF").getAsString());
+                    tempDataList.add(dataTemp);
+                }
+
+                /*Collections.sort(tempDataList, new Comparator<TreeDataDto>() {
+                    @Override
+                    public int compare(TreeDataDto c1, TreeDataDto c2) {
+                        if (c1.getElementId() == c1.getElementId()) {
+                            return 0;
+                        }
+                        if (c1.getElementId() == null) {
+                            return -1;
+                        }
+                        if (c2.getElementId() == null) {
+                            return 1;
+                        }
+                        return c1.getElementId().compareTo(c2.getElementId());
+                    }
+                });*/
+
+                for (TreeDataDto elementData : tempDataList) {
+                    List<TreeDataDto> tempList = null;
+                    if (finalDataList.containsKey(elementData.getParentId())) {
+                        tempList = finalDataList.get(elementData.getParentId());
+                        tempList.add(elementData);
+                    } else {
+                        tempList = new ArrayList<>();
+                        tempList.add(elementData);
+                        finalDataList.put(elementData.getParentId(), tempList);
+                    }
+                }
+            }
+            finalResult.setDataList(finalDataList);
+        }
+        return finalResult;
+    }
+
 
     private RecordHeaderResponseDto convertToRecordHeaderTable(JsonElement jsonElement, JsonObject sonData) throws IOException {
         RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
