@@ -40,5 +40,6 @@
 
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>
+    <string name="activity_newincident_title">Nuevo Incidente</string>
 
 </resources>

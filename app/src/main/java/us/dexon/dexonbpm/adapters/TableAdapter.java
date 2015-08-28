@@ -18,6 +18,7 @@ import java.util.Date;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
@@ -150,8 +151,8 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         String valueKey = sonData.get("tb_name") + "_ID";
         int columnValueID = this.indexColumnID;
         int tempIndex = 0;
-        for (String columnName : this.table[0]){
-            if(columnName.equals(valueKey)){
+        for (String columnName : this.table[0]) {
+            if (columnName.equals(valueKey)) {
                 columnValueID = tempIndex;
                 break;
             }
@@ -166,7 +167,28 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         ticketJsonInfo.add("headerInfo", headerInfo);
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
-        CommonSharedData.TicketActivity.inidentsCallBack(CommonSharedData.TicketInfo);
+
+        TicketDetail ticketDetail = null;
+        NewTicketActivity newTicket = null;
+
+        try {
+            ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+
+        } catch (Exception ex) {
+            // Do nothing, this is just to avoid duplicate code
+        }
+
+        try {
+            newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+        } catch (Exception ex) {
+            // Do nothing, this is just to avoid duplicate code
+        }
+
+        if (ticketDetail != null)
+            ticketDetail.inidentsCallBack(CommonSharedData.TicketInfo);
+
+        if (newTicket != null)
+            newTicket.inidentsCallBack(CommonSharedData.TicketInfo);
 
         Intent ticketDetailActivity = new Intent(this.context, TicketDetail.class);
         ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -181,7 +203,11 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
             SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
             CharSequence currentDateString = dateFormater.format(currentDate);
             ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
-            CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+            if (ticketDetail != null)
+                ticketDetail.reloadCallback(ticketJsonInfo);
+
+            if (newTicket != null)
+                newTicket.reloadCallback(ticketJsonInfo);
         }
     }
 }

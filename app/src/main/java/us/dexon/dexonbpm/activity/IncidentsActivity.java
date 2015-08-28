@@ -179,6 +179,14 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         this.startActivity(webIntent);
     }
 
+    public  void  newTicketClick(View view){
+        Intent newTicketIntent = new Intent(this, NewTicketActivity.class);
+        newTicketIntent.putExtra("TICKET_ID", "-1");
+        this.startActivity(newTicketIntent);
+        this.overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
+    }
+
     public final void executeSearch() {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);

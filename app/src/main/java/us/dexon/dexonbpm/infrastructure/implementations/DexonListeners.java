@@ -18,6 +18,7 @@ import java.util.Map;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
+import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
@@ -113,7 +114,30 @@ public final class DexonListeners {
             ticketJsonInfo.add("headerInfo", headerInfo);
             ITicketService ticketService = TicketService.getInstance();
             this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
-            CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+            //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+            TicketDetail ticketDetail = null;
+            NewTicketActivity newTicket = null;
+
+            try {
+               ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+
+            }
+            catch (Exception ex) {
+                // Do nothing, this is just to avoid duplicate code
+            }
+
+            try {
+                newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            }
+            catch (Exception ex) {
+                // Do nothing, this is just to avoid duplicate code
+            }
+
+            if (ticketDetail != null)
+                ticketDetail.inidentsCallBack(this.ticketInfo);
+
+            if (newTicket != null)
+                newTicket.inidentsCallBack(this.ticketInfo);
 
             Activity currentActivity = (Activity) this.currentContext;
 
@@ -129,7 +153,12 @@ public final class DexonListeners {
                 SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
                 CharSequence currentDateString = dateFormater.format(currentDate);
                 ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
-                CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+                //CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+                if (ticketDetail != null)
+                    ticketDetail.reloadCallback(ticketJsonInfo);
+
+                if (newTicket != null)
+                    newTicket.reloadCallback(ticketJsonInfo);
             }
         }
     }

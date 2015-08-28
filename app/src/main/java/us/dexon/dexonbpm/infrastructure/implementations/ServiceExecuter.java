@@ -14,6 +14,7 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
+import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -352,9 +353,25 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                TicketDetail ticketDetail = (TicketDetail) this.currentContext;
-                if (ticketDetail != null) {
-                    ticketDetail.inidentsCallBack(responseData);
+                try {
+
+
+                    TicketDetail ticketDetail = (TicketDetail) this.currentContext;
+                    if (ticketDetail != null) {
+                        ticketDetail.inidentsCallBack(responseData);
+                    }
+                } catch (Exception ex) {
+                    // Do nothing, this is just to avoid duplicate code
+                }
+
+                try {
+
+                    NewTicketActivity newTicket = (NewTicketActivity) this.currentContext;
+                    if (newTicket != null) {
+                        newTicket.inidentsCallBack(responseData);
+                    }
+                } catch (Exception ex) {
+                    // Do nothing, this is just to avoid duplicate code
                 }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {

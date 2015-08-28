@@ -1,5 +1,8 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
+import android.app.Activity;
+
+import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 
@@ -12,5 +15,5 @@ public class CommonSharedData {
 
     public static TicketResponseDto TicketInfoUpdated;
 
-    public static TicketDetail TicketActivity;
+    public static Activity TicketActivity;
 }

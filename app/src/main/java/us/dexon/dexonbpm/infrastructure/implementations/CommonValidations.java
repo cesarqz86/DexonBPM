@@ -59,6 +59,8 @@ public final class CommonValidations {
                     }
                 }
             }
+        } else {
+            finalResult = true;
         }
         return finalResult;
     }
