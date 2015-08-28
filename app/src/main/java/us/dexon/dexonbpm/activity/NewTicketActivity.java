@@ -105,4 +105,21 @@ public class NewTicketActivity extends FragmentActivity {
         ticketService.execute(reloadData);
     }
 
+
+    public void reloadPlantillaCallback(int plantillaId, String incidentUniqueId) {
+
+        /*IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        ReloadRequestDto reloadData = new ReloadRequestDto();
+        reloadData.setTicketInfo(ticketInfo);
+        reloadData.setLoggedUser(loggedUser);
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
+        ticketService.execute(reloadData);*/
+    }
+
 }

@@ -80,6 +80,10 @@ public class TicketDetail extends FragmentActivity {
 
                 LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
+                if (CommonSharedData.TicketInfoUpdated == null) {
+                    CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+                }
+
                 JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
                 JsonObject tempHeaderInfo = saveTicketInfo.get("headerInfo").getAsJsonObject();
                 JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
@@ -87,7 +91,7 @@ public class TicketDetail extends FragmentActivity {
 
                 Boolean isClosed = tempHeaderInfo.get("closureStatus").getAsBoolean();
 
-                if(!isClosed) {
+                if (!isClosed) {
                     SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
                     ticketData.setLoggedUser(loggedUser);
                     ticketData.setTicketInfo(saveTicketInfo);
@@ -95,8 +99,7 @@ public class TicketDetail extends FragmentActivity {
                     ServiceExecuter serviceExecuter = new ServiceExecuter();
                     ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
                     saveTicketService.execute(ticketData);
-                }
-                else {
+                } else {
                     //TODO Workflow process.
                 }
                 break;
@@ -143,26 +146,31 @@ public class TicketDetail extends FragmentActivity {
 
         StringBuilder progressText = new StringBuilder();
         progressText.append(progressInt);
-        progressText.append("%");
+        /*progressText.append("%");*/
 
         DonutProgress circularProgressBar = (DonutProgress) findViewById(R.id.circularProgressBar);
-        circularProgressBar.setMax( progressInt > 100 ? progressInt : 100);
+        circularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
         circularProgressBar.setProgress(progressInt);
         circularProgressBar.setTextSize(80);
-        circularProgressBar.setTextColor(getResources().getColor(R.color.light_green));
-        circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.light_green));
-        circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.light_green_tranparent));
 
-        Log.i("PROGRESS " , progressInt + "");
+        //Log.i("PROGRESS " , progressInt + "");
 
-        if (progressInt > 100) {
-
-            //circularProgressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_red));
-            //txt_progresstext.setTextColor(this.getResources().getColor(R.color.progress_red));
-            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red));
+        if (progressInt <= 50) {
+            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_green_transparent));
+            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_green));
+            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
+        } else if (progressInt <= 80) {
+            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_yellow_transparent));
+            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_yellow));
+            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
+        } else {
+            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red_transparent));
             circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_red));
-            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_red_transparent));
+            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
+        }
 
+        if (progressText.length() >= 4) {
+            circularProgressBar.setTextSize(50);
         }
 
         MenuItem action_reopen = this.menu.findItem(R.id.action_reopen);
