@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -143,23 +144,19 @@ public class TicketDetail extends FragmentActivity {
         StringBuilder progressText = new StringBuilder();
         progressText.append(progressInt);
         progressText.append("%");
-        /*TextView txt_progresstext = (TextView) this.findViewById(R.id.txt_progresstext);
-        txt_progresstext.setText(progressText.toString());
-        if (progressText.length() > 4) {
-            txt_progresstext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
-        }*/
-        //ProgressBar circularProgressBar = (ProgressBar) this.findViewById(R.id.circularProgressBar);
+
         DonutProgress circularProgressBar = (DonutProgress) findViewById(R.id.circularProgressBar);
+        circularProgressBar.setMax( progressInt > 100 ? progressInt : 100);
         circularProgressBar.setProgress(progressInt);
-        circularProgressBar.setMax(100);
         circularProgressBar.setTextSize(80);
         circularProgressBar.setTextColor(getResources().getColor(R.color.light_green));
         circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.light_green));
         circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.light_green_tranparent));
 
+        Log.i("PROGRESS " , progressInt + "");
 
         if (progressInt > 100) {
-            circularProgressBar.setMax(progressInt);
+
             //circularProgressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_red));
             //txt_progresstext.setTextColor(this.getResources().getColor(R.color.progress_red));
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red));
