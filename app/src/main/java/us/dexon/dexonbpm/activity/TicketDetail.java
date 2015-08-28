@@ -159,6 +159,7 @@ public class TicketDetail extends FragmentActivity {
 
 
         if (progressInt > 100) {
+            circularProgressBar.setMax(progressInt);
             //circularProgressBar.setProgressDrawable(this.getResources().getDrawable(R.drawable.progressbar_red));
             //txt_progresstext.setTextColor(this.getResources().getColor(R.color.progress_red));
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red));
