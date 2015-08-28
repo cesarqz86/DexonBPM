@@ -32,6 +32,7 @@
             android:background="@drawable/white_btn_style"
             android:drawableRight="@drawable/ic_arrow"
             android:gravity="right"
+            android:drawablePadding="5dp"
             android:singleLine="true"
             android:textColor="@color/gray_darker"
             android:textSize="15sp" />

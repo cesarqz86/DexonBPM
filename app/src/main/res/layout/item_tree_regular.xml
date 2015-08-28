@@ -13,6 +13,7 @@
         android:layout_weight="1"
         android:background="@drawable/white_btn_style"
         android:singleLine="true"
+        android:drawablePadding="5dp"
         android:textColor="@color/gray_darker"
         android:textSize="10sp" />
 
