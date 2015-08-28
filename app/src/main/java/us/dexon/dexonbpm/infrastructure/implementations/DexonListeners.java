@@ -19,6 +19,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
+import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
@@ -115,22 +116,18 @@ public final class DexonListeners {
             ITicketService ticketService = TicketService.getInstance();
             this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
             //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+
+            Activity currentActivity = (Activity) this.currentContext;
             TicketDetail ticketDetail = null;
             NewTicketActivity newTicket = null;
+            Intent ticketDetailActivity = null;
 
-            try {
-               ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-
-            }
-            catch (Exception ex) {
-                // Do nothing, this is just to avoid duplicate code
-            }
-
-            try {
+            if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+                ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+                ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
+            } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
                 newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-            }
-            catch (Exception ex) {
-                // Do nothing, this is just to avoid duplicate code
+                ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
             }
 
             if (ticketDetail != null)
@@ -139,9 +136,6 @@ public final class DexonListeners {
             if (newTicket != null)
                 newTicket.inidentsCallBack(this.ticketInfo);
 
-            Activity currentActivity = (Activity) this.currentContext;
-
-            Intent ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
             ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             currentActivity.startActivity(ticketDetailActivity);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
@@ -245,6 +239,99 @@ public final class DexonListeners {
                     break;
                 }
             }
+        }
+    }
+
+    public static class Plantilla2ClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final String keyToSearch;
+        private final String fieldKey;
+
+        public Plantilla2ClickListener(Context context, String key, String fieldKey) {
+            this.currentContext = context;
+            this.keyToSearch = key;
+            this.fieldKey = fieldKey;
+        }
+
+        public void onClick(View v) {
+            Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, PlantillaListViewActivity.class);
+            listViewDetailIntent.putExtra("keyToSearch", this.keyToSearch);
+            listViewDetailIntent.putExtra("fieldKey", this.fieldKey);
+            CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class PlantillaFinalClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final TreeDataDto nodeInfo;
+        private TicketResponseDto ticketInfo;
+        private final String fieldKey;
+
+        public PlantillaFinalClickListener(Context context,
+                                           TreeDataDto treeData,
+                                           TicketResponseDto ticketInfo,
+                                           String fieldKey) {
+            this.currentContext = context;
+            this.nodeInfo = treeData;
+            this.ticketInfo = ticketInfo;
+            this.fieldKey = fieldKey;
+        }
+
+        public void onClick(View v) {
+            /*JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
+            JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
+            JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
+            JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+
+            fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
+            sonData.addProperty("short_description", this.nodeInfo.getElementName());
+
+            fieldInfo.add("son", sonData);
+            headerInfo.add(this.fieldKey, fieldInfo);
+            ticketJsonInfo.add("headerInfo", headerInfo);
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
+            //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+            TicketDetail ticketDetail = null;
+            NewTicketActivity newTicket = null;
+
+            if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+                ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+            } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
+                newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            }
+
+            if (ticketDetail != null)
+                ticketDetail.inidentsCallBack(this.ticketInfo);
+
+            if (newTicket != null)
+                newTicket.inidentsCallBack(this.ticketInfo);*/
+
+            Activity currentActivity = (Activity) this.currentContext;
+
+            Intent ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
+            ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            currentActivity.startActivity(ticketDetailActivity);
+            currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+            /*Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+            if (isReloadRequired) {
+                Date currentDate = new Date();
+
+                SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+                CharSequence currentDateString = dateFormater.format(currentDate);
+                ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
+                //CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+                if (ticketDetail != null)
+                    ticketDetail.reloadCallback(ticketJsonInfo);
+
+                if (newTicket != null)
+                    newTicket.reloadCallback(ticketJsonInfo);
+            }*/
         }
     }
 

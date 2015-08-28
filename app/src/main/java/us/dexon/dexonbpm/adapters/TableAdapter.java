@@ -171,17 +171,10 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         TicketDetail ticketDetail = null;
         NewTicketActivity newTicket = null;
 
-        try {
+        if (CommonSharedData.TicketActivity instanceof TicketDetail) {
             ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-
-        } catch (Exception ex) {
-            // Do nothing, this is just to avoid duplicate code
-        }
-
-        try {
+        } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
             newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-        } catch (Exception ex) {
-            // Do nothing, this is just to avoid duplicate code
         }
 
         if (ticketDetail != null)

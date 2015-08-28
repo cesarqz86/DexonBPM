@@ -30,6 +30,7 @@
     <string name="chk_include_close">Cerrados</string>
     <string name="txt_progress_left">Progreso</string>
     <string name="txt_progress_right">de la Tarea.</string>
+    <string name="txt_plantilla">Plantilla</string>
 
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
@@ -41,5 +42,6 @@
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>
     <string name="activity_newincident_title">Nuevo Incidente</string>
+    <string name="activity_plantilla_title">Plantilla</string>
 
 </resources>

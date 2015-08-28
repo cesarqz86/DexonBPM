@@ -8,6 +8,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -66,6 +67,14 @@ public class NewTicketActivity extends FragmentActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_new_ticket, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void txt_Plantilla_Click(View view) {
+        Intent plantillaTreeView = new Intent(this, PlantillaListViewActivity.class);
+        plantillaTreeView.putExtra("fieldKey", "HD_INCIDENT_LAYOUT_ID");
+        this.startActivityForResult(plantillaTreeView, 0);
+        this.overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
     }
 
     public void inidentsCallBack(TicketResponseDto responseDto) {

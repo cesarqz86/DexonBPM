@@ -15,6 +15,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
+import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -30,6 +31,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -353,25 +355,12 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                try {
-
-
+                if (this.currentContext instanceof TicketDetail) {
                     TicketDetail ticketDetail = (TicketDetail) this.currentContext;
-                    if (ticketDetail != null) {
-                        ticketDetail.inidentsCallBack(responseData);
-                    }
-                } catch (Exception ex) {
-                    // Do nothing, this is just to avoid duplicate code
-                }
-
-                try {
-
+                    ticketDetail.inidentsCallBack(responseData);
+                } else if (this.currentContext instanceof NewTicketActivity) {
                     NewTicketActivity newTicket = (NewTicketActivity) this.currentContext;
-                    if (newTicket != null) {
-                        newTicket.inidentsCallBack(responseData);
-                    }
-                } catch (Exception ex) {
-                    // Do nothing, this is just to avoid duplicate code
+                    newTicket.inidentsCallBack(responseData);
                 }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
@@ -657,6 +646,51 @@ public class ServiceExecuter {
                             R.string.validation_ticket_success_message,
                             MessageTypeIcon.Error,
                             false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteAllLayout extends AsyncTask<AllLayoutRequestDto, Void, RecordHeaderResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private AllLayoutRequestDto recordRequest;
+
+        public ExecuteAllLayout(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected RecordHeaderResponseDto doInBackground(AllLayoutRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.recordRequest = params[0];
+            return ticketService.getAllLayouts(this.currentContext, this.recordRequest, 1);
+        }
+
+        protected void onPostExecute(RecordHeaderResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                PlantillaListViewActivity plantillaView = (PlantillaListViewActivity) this.currentContext;
+                if (plantillaView != null) {
+                    plantillaView.inidentsCallBack(responseData);
+                }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
                 }
             }
         }
