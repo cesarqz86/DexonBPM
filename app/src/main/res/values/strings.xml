@@ -30,6 +30,7 @@
     <string name="chk_include_close">Cerrados</string>
     <string name="txt_progress_left">Progreso</string>
     <string name="txt_progress_right">de la Tarea.</string>
+    <string name="txt_progress_above">Progresión de la Tarea</string>
     <string name="txt_plantilla">Plantilla</string>
 
     <!-- Menu Labels -->

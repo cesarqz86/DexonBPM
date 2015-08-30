@@ -34,5 +34,6 @@
     <color name="progress_yellow_transparent">#FFE600</color>
 
     <color name="progress_background">#F0F0F0</color>
+    <color name="progress_container">#9A9A9A</color>
 
 </resources>

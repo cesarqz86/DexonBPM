@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/containerbar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rectangularProgressContainer"
+        android:layout_alignParentTop="true"
+        android:layout_below="@+id/blue_separator"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/txt_progress_above"
+        android:textColor="@color/blue_buttons"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/rectangularProgressContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/progress_container_border"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="4">
+
+        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/rectangularProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="40dip"
+            android:layout_centerInParent="true"
+            android:layout_weight="3"
+            android:width="100dip"
+            android:height="100dip"
+            android:paddingRight="5dp"
+            app:rcBackgroundColor="@color/progress_background" />
+
+        <TextView
+            android:id="@+id/txt_progresstext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/rectangularProgressBar"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:singleLine="true"
+            android:text="100%"
+            android:textColor="@color/progress_green_transparent"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>

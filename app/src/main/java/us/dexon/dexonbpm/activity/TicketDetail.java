@@ -3,16 +3,23 @@ package us.dexon.dexonbpm.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.google.gson.JsonObject;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.adapters.ProgressPagerAdapter;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
@@ -146,37 +153,7 @@ public class TicketDetail extends FragmentActivity {
         }
         this.setTitle(activityTitle);
 
-        int progressInt = responseDto.getCircularPercentDone().intValue();
-
-        StringBuilder progressText = new StringBuilder();
-        progressText.append(progressInt);
-        /*progressText.append("%");*/
-
-        DonutProgress circularProgressBar = (DonutProgress) findViewById(R.id.circularProgressBar);
-        circularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
-        circularProgressBar.setProgress(progressInt);
-        circularProgressBar.setTextSize(80);
-
-        //Log.i("PROGRESS " , progressInt + "");
-
-        if (progressInt <= 50) {
-            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_green_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_green));
-            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
-        } else if (progressInt <= 80) {
-            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_yellow_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_yellow));
-            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
-        } else {
-            circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_red));
-            circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
-        }
-
-        if (progressText.length() >= 4) {
-            circularProgressBar.setTextSize(50);
-        }
-
+        // Menu options
         MenuItem action_reopen = this.menu.findItem(R.id.action_reopen);
         MenuItem action_save = this.menu.findItem(R.id.action_save);
 
@@ -190,6 +167,12 @@ public class TicketDetail extends FragmentActivity {
         } else {
             action_reopen.setVisible(true);
         }
+
+        // Progress Pager
+        ProgressPagerAdapter progressPagerAdapter = new ProgressPagerAdapter(
+                this.getSupportFragmentManager(), responseDto);
+        ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
+        progress_pager.setAdapter(progressPagerAdapter);
     }
 
     public void reloadCallback(JsonObject ticketInfo) {

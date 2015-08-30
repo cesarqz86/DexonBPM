@@ -119,7 +119,7 @@ public class TicketService implements ITicketService {
             finalResponse.setTicketArrayData(this.getEmptyData("TICKET"));
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -163,7 +163,7 @@ public class TicketService implements ITicketService {
         } catch (HttpServerErrorException ex) {
             Log.e("CallingService: " + TICKETS_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -214,7 +214,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             Log.e("CallingService: " + TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -254,7 +254,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -293,7 +293,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -367,7 +367,7 @@ public class TicketService implements ITicketService {
                         if (tempField.get("Value") != null && !tempField.get("Value").isJsonNull()) {
                             finalResult.setBarPercentDone(tempField.get("Value").getAsDouble());
                         } else {
-                            finalResult.setBarPercentDone(-1d);
+                            finalResult.setBarPercentDone(null);
                         }
                         break;
                     }
@@ -445,7 +445,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ReopenResponseDto.class);
             Log.e("CallingService: " + REOPEN_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -485,7 +485,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             Log.e("CallingService: " + RELOAD_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -524,7 +524,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             Log.e("CallingService: " + SAVE_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -564,7 +564,7 @@ public class TicketService implements ITicketService {
             finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             Log.e("CallingService: " + ALL_LAYOUT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
                 ILoginService loginService = LoginService.getInstance();
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
@@ -673,7 +673,7 @@ public class TicketService implements ITicketService {
                         if (tempField.get("Value") != null && !tempField.get("Value").isJsonNull()) {
                             finalResult.setBarPercentDone(tempField.get("Value").getAsDouble());
                         } else {
-                            finalResult.setBarPercentDone(-1d);
+                            finalResult.setBarPercentDone(null);
                         }
                         break;
                     }
