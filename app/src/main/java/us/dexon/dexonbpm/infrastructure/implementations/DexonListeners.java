@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -196,11 +199,25 @@ public final class DexonListeners {
             switch (v.getId()) {
                 case R.id.btn_setmanual_technician: {
                     ITicketService ticketService = TicketService.getInstance();
-                    TicketDetail ticketDetailView = (TicketDetail) this.currentContext;
-                    if (ticketDetailView != null) {
+
+                    TicketDetail ticketDetail = null;
+                    NewTicketActivity newTicket = null;
+
+                    if (this.currentContext instanceof TicketDetail) {
+                        ticketDetail = (TicketDetail) this.currentContext;
+                    } else if (this.currentContext instanceof NewTicketActivity) {
+                        newTicket = (NewTicketActivity) this.currentContext;
+                    }
+
+                    if (ticketDetail != null) {
                         JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
                         this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, this.currentTechnician);
-                        ticketDetailView.inidentsCallBack(this.ticketInfo);
+                        ticketDetail.inidentsCallBack(this.ticketInfo);
+                    }
+                    if (newTicket != null) {
+                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
+                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, this.currentTechnician);
+                        newTicket.inidentsCallBack(this.ticketInfo);
                     }
                     break;
                 }
@@ -228,12 +245,27 @@ public final class DexonListeners {
                     tempTechninician.addProperty("Value", loggedUser.getTechID());
 
                     ITicketService ticketService = TicketService.getInstance();
-                    TicketDetail ticketDetailView = (TicketDetail) this.currentContext;
-                    if (ticketDetailView != null) {
+
+                    TicketDetail ticketDetail = null;
+                    NewTicketActivity newTicket = null;
+
+                    if (this.currentContext instanceof TicketDetail) {
+                        ticketDetail = (TicketDetail) this.currentContext;
+                    } else if (this.currentContext instanceof NewTicketActivity) {
+                        newTicket = (NewTicketActivity) this.currentContext;
+                    }
+
+                    if (ticketDetail != null) {
                         JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
                         ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
                         this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_settome_technician, this.currentTechnician);
-                        ticketDetailView.inidentsCallBack(this.ticketInfo);
+                        ticketDetail.inidentsCallBack(this.ticketInfo);
+                    }
+                    if (newTicket != null) {
+                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
+                        ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
+                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_settome_technician, this.currentTechnician);
+                        newTicket.inidentsCallBack(this.ticketInfo);
                     }
 
                     break;
@@ -282,56 +314,21 @@ public final class DexonListeners {
         }
 
         public void onClick(View v) {
-            /*JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
-            JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
-            JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
-            JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+            JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
+            String incidenteCode = ticketJsonInfo.get("uniqueCode").getAsString();
+            String plantillaId = this.nodeInfo.getElementId();
 
-            fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
-            sonData.addProperty("short_description", this.nodeInfo.getElementName());
-
-            fieldInfo.add("son", sonData);
-            headerInfo.add(this.fieldKey, fieldInfo);
-            ticketJsonInfo.add("headerInfo", headerInfo);
-            ITicketService ticketService = TicketService.getInstance();
-            this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
-            //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
-            TicketDetail ticketDetail = null;
-            NewTicketActivity newTicket = null;
-
-            if (CommonSharedData.TicketActivity instanceof TicketDetail) {
-                ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-            } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
-                newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-            }
-
-            if (ticketDetail != null)
-                ticketDetail.inidentsCallBack(this.ticketInfo);
-
-            if (newTicket != null)
-                newTicket.inidentsCallBack(this.ticketInfo);*/
+            NewTicketActivity newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            newTicket.reloadPlantillaCallback(plantillaId, incidenteCode);
+            TextView txt_plantilla_value = (TextView) newTicket.findViewById(R.id.txt_plantilla_value);
+            txt_plantilla_value.setText(this.nodeInfo.getElementName());
 
             Activity currentActivity = (Activity) this.currentContext;
-
             Intent ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
             ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             currentActivity.startActivity(ticketDetailActivity);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
-            /*Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
-            if (isReloadRequired) {
-                Date currentDate = new Date();
-
-                SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-                CharSequence currentDateString = dateFormater.format(currentDate);
-                ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
-                //CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
-                if (ticketDetail != null)
-                    ticketDetail.reloadCallback(ticketJsonInfo);
-
-                if (newTicket != null)
-                    newTicket.reloadCallback(ticketJsonInfo);
-            }*/
         }
     }
 

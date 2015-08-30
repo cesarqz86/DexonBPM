@@ -5,33 +5,57 @@
     android:background="@drawable/white_btn_style"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txt_plantilla"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:clickable="true"
-        android:drawableLeft="@drawable/ic_action_newticket_layoutimage3x"
-        android:drawableRight="@drawable/ic_arrow"
         android:gravity="center_vertical"
-        android:onClick="txt_Plantilla_Click"
+        android:onClick="selectPlantilla_Click"
+        android:orientation="horizontal"
         android:paddingBottom="10dp"
-        android:paddingTop="5dp"
-        android:text="@string/txt_plantilla"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:paddingTop="5dp">
+
+        <TextView
+            android:id="@+id/txt_plantilla"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/white_btn_style"
+            android:drawableLeft="@drawable/ic_action_newticket_layoutimage3x"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="@string/txt_plantilla"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/txt_plantilla_value"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/white_btn_style"
+            android:drawablePadding="5dp"
+            android:drawableRight="@drawable/ic_arrow"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/gray_darker"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
 
     <ListView
         android:id="@+id/lstvw_ticketdetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
         android:background="@drawable/white_btn_style"
         android:dividerHeight="1.5sp"
-        android:footerDividersEnabled="true">
+        android:footerDividersEnabled="true"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp">
 
     </ListView>
 </LinearLayout>

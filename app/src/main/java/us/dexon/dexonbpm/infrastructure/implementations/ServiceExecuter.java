@@ -40,6 +40,7 @@ import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -497,12 +498,27 @@ public class ServiceExecuter {
             if (responseData != null) {
 
                 ITicketService ticketService = TicketService.getInstance();
-                TicketDetail ticketDetailView = (TicketDetail) this.currentContext;
-                if (ticketDetailView != null) {
+
+                TicketDetail ticketDetail = null;
+                NewTicketActivity newTicket = null;
+
+                if (this.currentContext instanceof TicketDetail) {
+                    ticketDetail = (TicketDetail) this.currentContext;
+                } else if (this.currentContext instanceof NewTicketActivity) {
+                    newTicket = (NewTicketActivity) this.currentContext;
+                }
+
+                if (ticketDetail != null) {
                     JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
                     ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", responseData.getTechnicianInfo());
                     this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setautomatic_technician, this.currentTechnician);
-                    ticketDetailView.inidentsCallBack(this.ticketInfo);
+                    ticketDetail.inidentsCallBack(this.ticketInfo);
+                }
+                if(newTicket != null){
+                    JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
+                    ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", responseData.getTechnicianInfo());
+                    this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setautomatic_technician, this.currentTechnician);
+                    newTicket.inidentsCallBack(this.ticketInfo);
                 }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
@@ -688,6 +704,49 @@ public class ServiceExecuter {
                 if (plantillaView != null) {
                     plantillaView.inidentsCallBack(responseData);
                 }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteTicketByLayout extends AsyncTask<TicketByLayoutRequestDto, Void, TicketResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private TicketByLayoutRequestDto ticketRequest;
+
+        public ExecuteTicketByLayout(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected TicketResponseDto doInBackground(TicketByLayoutRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.getTicketByLayout(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(TicketResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                NewTicketActivity newTicket = (NewTicketActivity) this.currentContext;
+                newTicket.inidentsCallBack(responseData);
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);

@@ -14,10 +14,10 @@ public class TicketByLayoutRequestDto {
     private LoginResponseDto loggedUser;
 
     @SerializedName("layoutID")
-    private int layoutID;
+    private String layoutID;
 
-    @SerializedName("layoutID")
-    private String ticketID;
+    @SerializedName("uniqueCodeIncident")
+    private String incidentCode;
     //endregion
 
     //region Properties
@@ -29,12 +29,20 @@ public class TicketByLayoutRequestDto {
         this.loggedUser = loggedUser;
     }
 
-    public int getLayoutID() {
+    public String getLayoutID() {
         return layoutID;
     }
 
-    public void setLayoutID(int layoutID) {
+    public void setLayoutID(String layoutID) {
         this.layoutID = layoutID;
+    }
+
+    public String getIncidentCode() {
+        return incidentCode;
+    }
+
+    public void setIncidentCode(String incidentCode) {
+        this.incidentCode = incidentCode;
     }
     //endregion
 

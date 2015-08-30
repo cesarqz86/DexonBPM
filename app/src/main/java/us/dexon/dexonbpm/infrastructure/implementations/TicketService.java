@@ -53,6 +53,7 @@ import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
@@ -75,6 +76,7 @@ public class TicketService implements ITicketService {
     private static String RELOAD_TICKET_URL = "api/Incident/LoadTicket";
     private static String SAVE_TICKET_URL = "api/Incident/SaveTicket";
     private static String ALL_LAYOUT_URL = "api/Header/GetAllLayouts";
+    private static String TICKET_LAYOUT_URL = "api/Incident/GetTicketByLayout";
 
     private int columnCount = 6;
     //endregion
@@ -577,6 +579,47 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + ALL_LAYOUT_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public TicketResponseDto getTicketByLayout(Context context, TicketByLayoutRequestDto ticketRequestDto, int reloginCount)
+    {
+        TicketResponseDto finalResponse = new TicketResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += TICKET_LAYOUT_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(ticketRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToTicketData(jsonData);
+
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
+            Log.e("CallingService: " + TICKET_LAYOUT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                ticketRequestDto.setLoggedUser(loggedUser);
+                this.getTicketByLayout(context, ticketRequestDto, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
+            }
+            Log.e("CallingService: " + TICKET_LAYOUT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + TICKET_LAYOUT_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }

@@ -31,20 +31,31 @@ public class PlantillaListViewActivity extends FragmentActivity {
         this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
         this.fieldKey = currentIntent.getStringExtra("fieldKey");
 
-        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-        dexonDatabase.setContext(this);
+        if (CommonSharedData.TreeData == null) {
+            IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+            dexonDatabase.setContext(this);
 
-        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-        AllLayoutRequestDto allLayoutRequestDto = new AllLayoutRequestDto();
-        allLayoutRequestDto.setLoggedUser(loggedUser);
+            AllLayoutRequestDto allLayoutRequestDto = new AllLayoutRequestDto();
+            allLayoutRequestDto.setLoggedUser(loggedUser);
 
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteAllLayout getAllLayouts = serviceExecuter.new ExecuteAllLayout(this);
-        getAllLayouts.execute(allLayoutRequestDto);
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteAllLayout getAllLayouts = serviceExecuter.new ExecuteAllLayout(this);
+            getAllLayouts.execute(allLayoutRequestDto);
+        }
+        else
+        {
+            this.inidentsCallBack(CommonSharedData.TreeData);
+        }
     }
 
     public void inidentsCallBack(RecordHeaderResponseDto responseDto) {
+
+        if (CommonSharedData.TreeData == null) {
+            CommonSharedData.TreeData = responseDto;
+        }
+
         ListView lstvw_tree_detail = (ListView) this.findViewById(R.id.lstvw_tree_detail);
 
         if (!CommonValidations.validateEmpty(this.keyToSearch)) {

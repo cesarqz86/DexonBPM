@@ -168,13 +168,17 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
 
+        Activity currentActivity = (Activity) this.context;
         TicketDetail ticketDetail = null;
         NewTicketActivity newTicket = null;
+        Intent ticketDetailActivity = null;
 
         if (CommonSharedData.TicketActivity instanceof TicketDetail) {
             ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+            ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
         } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
             newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
         }
 
         if (ticketDetail != null)
@@ -183,7 +187,6 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         if (newTicket != null)
             newTicket.inidentsCallBack(CommonSharedData.TicketInfo);
 
-        Intent ticketDetailActivity = new Intent(this.context, TicketDetail.class);
         ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         this.context.startActivity(ticketDetailActivity);
         this.context.overridePendingTransition(R.anim.right_slide_in,

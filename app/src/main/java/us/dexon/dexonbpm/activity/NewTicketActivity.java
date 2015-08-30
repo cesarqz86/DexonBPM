@@ -26,6 +26,9 @@ import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 
 public class NewTicketActivity extends FragmentActivity {
@@ -69,7 +72,44 @@ public class NewTicketActivity extends FragmentActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void txt_Plantilla_Click(View view) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_save: {
+                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+                dexonDatabase.setContext(this);
+
+                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+                if (CommonSharedData.TicketInfoUpdated == null) {
+                    CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+                }
+
+                JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+                JsonObject tempHeaderInfo = saveTicketInfo.get("headerInfo").getAsJsonObject();
+                JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
+                saveTicketInfo.add("headerInfo", headerInfo);
+
+                Boolean isClosed = tempHeaderInfo.get("closureStatus").getAsBoolean();
+
+                if (!isClosed) {
+                    SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+                    ticketData.setLoggedUser(loggedUser);
+                    ticketData.setTicketInfo(saveTicketInfo);
+
+                    ServiceExecuter serviceExecuter = new ServiceExecuter();
+                    ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
+                    saveTicketService.execute(ticketData);
+                } else {
+                    //TODO Workflow process.
+                }
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void selectPlantilla_Click(View view) {
         Intent plantillaTreeView = new Intent(this, PlantillaListViewActivity.class);
         plantillaTreeView.putExtra("fieldKey", "HD_INCIDENT_LAYOUT_ID");
         this.startActivityForResult(plantillaTreeView, 0);
@@ -109,20 +149,21 @@ public class NewTicketActivity extends FragmentActivity {
         ticketService.execute(reloadData);
     }
 
-    public void reloadPlantillaCallback(int plantillaId, String incidentUniqueId) {
+    public void reloadPlantillaCallback(String plantillaId, String incidentUniqueId) {
 
-        /*IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
 
         LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-        ReloadRequestDto reloadData = new ReloadRequestDto();
-        reloadData.setTicketInfo(ticketInfo);
-        reloadData.setLoggedUser(loggedUser);
+        TicketByLayoutRequestDto layoutData = new TicketByLayoutRequestDto();
+        layoutData.setLoggedUser(loggedUser);
+        layoutData.setLayoutID(plantillaId);
+        layoutData.setIncidentCode(incidentUniqueId);
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
-        ticketService.execute(reloadData);*/
+        ServiceExecuter.ExecuteTicketByLayout ticketService = serviceExecuter.new ExecuteTicketByLayout(this);
+        ticketService.execute(layoutData);
     }
 
 }
