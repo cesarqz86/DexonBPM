@@ -14,6 +14,9 @@ public class RecordHeaderResquestDto {
     @SerializedName("loggedUserModel")
     private LoginResponseDto loggedUser;
 
+    @SerializedName("uniqueCodeIncidentModel")
+    private String incidentCode;
+
     @SerializedName("fieldConsulted")
     private JsonObject fieldInformation;
 
@@ -26,6 +29,14 @@ public class RecordHeaderResquestDto {
 
     public void setLoggedUser(LoginResponseDto loggedUser) {
         this.loggedUser = loggedUser;
+    }
+
+    public String getIncidentCode() {
+        return incidentCode;
+    }
+
+    public void setIncidentCode(String incidentCode) {
+        this.incidentCode = incidentCode;
     }
 
     public JsonObject getFieldInformation() {

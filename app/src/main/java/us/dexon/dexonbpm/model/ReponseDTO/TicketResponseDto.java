@@ -22,6 +22,7 @@ public class TicketResponseDto {
     private Boolean isOpen;
     private Boolean isEditable;
     private int technicianSelected;
+    private String ticketCode;
     private List<TicketDetailDataDto> dataList;
     //endregion
 
@@ -104,6 +105,14 @@ public class TicketResponseDto {
 
     public void setTechnicianSelected(int technicianSelected) {
         this.technicianSelected = technicianSelected;
+    }
+
+    public String getTicketCode() {
+        return ticketCode;
+    }
+
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
     }
     //endregion
 

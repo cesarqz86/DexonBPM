@@ -77,6 +77,10 @@ public class NewTicketActivity extends FragmentActivity {
                 R.anim.right_slide_out);
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        CommonSharedData.TreeData = null;
+    }
+
     public void inidentsCallBack(TicketResponseDto responseDto) {
 
         CommonSharedData.TicketInfo = responseDto;
@@ -104,7 +108,6 @@ public class NewTicketActivity extends FragmentActivity {
         ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
         ticketService.execute(reloadData);
     }
-
 
     public void reloadPlantillaCallback(int plantillaId, String incidentUniqueId) {
 

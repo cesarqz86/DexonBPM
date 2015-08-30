@@ -123,6 +123,10 @@ public class TicketDetail extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        CommonSharedData.TreeData = null;
+    }
+
     public void inidentsCallBack(TicketResponseDto responseDto) {
 
         CommonSharedData.TicketInfo = responseDto;

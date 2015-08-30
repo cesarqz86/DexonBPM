@@ -10,6 +10,7 @@ import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
 import us.dexon.dexonbpm.adapters.TableAdapter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -25,6 +26,7 @@ public class TableActivity extends FragmentActivity {
     private String sonData;
     private TableAdapter matrixTableAdapter;
     private String fieldKey;
+    private String incidentCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class TableActivity extends FragmentActivity {
         this.sonData = currentIntent.getStringExtra("sonData");
         this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
         this.fieldKey = currentIntent.getStringExtra("fieldKey");
+        this.incidentCode = CommonSharedData.TicketInfo.getTicketCode();
 
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(this);
@@ -45,6 +48,7 @@ public class TableActivity extends FragmentActivity {
         RecordHeaderResquestDto recordHeader = new RecordHeaderResquestDto();
         recordHeader.setLoggedUser(loggedUser);
         recordHeader.setFieldInformation(gsonSerializer.parse(this.sonData).getAsJsonObject());
+        recordHeader.setIncidentCode(this.incidentCode);
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteAllRecordHeaderTable getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTable(this);

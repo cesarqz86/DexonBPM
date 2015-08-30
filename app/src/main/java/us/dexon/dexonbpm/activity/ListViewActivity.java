@@ -23,6 +23,7 @@ public class ListViewActivity extends FragmentActivity {
     private String keyToSearch;
     private String sonData;
     private String fieldKey;
+    private String incidentCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +35,34 @@ public class ListViewActivity extends FragmentActivity {
         this.sonData = currentIntent.getStringExtra("sonData");
         this.keyToSearch = currentIntent.getStringExtra("keyToSearch");
         this.fieldKey = currentIntent.getStringExtra("fieldKey");
+        this.incidentCode = CommonSharedData.TicketInfo.getTicketCode();
 
-        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-        dexonDatabase.setContext(this);
+        if (CommonSharedData.TreeData == null) {
+            IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+            dexonDatabase.setContext(this);
 
-        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-        RecordHeaderResquestDto recordHeader = new RecordHeaderResquestDto();
-        recordHeader.setLoggedUser(loggedUser);
-        recordHeader.setFieldInformation(gsonSerializer.parse(this.sonData).getAsJsonObject());
+            RecordHeaderResquestDto recordHeader = new RecordHeaderResquestDto();
+            recordHeader.setLoggedUser(loggedUser);
+            recordHeader.setFieldInformation(gsonSerializer.parse(this.sonData).getAsJsonObject());
+            recordHeader.setIncidentCode(this.incidentCode);
 
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteAllRecordHeaderTree getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTree(this);
-        getAllRecords.execute(recordHeader);
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteAllRecordHeaderTree getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTree(this);
+            getAllRecords.execute(recordHeader);
+        } else {
+            this.inidentsCallBack(CommonSharedData.TreeData);
+        }
+
     }
 
     public void inidentsCallBack(RecordHeaderResponseDto responseDto) {
+
+        if (CommonSharedData.TreeData == null) {
+            CommonSharedData.TreeData = responseDto;
+        }
+
         ListView lstvw_tree_detail = (ListView) this.findViewById(R.id.lstvw_tree_detail);
 
         if (!CommonValidations.validateEmpty(this.keyToSearch)) {
