@@ -73,6 +73,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
             }
         });
 
+        // To avoid issues with the Spring RestClient and HttpHeaders
+        System.setProperty("http.keepAlive", "false");
     }
 
     @Override

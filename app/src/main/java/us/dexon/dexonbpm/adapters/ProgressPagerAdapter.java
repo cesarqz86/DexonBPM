@@ -38,9 +38,9 @@ public class ProgressPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         int pagerCount = 2;
-        /*if (this.ticketInfo.getBarPercentDone() == null) {
+        if (this.ticketInfo.getBarPercentDone() == null) {
             pagerCount = 1;
-        }*/
+        }
         return pagerCount;
     }
 }

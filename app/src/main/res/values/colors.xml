@@ -36,4 +36,7 @@
     <color name="progress_background">#F0F0F0</color>
     <color name="progress_container">#9A9A9A</color>
 
+    <color name="pager_not_selected">#E5E5E5</color>
+    <color name="pager_selected">#949494</color>
+
 </resources>

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.google.gson.JsonObject;
+import com.viewpagerindicator.CirclePageIndicator;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.ProgressPagerAdapter;
@@ -173,6 +174,13 @@ public class TicketDetail extends FragmentActivity {
                 this.getSupportFragmentManager(), responseDto);
         ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
         progress_pager.setAdapter(progressPagerAdapter);
+
+        CirclePageIndicator progress_pager_indicator = (CirclePageIndicator) this.findViewById(R.id.progress_pager_indicator);
+        progress_pager_indicator.setViewPager(progress_pager);
+
+        if (responseDto.getBarPercentDone() == null) {
+            progress_pager_indicator.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void reloadCallback(JsonObject ticketInfo) {
