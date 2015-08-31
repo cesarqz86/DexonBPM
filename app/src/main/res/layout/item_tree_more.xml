@@ -9,13 +9,13 @@
         android:id="@+id/txt_fieldvalue"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
         android:layout_weight="1"
         android:background="@drawable/white_btn_style"
-        android:drawableRight="@drawable/ic_arrow"
-        android:singleLine="true"
         android:drawablePadding="5dp"
+        android:drawableRight="@drawable/ic_arrow"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:singleLine="true"
         android:textColor="@color/gray_darker"
         android:textSize="10sp" />
 

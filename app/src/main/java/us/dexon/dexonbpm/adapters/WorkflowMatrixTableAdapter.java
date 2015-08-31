@@ -1,7 +1,6 @@
 package us.dexon.dexonbpm.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.util.TypedValue;
@@ -18,6 +17,7 @@ import java.util.Date;
 
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.ActivityListActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
@@ -25,9 +25,9 @@ import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
 /**
- * Created by Cesar Quiroz on 8/23/15.
+ * Created by Cesar Quiroz on 8/30/15.
  */
-public class TableAdapter extends BaseTableAdapter implements View.OnClickListener {
+public class WorkflowMatrixTableAdapter extends BaseTableAdapter implements View.OnClickListener {
 
     private final static int WIDTH_DIP = 150;
     private final static int HEIGHT_DIP = 45;
@@ -46,12 +46,11 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
     private String[][] table;
     private int indexColumnID;
-    private String fieldKey;
 
     private final int width;
     private final int height;
 
-    public TableAdapter(Activity context, String[][] table, int columnID, String fieldKey) {
+    public WorkflowMatrixTableAdapter(Activity context, String[][] table, int columnID) {
         this.context = context;
         Resources r = this.context.getResources();
 
@@ -60,7 +59,6 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         this.table = table;
         this.inflater = LayoutInflater.from(context);
         this.indexColumnID = columnID;
-        this.fieldKey = fieldKey;
     }
 
     @Override
@@ -145,13 +143,13 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
         JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
         JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
-        JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
-        JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+        JsonObject headerUpdated = CommonSharedData.TicketInfoUpdated != null ? CommonSharedData.TicketInfoUpdated.getTicketInfo().get("headerInfo").getAsJsonObject() : null;
+        if (headerUpdated != null && headerUpdated.has("workFlowResult")) {
+            headerInfo.add("workFlowResult", headerUpdated.get("workFlowResult"));
+        }
+        JsonObject fieldInfo = headerInfo.get("workFlowResult").getAsJsonObject();
 
-        StringBuilder valueKeyBuilder = new StringBuilder();
-        valueKeyBuilder.append(sonData.get("tb_name").getAsString());
-        valueKeyBuilder.append("_ID");
-        String valueKey =  valueKeyBuilder.toString();
+        String valueKey = "WF_RESULT_LST_ID";
         int columnValueID = this.indexColumnID;
         int tempIndex = 0;
         for (String columnName : this.table[0]) {
@@ -163,50 +161,15 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         }
 
         fieldInfo.addProperty("Value", this.table[rowNumber][columnValueID]);
-        sonData.addProperty("short_description", this.table[rowNumber][this.indexColumnID]);
 
-        fieldInfo.add("son", sonData);
-        headerInfo.add(this.fieldKey, fieldInfo);
+        headerInfo.add("workFlowResult", fieldInfo);
         ticketJsonInfo.add("headerInfo", headerInfo);
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
 
-        Activity currentActivity = (Activity) this.context;
-        TicketDetail ticketDetail = null;
-        NewTicketActivity newTicket = null;
-        Intent ticketDetailActivity = null;
-
-        if (CommonSharedData.TicketActivity instanceof TicketDetail) {
-            ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-            ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
-        } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
-            newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-            ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
-        }
-
-        if (ticketDetail != null)
-            ticketDetail.inidentsCallBack(CommonSharedData.TicketInfo);
-
-        if (newTicket != null)
-            newTicket.inidentsCallBack(CommonSharedData.TicketInfo);
-
-        ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.context.startActivity(ticketDetailActivity);
-        this.context.overridePendingTransition(R.anim.right_slide_in,
+        Intent activityListIntent = new Intent(CommonSharedData.TicketActivity, ActivityListActivity.class);
+        CommonSharedData.TicketActivity.startActivityForResult(activityListIntent, 0);
+        CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                 R.anim.right_slide_out);
-        Boolean isStatus = this.fieldKey.equals("status");
-        Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
-        if (isReloadRequired || isStatus) {
-            Date currentDate = new Date();
-
-            SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-            CharSequence currentDateString = dateFormater.format(currentDate);
-            ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
-            if (ticketDetail != null)
-                ticketDetail.reloadCallback(ticketJsonInfo);
-
-            if (newTicket != null)
-                newTicket.reloadCallback(ticketJsonInfo);
-        }
     }
 }

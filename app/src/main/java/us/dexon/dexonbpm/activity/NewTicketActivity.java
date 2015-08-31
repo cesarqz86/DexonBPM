@@ -86,23 +86,16 @@ public class NewTicketActivity extends FragmentActivity {
                 }
 
                 JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-                JsonObject tempHeaderInfo = saveTicketInfo.get("headerInfo").getAsJsonObject();
                 JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
                 saveTicketInfo.add("headerInfo", headerInfo);
 
-                Boolean isClosed = tempHeaderInfo.get("closureStatus").getAsBoolean();
+                SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+                ticketData.setLoggedUser(loggedUser);
+                ticketData.setTicketInfo(saveTicketInfo);
 
-                if (!isClosed) {
-                    SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-                    ticketData.setLoggedUser(loggedUser);
-                    ticketData.setTicketInfo(saveTicketInfo);
-
-                    ServiceExecuter serviceExecuter = new ServiceExecuter();
-                    ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
-                    saveTicketService.execute(ticketData);
-                } else {
-                    //TODO Workflow process.
-                }
+                ServiceExecuter serviceExecuter = new ServiceExecuter();
+                ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
+                saveTicketService.execute(ticketData);
                 break;
             }
         }

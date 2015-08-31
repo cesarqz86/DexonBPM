@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.ActivityListActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
+import us.dexon.dexonbpm.activity.WorkflowGridActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
@@ -36,6 +38,7 @@ import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -43,6 +46,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.WorkflowRequestDto;
 
 /**
  * Created by Cesar Quiroz on 5/9/15.
@@ -514,7 +518,7 @@ public class ServiceExecuter {
                     this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setautomatic_technician, this.currentTechnician);
                     ticketDetail.inidentsCallBack(this.ticketInfo);
                 }
-                if(newTicket != null){
+                if (newTicket != null) {
                     JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
                     ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", responseData.getTechnicianInfo());
                     this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setautomatic_technician, this.currentTechnician);
@@ -606,10 +610,20 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                CommonSharedData.TicketInfoUpdated = responseData;
-
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+
+                    CommonSharedData.TicketInfoUpdated = responseData;
+
+                    JsonObject headerInfo = responseData.getTicketInfo().get("headerInfo").getAsJsonObject();
+                    Boolean isClosed = headerInfo.get("closureStatus").getAsBoolean();
+                    if (isClosed) {
+                        Intent workfloIntent = new Intent(this.currentContext, WorkflowGridActivity.class);
+                        CommonSharedData.TicketActivity.startActivityForResult(workfloIntent, 0);
+                        CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                                R.anim.right_slide_out);
+                    }
                 }
             }
         }
@@ -747,6 +761,98 @@ public class ServiceExecuter {
 
                 NewTicketActivity newTicket = (NewTicketActivity) this.currentContext;
                 newTicket.inidentsCallBack(responseData);
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteLoadWorkflowTable extends AsyncTask<WorkflowRequestDto, Void, RecordHeaderResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private WorkflowRequestDto recordRequest;
+
+        public ExecuteLoadWorkflowTable(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected RecordHeaderResponseDto doInBackground(WorkflowRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.recordRequest = params[0];
+            return ticketService.loadWorkflow(this.currentContext, this.recordRequest);
+        }
+
+        protected void onPostExecute(RecordHeaderResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                WorkflowGridActivity tableView = (WorkflowGridActivity) this.currentContext;
+                if (tableView != null) {
+                    tableView.inidentsCallBack(responseData.getTableDataList());
+                }
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteRelatedActivities extends AsyncTask<RelatedActivitiesRequestDto, Void, TicketResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private RelatedActivitiesRequestDto ticketRequest;
+
+        public ExecuteRelatedActivities(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected TicketResponseDto doInBackground(RelatedActivitiesRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.getRelatedActivities(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(TicketResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                CommonSharedData.TicketInfoUpdated = responseData;
+
+                ActivityListActivity activityListActivity = (ActivityListActivity) this.currentContext;
+                if (activityListActivity != null) {
+                    activityListActivity.inidentsCallBack(responseData);
+                }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);

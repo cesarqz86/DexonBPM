@@ -93,23 +93,17 @@ public class TicketDetail extends FragmentActivity {
                 }
 
                 JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-                JsonObject tempHeaderInfo = saveTicketInfo.get("headerInfo").getAsJsonObject();
                 JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
                 saveTicketInfo.add("headerInfo", headerInfo);
 
-                Boolean isClosed = tempHeaderInfo.get("closureStatus").getAsBoolean();
+                SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+                ticketData.setLoggedUser(loggedUser);
+                ticketData.setTicketInfo(saveTicketInfo);
 
-                if (!isClosed) {
-                    SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-                    ticketData.setLoggedUser(loggedUser);
-                    ticketData.setTicketInfo(saveTicketInfo);
+                ServiceExecuter serviceExecuter = new ServiceExecuter();
+                ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
+                saveTicketService.execute(ticketData);
 
-                    ServiceExecuter serviceExecuter = new ServiceExecuter();
-                    ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
-                    saveTicketService.execute(ticketData);
-                } else {
-                    //TODO Workflow process.
-                }
                 break;
             }
             case R.id.action_reopen: {
@@ -197,5 +191,9 @@ public class TicketDetail extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
         ticketService.execute(reloadData);
+    }
+
+    public void workflowCallback(JsonObject ticketInfo){
+
     }
 }

@@ -7,13 +7,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -139,6 +142,18 @@ public class CommonService {
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / (metrics.densityDpi / 160f);
         return dp;
+    }
+
+    public static String convertToDexonDate(String dateString){
+        if (CommonValidations.validateEmpty(dateString)) {
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
+                dateString = new SimpleDateFormat("dd/MMM/yyyy").format(date);
+            } catch (Exception ex) {
+                Log.e("Converting Date: ", ex.getMessage(), ex);
+            }
+        }
+        return dateString;
     }
     //endregion
 

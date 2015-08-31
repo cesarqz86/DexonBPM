@@ -1,20 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/white_btn_style"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/txt_fieldvalue"
+        android:id="@+id/txt_next_activity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:background="@drawable/white_btn_style"
-        android:drawablePadding="5dp"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:singleLine="true"
-        android:textColor="@color/gray_darker"
-        android:textSize="10sp" />
+        android:textColor="@color/black"
+        android:textSize="15sp" />
 
 </LinearLayout>

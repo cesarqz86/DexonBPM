@@ -33,6 +33,12 @@
     <string name="txt_progress_above">Progresión de la Tarea</string>
     <string name="txt_plantilla">Plantilla</string>
 
+    <string name="txt_activity_technician">Técnico</string>
+    <string name="txt_activity_status">Estado</string>
+    <string name="txt_activity_startdate">Fecha de Inicio</string>
+    <string name="txt_activity_enddate">Fecha de Fin</string>
+    <string name="txt_activity_comments">Comentario</string>
+
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Cerrar Sesión</string>
@@ -44,5 +50,7 @@
     <string name="activity_incident_title">Incidentes</string>
     <string name="activity_newincident_title">Nuevo Incidente</string>
     <string name="activity_plantilla_title">Plantilla</string>
+    <string name="activity_workflow_title">Workflow</string>
+    <string name="title_activity_activity_list">Actividades</string>
 
 </resources>

@@ -14,6 +14,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -21,6 +22,7 @@ import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.WorkflowRequestDto;
 
 /**
  * Created by Cesar Quiroz on 5/9/15.
@@ -52,4 +54,9 @@ public interface ITicketService {
     RecordHeaderResponseDto getAllLayouts(Context context, AllLayoutRequestDto layoutRequestDto, int reloginCount);
 
     TicketResponseDto getTicketByLayout(Context context, TicketByLayoutRequestDto ticketRequestDto, int reloginCount);
+
+    RecordHeaderResponseDto loadWorkflow(Context context, WorkflowRequestDto workflowRequestDto);
+
+    TicketResponseDto getRelatedActivities(Context context, RelatedActivitiesRequestDto relatedActivitiesRequestDto, int reloginCount);
+
 }

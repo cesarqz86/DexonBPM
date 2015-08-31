@@ -9,6 +9,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.w3c.dom.Text;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.activity.ActivityDetailActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
@@ -27,6 +29,7 @@ import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
@@ -328,6 +331,30 @@ public final class DexonListeners {
             ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             currentActivity.startActivity(ticketDetailActivity);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class ActivityClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final ActivityTreeDto nodeInfo;
+        private final String selectedField;
+
+        public ActivityClickListener(Context context,
+                                     ActivityTreeDto treeData,
+                                     String fieldName) {
+            this.currentContext = context;
+            this.nodeInfo = treeData;
+            this.selectedField = fieldName;
+        }
+
+        public void onClick(View v) {
+            CommonSharedData.NewActivityData = this.nodeInfo;
+            Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, ActivityDetailActivity.class);
+            listViewDetailIntent.putExtra("activityTitle", this.selectedField);
+            CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }
     }

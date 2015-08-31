@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/white_btn_style"
+    android:orientation="horizontal"
     android:paddingBottom="10dp"
-    android:paddingTop="10dp"
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
-    android:orientation="horizontal">
+    android:paddingTop="10dp">
 
     <TextView
         android:id="@+id/txt_fieldtitle"
@@ -23,8 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:drawablePadding="5dp"
         android:background="@drawable/white_btn_style"
+        android:drawablePadding="5dp"
         android:drawableRight="@drawable/ic_arrow"
         android:gravity="right"
         android:singleLine="true"

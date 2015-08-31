@@ -39,4 +39,6 @@
     <color name="pager_not_selected">#E5E5E5</color>
     <color name="pager_selected">#949494</color>
 
+    <color name="separator_color">#757378</color>
+
 </resources>
