@@ -2,6 +2,8 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.app.Activity;
 
+import java.util.List;
+
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
@@ -24,4 +26,6 @@ public class CommonSharedData {
     public static RecordHeaderResponseDto TreeData;
 
     public static ActivityTreeDto NewActivityData;
+
+    public static List<ActivityTreeDto> ActivityList;
 }

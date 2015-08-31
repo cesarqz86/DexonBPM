@@ -25,6 +25,8 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.ActivityListAdapter;
 import us.dexon.dexonbpm.adapters.TreeAdapter;
+import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
@@ -83,26 +85,48 @@ public class ActivityListActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save: {
-                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-                dexonDatabase.setContext(this);
+                Boolean canSave = true;
 
-                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+                for (ActivityTreeDto activityData : CommonSharedData.ActivityList) {
+                    int technicianID = activityData.getTechnicianID().get("record_ID").getAsInt();
+                    if (technicianID == 0) {
+                        canSave = false;
+                        break;
+                    }
 
-                if (CommonSharedData.TicketInfoUpdated == null) {
-                    CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+                    int statusID = activityData.getNextStatusID().get("record_ID").getAsInt();
+                    if (statusID == 0) {
+                        canSave = false;
+                        break;
+                    }
                 }
 
-                JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-                JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
-                saveTicketInfo.add("headerInfo", headerInfo);
+                if (canSave) {
+                    IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+                    dexonDatabase.setContext(this);
 
-                SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-                ticketData.setLoggedUser(loggedUser);
-                ticketData.setTicketInfo(saveTicketInfo);
+                    LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
 
-                ServiceExecuter serviceExecuter = new ServiceExecuter();
-                ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
-                saveTicketService.execute(ticketData);
+                    if (CommonSharedData.TicketInfoUpdated == null) {
+                        CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+                    }
+
+                    JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+                    JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
+                    saveTicketInfo.add("headerInfo", headerInfo);
+
+                    SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+                    ticketData.setLoggedUser(loggedUser);
+                    ticketData.setTicketInfo(saveTicketInfo);
+
+                    ServiceExecuter serviceExecuter = new ServiceExecuter();
+                    ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
+                    saveTicketService.execute(ticketData);
+                }
+                else {
+                    CommonService.ShowAlertDialog(this, R.string.validation_general_error_title, R.string.validation_workflow_error_save, MessageTypeIcon.Error, false);
+                }
+
                 break;
             }
         }
@@ -144,6 +168,8 @@ public class ActivityListActivity extends FragmentActivity {
 
             activityList.add(activityTreeDto);
         }
+
+        CommonSharedData.ActivityList = activityList;
 
         ActivityListAdapter treeAdapter = new ActivityListAdapter(this, activityList);
 

@@ -38,7 +38,8 @@ public class ActivityListAdapter extends ArrayAdapter<ActivityTreeDto> {
         txt_next_activity.setText(values.get(position).getElementName());
         rowView.setOnClickListener(new DexonListeners.ActivityClickListener(rowView.getContext(),
                 values.get(position),
-                values.get(position).getElementName()));
+                values.get(position).getElementName(),
+                position));
         return rowView;
     }
 }

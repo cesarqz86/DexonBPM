@@ -340,19 +340,23 @@ public final class DexonListeners {
         private final Context currentContext;
         private final ActivityTreeDto nodeInfo;
         private final String selectedField;
+        private final int position;
 
         public ActivityClickListener(Context context,
                                      ActivityTreeDto treeData,
-                                     String fieldName) {
+                                     String fieldName,
+                                     int positionData) {
             this.currentContext = context;
             this.nodeInfo = treeData;
             this.selectedField = fieldName;
+            this.position = positionData;
         }
 
         public void onClick(View v) {
             CommonSharedData.NewActivityData = this.nodeInfo;
             Intent listViewDetailIntent = new Intent(CommonSharedData.TicketActivity, ActivityDetailActivity.class);
             listViewDetailIntent.putExtra("activityTitle", this.selectedField);
+            listViewDetailIntent.putExtra("position", this.position);
             CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
             CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);

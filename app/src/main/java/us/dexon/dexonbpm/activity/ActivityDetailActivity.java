@@ -21,6 +21,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
 public class ActivityDetailActivity extends FragmentActivity {
 
     private ActivityTreeDto currentActivity;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,8 @@ public class ActivityDetailActivity extends FragmentActivity {
 
         String title = currentIntent.getStringExtra("activityTitle");
         this.setTitle(title);
+
+        position = currentIntent.getIntExtra("position", 0);
 
         CommonSharedData.ActivityActivity = this;
 
@@ -68,9 +71,10 @@ public class ActivityDetailActivity extends FragmentActivity {
                 R.anim.right_slide_out);
     }
 
-    public  void drawInfo(){
+    public void drawInfo() {
 
         currentActivity = CommonSharedData.NewActivityData;
+        CommonSharedData.ActivityList.set(this.position, CommonSharedData.NewActivityData);
 
         TextView txt_activity_technician = (TextView) this.findViewById(R.id.txt_activity_technician);
         TextView txt_activity_status = (TextView) this.findViewById(R.id.txt_activity_status);
