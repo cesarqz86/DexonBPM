@@ -41,6 +41,8 @@ public interface ITicketService {
 
     RecordHeaderResponseDto getAllRecordsHeaderTable (Context context, RecordHeaderResquestDto recordDetail, int reloginCount);
 
+    RecordHeaderResponseDto getAllRecordsHeaderTable (Context context, RecordHeaderResquestDto recordDetail, int reloginCount, int position);
+
     TechnicianResponseDto getTechnician(Context context, TechnicianRequestDto headerInfo);
 
     TicketResponseDto convertToTicketData(JsonObject ticketObject, int selectedTechnician, JsonObject currentTechnician);

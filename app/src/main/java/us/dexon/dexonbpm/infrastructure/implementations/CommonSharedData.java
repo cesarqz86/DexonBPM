@@ -19,6 +19,8 @@ public class CommonSharedData {
 
     public static Activity TicketActivity;
 
+    public static Activity ActivityActivity;
+
     public static RecordHeaderResponseDto TreeData;
 
     public static ActivityTreeDto NewActivityData;

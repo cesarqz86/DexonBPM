@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.model.RequestDTO;
 
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
@@ -19,6 +20,9 @@ public class RecordHeaderResquestDto {
 
     @SerializedName("fieldConsulted")
     private JsonObject fieldInformation;
+
+    @Expose(serialize = false, deserialize = false)
+    private JsonObject secondFieldInformation;
 
     //endregion
 
@@ -45,6 +49,14 @@ public class RecordHeaderResquestDto {
 
     public void setFieldInformation(JsonObject fieldInformation) {
         this.fieldInformation = fieldInformation;
+    }
+
+    public JsonObject getSecondFieldInformation() {
+        return secondFieldInformation;
+    }
+
+    public void setSecondFieldInformation(JsonObject secondFieldInformation) {
+        this.secondFieldInformation = secondFieldInformation;
     }
     //endregion
 

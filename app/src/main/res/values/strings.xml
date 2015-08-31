@@ -52,5 +52,9 @@
     <string name="activity_plantilla_title">Plantilla</string>
     <string name="activity_workflow_title">Workflow</string>
     <string name="title_activity_activity_list">Actividades</string>
+    <string name="title_activity_activity_options_table">ActivityOptionsTableActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

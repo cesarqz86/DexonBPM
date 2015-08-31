@@ -316,6 +316,45 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
+    public RecordHeaderResponseDto getAllRecordsHeaderTable(Context context, RecordHeaderResquestDto recordDetail, int reloginCount, int position) {
+        RecordHeaderResponseDto finalResponse = new RecordHeaderResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += RECORD_HEADER_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(recordDetail, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToRecordHeaderTable(jsonData, recordDetail.getSecondFieldInformation(), position);
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                recordDetail.setLoggedUser(loggedUser);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
+            }
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + RECORD_HEADER_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
     public TechnicianResponseDto getTechnician(Context context, TechnicianRequestDto headerInfo) {
         TechnicianResponseDto finalResponse = new TechnicianResponseDto();
         Gson gsonSerializer = new Gson();
@@ -1026,6 +1065,61 @@ public class TicketService implements ITicketService {
                     dataListTemp.remove("USER_N");
                     dataList = new LinkedHashMap<>();
                     dataList.put("USER_N", keyNameValue);
+                    dataList.putAll(dataListTemp);
+                } else {
+                    String keyNameValue = dataListTemp.get(keyName);
+                    dataListTemp.remove(keyName);
+                    dataList = new LinkedHashMap<>();
+                    dataList.put(keyName, keyNameValue);
+                    dataList.putAll(dataListTemp);
+                }
+
+                dataResponse = dataList.values().toArray(new String[0]);
+                if (indexPosition == 0) {
+                    finalData[indexPosition] = dataList.keySet().toArray(new String[0]);
+                    columnCount = finalData[indexPosition].length;
+                    indexPosition++;
+                }
+                finalData[indexPosition] = dataResponse;
+                indexPosition++;
+            }
+            finalResult.setTableDataList(finalData);
+        } else {
+            finalResult.setTableDataList(this.getEmptyData(""));
+        }
+        return finalResult;
+    }
+
+    private RecordHeaderResponseDto convertToRecordHeaderTable(JsonElement jsonElement, JsonObject sonData, int position) throws IOException {
+        RecordHeaderResponseDto finalResult = new RecordHeaderResponseDto();
+        if (jsonElement != null &&
+                jsonElement.isJsonArray() &&
+                sonData != null &&
+                jsonElement.getAsJsonArray().get(position).isJsonArray()) {
+            String keyName = sonData.get("main_field").getAsString();
+            String[][] finalData = null;
+            Gson gsonSerializer = new Gson();
+            JsonFactory factory = new JsonFactory();
+            ObjectMapper jacksonSerializer = new ObjectMapper(factory);
+            TypeReference<LinkedHashMap<String, String>> typeReference = new TypeReference<LinkedHashMap<String, String>>() {
+            };
+            JsonArray arrayData = jsonElement.getAsJsonArray().get(position).getAsJsonArray();
+            String dataString;
+            String[] dataResponse;
+            LinkedHashMap<String, String> dataList;
+            LinkedHashMap<String, String> dataListTemp;
+            int finalSize = arrayData.size() + 1;
+            finalData = new String[finalSize][];
+            int indexPosition = 0;
+            for (JsonElement itemData : arrayData) {
+                dataString = gsonSerializer.toJson(itemData);
+                dataListTemp = jacksonSerializer.readValue(dataString, typeReference);
+
+                if (dataListTemp.containsKey("PS_NAME")) {
+                    String keyNameValue = dataListTemp.get("PS_NAME");
+                    dataListTemp.remove("PS_NAME");
+                    dataList = new LinkedHashMap<>();
+                    dataList.put("PS_NAME", keyNameValue);
                     dataList.putAll(dataListTemp);
                 } else {
                     String keyNameValue = dataListTemp.get(keyName);
