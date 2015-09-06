@@ -165,7 +165,7 @@ public class CommonService {
         return result;
     }
 
-    public static String convertToDexonDate(String dateString){
+    public static String convertToDexonDate(String dateString) {
         if (CommonValidations.validateEmpty(dateString)) {
             try {
                 Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
@@ -321,8 +321,7 @@ public class CommonService {
         }
     }
 
-    public static void saveTicket(Context context)
-    {
+    public static void saveTicket(Context context) {
         IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
         dexonDatabase.setContext(context);
 
@@ -335,6 +334,11 @@ public class CommonService {
         JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
         JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
         saveTicketInfo.add("headerInfo", headerInfo);
+
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+        CharSequence currentDateString = dateFormater.format(currentDate);
+        saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
 
         SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
         ticketData.setLoggedUser(loggedUser);
