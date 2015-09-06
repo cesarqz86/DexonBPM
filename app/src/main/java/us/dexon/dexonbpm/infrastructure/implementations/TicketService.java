@@ -38,6 +38,7 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
@@ -47,6 +48,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
@@ -81,6 +83,7 @@ public class TicketService implements ITicketService {
     private static String TICKET_LAYOUT_URL = "api/Incident/GetTicketByLayout";
     private static String LOAD_WORKFLOW_URL = "api/Incident/GetWFResult";
     private static String RELATED_ACT_URL = "api/Incident/GetActivitiesRelated";
+    private static String CREATE_DESCENDANT_URL = "api/Incident/CreateDescendant";
 
     private int columnCount = 6;
     //endregion
@@ -737,6 +740,44 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
+    public DescendantResponseDto createDescendant(Context context, DescendantRequestDto descendantRequestDto, int reloginCount) {
+        DescendantResponseDto finalResponse = new DescendantResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += CREATE_DESCENDANT_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(descendantRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToDescendant(jsonData);
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), DescendantResponseDto.class);
+            Log.e("CallingService: " + CREATE_DESCENDANT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                descendantRequestDto.setLoggedUser(loggedUser);
+                finalResponse = this.createDescendant(context, descendantRequestDto, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), DescendantResponseDto.class);
+            }
+            Log.e("CallingService: " + CREATE_DESCENDANT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + CREATE_DESCENDANT_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
     //endregion
 
     //region Private Methods
@@ -1211,6 +1252,21 @@ public class TicketService implements ITicketService {
 
         if (jsonElement != null) {
             finalResult.setTicketData(this.convertToTicketData(jsonElement));
+        }
+        return finalResult;
+    }
+
+    private DescendantResponseDto convertToDescendant(JsonElement jsonData) {
+        DescendantResponseDto finalResult = new DescendantResponseDto();
+        if (jsonData != null && jsonData.isJsonArray()) {
+            JsonArray dataArray = jsonData.getAsJsonArray();
+            for (int index = 0; index < dataArray.size(); index++) {
+                if (index == 0) {
+                    finalResult.setTicketName(dataArray.get(index).getAsString());
+                } else if (index == 1) {
+                    finalResult.setTicketID(dataArray.get(index).getAsString());
+                }
+            }
         }
         return finalResult;
     }

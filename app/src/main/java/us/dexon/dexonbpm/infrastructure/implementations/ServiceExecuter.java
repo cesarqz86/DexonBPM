@@ -27,6 +27,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
@@ -36,6 +37,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
@@ -906,6 +908,51 @@ public class ServiceExecuter {
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteCreateDescendant extends AsyncTask<DescendantRequestDto, Void, DescendantResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private DescendantRequestDto ticketRequest;
+
+        public ExecuteCreateDescendant(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected DescendantResponseDto doInBackground(DescendantRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.createDescendant(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(DescendantResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+                    TicketDetail ticketDetailActivity = (TicketDetail) this.currentContext;
+                    if (ticketDetailActivity != null) {
+                        ticketDetailActivity.descendantCallback(responseData);
+                    }
                 }
             }
         }

@@ -42,9 +42,11 @@ import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -143,10 +145,22 @@ public class TicketDetail extends FragmentActivity {
         // asignarle aquí el texto en función de la opción seleccionada.
         switch (item.getItemId()) {
             case R.id.button2_menu_opt1:
-                // Create son
-                return true;
             case R.id.button2_menu_opt2:
+                // Create son or
                 // Create brother
+                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+                dexonDatabase.setContext(this);
+
+                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+                DescendantRequestDto ticketData = new DescendantRequestDto();
+                ticketData.setLoggedUser(loggedUser);
+                ticketData.setTicketInfo(this.ticketData.getTicketInfo());
+                ticketData.setIsTicketSon(item.getItemId() == R.id.button2_menu_opt1);
+
+                ServiceExecuter serviceExecuter = new ServiceExecuter();
+                ServiceExecuter.ExecuteCreateDescendant createDescendantService = serviceExecuter.new ExecuteCreateDescendant(this);
+                createDescendantService.execute(ticketData);
                 return true;
             case R.id.button2_menu_opt3:
                 // Print ticket
@@ -243,6 +257,24 @@ public class TicketDetail extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
         ticketService.execute(reloadData);
+    }
+
+    public void descendantCallback(DescendantResponseDto descendantResponseDto){
+
+        if (CommonValidations.validateEmpty(descendantResponseDto.getTicketID())) {
+            IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+            dexonDatabase.setContext(this);
+
+            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+            TicketDetailRequestDto ticketData = new TicketDetailRequestDto();
+            ticketData.setIncidentID(Integer.parseInt(descendantResponseDto.getTicketID()));
+            ticketData.setLoggedUser(loggedUser);
+
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteTicketDetailService ticketService = serviceExecuter.new ExecuteTicketDetailService(this);
+            ticketService.execute(ticketData);
+        }
     }
 
 }
