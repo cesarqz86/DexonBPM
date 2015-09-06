@@ -361,6 +361,8 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
+                CommonSharedData.OriginalTechnician = responseData.getCurrentTechnician();
+
                 if (this.currentContext instanceof TicketDetail) {
                     TicketDetail ticketDetail = (TicketDetail) this.currentContext;
                     ticketDetail.inidentsCallBack(responseData);

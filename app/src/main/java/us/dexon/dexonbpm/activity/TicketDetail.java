@@ -31,6 +31,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.ProgressPagerAdapter;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
@@ -93,27 +94,7 @@ public class TicketDetail extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save: {
-                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-                dexonDatabase.setContext(this);
-
-                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
-
-                if (CommonSharedData.TicketInfoUpdated == null) {
-                    CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
-                }
-
-                JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-                JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
-                saveTicketInfo.add("headerInfo", headerInfo);
-
-                SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-                ticketData.setLoggedUser(loggedUser);
-                ticketData.setTicketInfo(saveTicketInfo);
-
-                ServiceExecuter serviceExecuter = new ServiceExecuter();
-                ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
-                saveTicketService.execute(ticketData);
-
+                CommonService.saveTicket(this);
                 break;
             }
             case R.id.action_reopen: {
@@ -149,7 +130,8 @@ public class TicketDetail extends FragmentActivity {
         lstvw_ticketdetail.setScrollContainer(false);
         TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList(), responseDto);
         lstvw_ticketdetail.setAdapter(detailAdapter);*/
-        this.drawTicket(responseDto);
+        //this.drawTicket(responseDto);
+        CommonService.drawTicket(responseDto, this);
 
         String activityTitle = this.getString(R.string.app_name);
         for (TicketDetailDataDto ticketData : responseDto.getDataList()) {
@@ -203,149 +185,6 @@ public class TicketDetail extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteReloadTicket ticketService = serviceExecuter.new ExecuteReloadTicket(this);
         ticketService.execute(reloadData);
-    }
-
-    private void drawTicket(TicketResponseDto responseDto) {
-        LinearLayout lstvw_ticketdetail = (LinearLayout) this.findViewById(R.id.lstvw_ticketdetail);
-        lstvw_ticketdetail.removeAllViews();
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        if (responseDto != null && responseDto.getDataList() != null && responseDto.getDataList().size() > 0) {
-            for (TicketDetailDataDto itemDetail : responseDto.getDataList()) {
-                View rowView = inflater.inflate(R.layout.item_detailticket, null);
-                RenderControlType controlType = itemDetail.getFieldType();
-                switch (controlType) {
-                    case DXControlsTree: {
-                        rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                            rowView.setOnClickListener(new DexonListeners.ListViewClickListener(
-                                    this,
-                                    itemDetail.getFieldSonData(),
-                                    itemDetail.getFieldKey()));
-                        }
-                        break;
-                    }
-                    case DXControlsGrid: {
-                        rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                            rowView.setOnClickListener(new DexonListeners.TableClickListener(
-                                    this,
-                                    itemDetail.getFieldSonData(),
-                                    itemDetail.getFieldKey()));
-                        }
-                        break;
-                    }
-                    case DXControlsDate: {
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        String dateString = itemDetail.getFieldValue();
-                        if (CommonValidations.validateEmpty(dateString)) {
-                            try {
-                                Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
-                                dateString = new SimpleDateFormat("dd/MMM/yyyy").format(date);
-                            } catch (Exception ex) {
-                                Log.e("Converting Date: ", ex.getMessage(), ex);
-                            }
-                        }
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(dateString);
-                        break;
-                    }
-                    case DXControlsGridWithOptions: {
-                        rowView = inflater.inflate(R.layout.item_detailticket_technician, null);
-
-                        LinearLayout linear_select_technician = (LinearLayout) rowView.findViewById(R.id.linear_select_technician);
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(itemDetail.getFieldValue());
-
-                        RadioButton btn_setmanual_technician = (RadioButton) rowView.findViewById(R.id.btn_setmanual_technician);
-                        RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
-                        RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
-
-                        if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                            DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(
-                                    this,
-                                    this.ticketData.getCurrentTechnician(),
-                                    this.ticketData);
-                            btn_setmanual_technician.setOnClickListener(technicianClickListener);
-                            btn_setautomatic_technician.setOnClickListener(technicianClickListener);
-                            btn_settome_technician.setOnClickListener(technicianClickListener);
-                        }
-
-                        switch (this.ticketData.getTechnicianSelected()) {
-                            case R.id.btn_setmanual_technician: {
-                                btn_setmanual_technician.setChecked(true);
-                                txt_fieldvalue.setCompoundDrawablesWithIntrinsicBounds(
-                                        0, //left
-                                        0, //top
-                                        R.drawable.ic_arrow, //right
-                                        0);//bottom
-                                if (this.ticketData.getIsOpen() && this.ticketData.getIsEditable()) {
-                                    linear_select_technician.setOnClickListener(new DexonListeners.TableClickListener(
-                                            this,
-                                            itemDetail.getFieldSonData(),
-                                            itemDetail.getFieldKey()));
-                                }
-                                break;
-                            }
-                            case R.id.btn_setautomatic_technician: {
-                                btn_setautomatic_technician.setChecked(true);
-                                txt_fieldvalue.setCompoundDrawablesWithIntrinsicBounds(
-                                        0, //left
-                                        0, //top
-                                        0, //right
-                                        0);//bottom
-                                break;
-                            }
-                            case R.id.btn_settome_technician: {
-                                btn_settome_technician.setChecked(true);
-                                txt_fieldvalue.setCompoundDrawablesWithIntrinsicBounds(
-                                        0, //left
-                                        0, //top
-                                        0, //right
-                                        0);//bottom
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    case DXControlsMultiline: {
-                        rowView = inflater.inflate(R.layout.item_detailticket_text_multi, null);
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        //txt_fieldvalue.setMovementMethod(new ScrollingMovementMethod());
-                        break;
-                    }
-                    default: {
-                        TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-                        TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
-
-                        txt_fieldtitle.setText(itemDetail.getFieldName());
-                        txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        break;
-                    }
-                }
-                lstvw_ticketdetail.addView(rowView);
-            }
-        }
     }
 
 }

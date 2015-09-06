@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
@@ -76,26 +77,7 @@ public class NewTicketActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save: {
-                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-                dexonDatabase.setContext(this);
-
-                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
-
-                if (CommonSharedData.TicketInfoUpdated == null) {
-                    CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
-                }
-
-                JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-                JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
-                saveTicketInfo.add("headerInfo", headerInfo);
-
-                SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-                ticketData.setLoggedUser(loggedUser);
-                ticketData.setTicketInfo(saveTicketInfo);
-
-                ServiceExecuter serviceExecuter = new ServiceExecuter();
-                ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(this);
-                saveTicketService.execute(ticketData);
+                CommonService.saveTicket(this);
                 break;
             }
         }
@@ -120,10 +102,11 @@ public class NewTicketActivity extends FragmentActivity {
 
         this.ticketData = responseDto;
 
-        ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
+        /*ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
         TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList(), responseDto);
-        lstvw_ticketdetail.setAdapter(detailAdapter);
+        lstvw_ticketdetail.setAdapter(detailAdapter);*/
 
+        CommonService.drawTicket(responseDto, this);
     }
 
     public void reloadCallback(JsonObject ticketInfo) {

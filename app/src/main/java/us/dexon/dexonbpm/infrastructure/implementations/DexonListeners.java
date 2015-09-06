@@ -212,14 +212,14 @@ public final class DexonListeners {
                         newTicket = (NewTicketActivity) this.currentContext;
                     }
 
+                    JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
+                    ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", CommonSharedData.OriginalTechnician);
+                    this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, CommonSharedData.OriginalTechnician);
+
                     if (ticketDetail != null) {
-                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
-                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, this.currentTechnician);
                         ticketDetail.inidentsCallBack(this.ticketInfo);
                     }
                     if (newTicket != null) {
-                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
-                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, this.currentTechnician);
                         newTicket.inidentsCallBack(this.ticketInfo);
                     }
                     break;
@@ -258,16 +258,15 @@ public final class DexonListeners {
                         newTicket = (NewTicketActivity) this.currentContext;
                     }
 
+
+                    JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
+                    ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
+                    this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_settome_technician, this.currentTechnician);
+
                     if (ticketDetail != null) {
-                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
-                        ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
-                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_settome_technician, this.currentTechnician);
                         ticketDetail.inidentsCallBack(this.ticketInfo);
                     }
                     if (newTicket != null) {
-                        JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
-                        ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
-                        this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_settome_technician, this.currentTechnician);
                         newTicket.inidentsCallBack(this.ticketInfo);
                     }
 

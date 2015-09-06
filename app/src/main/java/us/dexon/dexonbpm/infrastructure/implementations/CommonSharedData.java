@@ -2,6 +2,8 @@ package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.app.Activity;
 
+import com.google.gson.JsonObject;
+
 import java.util.List;
 
 import us.dexon.dexonbpm.activity.NewTicketActivity;
@@ -28,4 +30,6 @@ public class CommonSharedData {
     public static ActivityTreeDto NewActivityData;
 
     public static List<ActivityTreeDto> ActivityList;
+
+    public static JsonObject OriginalTechnician;
 }

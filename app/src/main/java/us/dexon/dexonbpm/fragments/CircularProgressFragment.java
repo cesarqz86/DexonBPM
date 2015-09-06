@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.github.lzyzsd.circleprogress.DonutProgress;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 
 /**
  * Created by Cesar Quiroz on 8/30/15.
@@ -33,10 +34,7 @@ public class CircularProgressFragment extends Fragment {
         StringBuilder progressText = new StringBuilder();
         progressText.append(progressInt);
 
-        int pixelSize = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_SP,
-                25,
-                getResources().getDisplayMetrics());
+        int pixelSize = CommonService.convertSpToPixel(25f, this.getActivity());
 
         DonutProgress circularProgressBar = (DonutProgress) rootView.findViewById(R.id.circularProgressBar);
         circularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
@@ -59,11 +57,7 @@ public class CircularProgressFragment extends Fragment {
         }
 
         if (progressText.length() >= 4) {
-            pixelSize = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_SP,
-                    15,
-                    getResources().getDisplayMetrics());
-            circularProgressBar.setTextSize(pixelSize);
+            pixelSize = CommonService.convertSpToPixel(15f, this.getActivity());
             //circularProgressBar.setTextSize(30);
         }
         return rootView;
