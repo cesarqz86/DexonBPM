@@ -64,5 +64,9 @@ public final class CommonValidations {
         }
         return finalResult;
     }
+
+    public static boolean validateContains(String originalValue, String filterValue){
+        return org.apache.commons.lang3.StringUtils.containsIgnoreCase(originalValue, filterValue);
+    }
     //endregion
 }

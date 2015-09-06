@@ -3,8 +3,17 @@ package us.dexon.dexonbpm.activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
@@ -18,6 +27,7 @@ import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 
 public class TableActivity extends FragmentActivity {
@@ -27,6 +37,7 @@ public class TableActivity extends FragmentActivity {
     private TableAdapter matrixTableAdapter;
     private String fieldKey;
     private String incidentCode;
+    private String[][] originalData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +64,44 @@ public class TableActivity extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteAllRecordHeaderTable getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTable(this);
         getAllRecords.execute(recordHeader);
+
+        final EditText findDaemon = (EditText) findViewById(R.id.search_field);
+        findDaemon.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    String filterValue = v.getText().toString();
+                    if (!CommonValidations.validateEmpty(filterValue)) {
+                        drawData(originalData);
+                    } else {
+                        String[][] filteredList = null;
+                        List<String[]> filteredTempList = new ArrayList<String[]>();
+                        int count = 0;
+                        for (String[] itemTree : originalData) {
+                            if (count == 0) {
+                                filteredTempList.add(itemTree);
+                            } else {
+                                for (String itemTreeDetail : itemTree) {
+                                    if (CommonValidations.validateContains(itemTreeDetail, filterValue)) {
+                                        filteredTempList.add(itemTree);
+                                        break;
+                                    }
+                                }
+                            }
+                            count++;
+                        }
+                        filteredList = new String[filteredTempList.size()][];
+                        count = 0;
+                        for (String[] itemTree : filteredTempList) {
+                            filteredList[count] = itemTree;
+                            count++;
+                        }
+                        drawData(filteredList);
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     public void inidentsCallBack(String[][] dataList) {
@@ -60,14 +109,18 @@ public class TableActivity extends FragmentActivity {
             ITicketService ticketService = TicketService.getInstance();
             dataList = ticketService.getEmptyData("");
         }
+        if (this.originalData == null) {
+            this.originalData = dataList;
+        }
+        this.drawData(dataList);
+    }
+
+    private void drawData(String[][] dataList) {
         int indexColumnID = -1;
-        if(dataList.length > 0)
-        {
+        if (dataList.length > 0) {
             int tempIndex = 0;
-            for (String columnData: dataList[0])
-            {
-                if(CommonValidations.validateEmpty(columnData))
-                {
+            for (String columnData : dataList[0]) {
+                if (CommonValidations.validateEmpty(columnData)) {
                     indexColumnID = tempIndex;
                     break;
                 }
