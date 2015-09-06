@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/button2_menu_opt1"
+        android:title="@string/menu_create_son" />
+    <item
+        android:id="@+id/button2_menu_opt2"
+        android:title="@string/menu_create_brother" />
+    <item
+        android:id="@+id/button2_menu_opt3"
+        android:title="@string/menu_print_ticket" />
+    <item
+        android:id="@+id/button2_menu_opt4"
+        android:title="@string/menu_recalculate_sla" />
+    <item
+        android:id="@+id/button2_menu_opt5"
+        android:title="@string/menu_cancel_label" />
+</menu>

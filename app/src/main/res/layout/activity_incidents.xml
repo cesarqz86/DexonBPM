@@ -54,7 +54,6 @@
         android:orientation="vertical">
     </inqbarna.tablefixheaders.TableFixHeaders>
 
-
     <RelativeLayout
         android:id="@+id/footer_container"
         android:layout_width="match_parent"

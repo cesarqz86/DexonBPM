@@ -1,17 +1,20 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -34,6 +37,7 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -59,6 +63,9 @@ public class TicketDetail extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ticket_detail);
+
+        ImageButton menuButton = (ImageButton) findViewById(R.id.menu_button);
+        this.registerForContextMenu(menuButton);
 
         Intent i = getIntent();
         ticketId = i.getExtras().getString("TICKET_ID");
@@ -116,8 +123,59 @@ public class TicketDetail extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        // Creamos el objeto que debe inflar la vista del menú en la pantalla.
+        MenuInflater inflater = new MenuInflater(this);
+
+        switch (v.getId()) {
+            case R.id.menu_button:
+                inflater.inflate(R.menu.menu_ticket_detail_submenu, menu);
+                break;
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // Previamente creamos el objeto TextView y lo inicializamos para poder
+        // asignarle aquí el texto en función de la opción seleccionada.
+        switch (item.getItemId()) {
+            case R.id.button2_menu_opt1:
+                // Create son
+                return true;
+            case R.id.button2_menu_opt2:
+                // Create brother
+                return true;
+            case R.id.button2_menu_opt3:
+                // Print ticket
+                return true;
+            case R.id.button2_menu_opt4:
+                // Recalculate SLA
+                return true;
+            case R.id.button2_menu_opt5:
+                // Cancel does nothing
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         CommonSharedData.TreeData = null;
+    }
+
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
+    }
+
+    public void menuClick(View view) {
+        this.openContextMenu(view);
     }
 
     public void inidentsCallBack(TicketResponseDto responseDto) {

@@ -45,6 +45,10 @@
     <string name="menu_cancel_label">Cancelar</string>
     <string name="menu_save_ticket">Save</string>
     <string name="menu_reopen_ticket">Reopen</string>
+    <string name="menu_create_son">Crear Hijo</string>
+    <string name="menu_create_brother">Crear Hermano</string>
+    <string name="menu_print_ticket">Imprimir Ticket</string>
+    <string name="menu_recalculate_sla">Recalcular SLA</string>
 
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>

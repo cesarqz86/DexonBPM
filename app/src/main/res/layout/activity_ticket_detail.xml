@@ -1,47 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/white_btn_style">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="us.dexon.dexonbpm.activity.TicketDetail">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/white_btn_style"
-        android:orientation="vertical">
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/progress_pager"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/progress_pager_border" />
-
-        <com.viewpagerindicator.CirclePageIndicator
-            android:id="@+id/progress_pager_indicator"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dip" />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/footer_container"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/white_btn_style">
 
         <LinearLayout
-            android:id="@+id/lstvw_ticketdetail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-10dp"
-            android:orientation="vertical"
-            android:padding="5dp" />
-
-        <!--<ListView
-            android:id="@+id/lstvw_ticketdetail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/white_btn_style"
-            android:dividerHeight="1.5sp"
-            android:footerDividersEnabled="true"
-            android:isScrollContainer="false"
-            android:padding="5dp" />-->
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/progress_pager"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/progress_pager_border" />
 
-</ScrollView>
+            <com.viewpagerindicator.CirclePageIndicator
+                android:id="@+id/progress_pager_indicator"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dip" />
+
+            <LinearLayout
+                android:id="@+id/lstvw_ticketdetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-10dp"
+                android:orientation="vertical"
+                android:padding="5dp" />
+
+            <!--<ListView
+                android:id="@+id/lstvw_ticketdetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_btn_style"
+                android:dividerHeight="1.5sp"
+                android:footerDividersEnabled="true"
+                android:isScrollContainer="false"
+                android:padding="5dp" />-->
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/footer_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/blue_light"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/dexon_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:onClick="logoClick"
+            android:src="@drawable/logo_mini" />
+
+        <ImageButton
+            android:id="@+id/menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:onClick="menuClick"
+            android:src="@drawable/ic_action_ticket_menu" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
