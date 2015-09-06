@@ -5,6 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:actionMenuTextColor">@color/white</item>
+        <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
     </style>
 
 
@@ -112,6 +113,13 @@
         <item name="android:ellipsize">end</item>
         <!--<item name="android:layout_marginBottom">1dip</item>
         <item name="android:layout_marginRight">1dip</item>-->
+    </style>
+
+    <style name="CustomCirclePageIndicator">
+        <item name="fillColor">@color/pager_selected</item>
+        <item name="pageColor">@color/pager_not_selected</item>
+        <item name="android:background">@color/white</item>
+        <item name="centered">true</item>
     </style>
 
 </resources>

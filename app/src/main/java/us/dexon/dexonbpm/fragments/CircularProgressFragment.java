@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +33,16 @@ public class CircularProgressFragment extends Fragment {
         StringBuilder progressText = new StringBuilder();
         progressText.append(progressInt);
 
+        int pixelSize = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_SP,
+                25,
+                getResources().getDisplayMetrics());
+
         DonutProgress circularProgressBar = (DonutProgress) rootView.findViewById(R.id.circularProgressBar);
         circularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
         circularProgressBar.setProgress(progressInt);
-        circularProgressBar.setTextSize(80);
+        circularProgressBar.setTextSize(pixelSize);
+        //circularProgressBar.setTextSize(80);
 
         if (progressInt <= 50) {
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_green_transparent));
@@ -52,7 +59,12 @@ public class CircularProgressFragment extends Fragment {
         }
 
         if (progressText.length() >= 4) {
-            circularProgressBar.setTextSize(50);
+            pixelSize = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_SP,
+                    15,
+                    getResources().getDisplayMetrics());
+            circularProgressBar.setTextSize(pixelSize);
+            //circularProgressBar.setTextSize(30);
         }
         return rootView;
     }
