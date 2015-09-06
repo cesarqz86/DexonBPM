@@ -3,9 +3,11 @@ package us.dexon.dexonbpm.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
@@ -22,12 +24,17 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.google.gson.JsonObject;
 import com.viewpagerindicator.CirclePageIndicator;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.FileHandler;
 import java.util.zip.Inflater;
 
 import us.dexon.dexonbpm.R;
@@ -44,9 +51,11 @@ import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -141,6 +150,14 @@ public class TicketDetail extends FragmentActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+
         // Previamente creamos el objeto TextView y lo inicializamos para poder
         // asignarle aquí el texto en función de la opción seleccionada.
         switch (item.getItemId()) {
@@ -148,32 +165,33 @@ public class TicketDetail extends FragmentActivity {
             case R.id.button2_menu_opt2:
                 // Create son or
                 // Create brother
-                IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-                dexonDatabase.setContext(this);
-
-                LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
-
                 DescendantRequestDto ticketData = new DescendantRequestDto();
                 ticketData.setLoggedUser(loggedUser);
                 ticketData.setTicketInfo(this.ticketData.getTicketInfo());
                 ticketData.setIsTicketSon(item.getItemId() == R.id.button2_menu_opt1);
 
-                ServiceExecuter serviceExecuter = new ServiceExecuter();
                 ServiceExecuter.ExecuteCreateDescendant createDescendantService = serviceExecuter.new ExecuteCreateDescendant(this);
                 createDescendantService.execute(ticketData);
-                return true;
+                break;
             case R.id.button2_menu_opt3:
                 // Print ticket
-                return true;
+                PrintTicketRequestDto printTicketData = new PrintTicketRequestDto();
+                printTicketData.setLoggedUser(loggedUser);
+                printTicketData.setTicketInfo(this.ticketData.getTicketInfo());
+
+                ServiceExecuter.ExecutePrintTicket printTicketService = serviceExecuter.new ExecutePrintTicket(this);
+                printTicketService.execute(printTicketData);
+                break;
             case R.id.button2_menu_opt4:
                 // Recalculate SLA
-                return true;
+                break;
             case R.id.button2_menu_opt5:
                 // Cancel does nothing
-                return true;
+                break;
             default:
                 return super.onContextItemSelected(item);
         }
+        return true;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -259,7 +277,7 @@ public class TicketDetail extends FragmentActivity {
         ticketService.execute(reloadData);
     }
 
-    public void descendantCallback(DescendantResponseDto descendantResponseDto){
+    public void descendantCallback(DescendantResponseDto descendantResponseDto) {
 
         if (CommonValidations.validateEmpty(descendantResponseDto.getTicketID())) {
             IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
@@ -277,4 +295,37 @@ public class TicketDetail extends FragmentActivity {
         }
     }
 
+    public void printCallback(PrintTicketResponseDto printTicketResponseDto) {
+
+        if (CommonValidations.validateEmpty(printTicketResponseDto.getBufferData())) {
+            try {
+                byte[] pdfData = Base64.decode(printTicketResponseDto.getBufferData(), Base64.DEFAULT);
+                File filePath = new File(Environment.getExternalStorageDirectory() + "/temp.pdf");
+                if (filePath.exists()) {
+                    filePath.delete();
+                }
+                FileOutputStream fileWriter = new FileOutputStream(filePath, true);
+                fileWriter.write(pdfData);
+                fileWriter.flush();
+                fileWriter.close();
+
+                Intent pdfIntent = new Intent(this, WebViewActivity.class);
+                //pdfIntent.putExtra("PdfData", printTicketResponseDto.getBufferData());
+                String filePathString = Environment.getExternalStorageDirectory() + "/temp.pdf";
+                pdfIntent.putExtra("PdfUrl", filePathString);
+
+                /*Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
+                //pdfIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+                String finalPath = "file://" + Environment.getExternalStorageDirectory() + "/temp.pdf";
+                //pdfIntent.setDataAndType(Uri.parse(finalPath), "application/pdf");
+                pdfIntent.setDataAndType(Uri.fromFile(filePath), "application/pdf");*/
+                this.startActivity(pdfIntent);
+                this.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+
+            } catch (Exception e) {
+                Log.e("Error loading PDF data", e.getMessage());
+            }
+        }
+    }
 }

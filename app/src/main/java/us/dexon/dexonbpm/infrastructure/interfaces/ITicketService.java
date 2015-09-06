@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
@@ -15,6 +16,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
@@ -64,5 +66,7 @@ public interface ITicketService {
     TicketResponseDto getRelatedActivities(Context context, RelatedActivitiesRequestDto relatedActivitiesRequestDto, int reloginCount);
 
     DescendantResponseDto createDescendant(Context context, DescendantRequestDto descendantRequestDto, int reloginCount);
+
+    PrintTicketResponseDto printTicket(Context context, PrintTicketRequestDto printTicketRequestDto, int reloginCount);
 
 }

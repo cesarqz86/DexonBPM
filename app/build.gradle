@@ -47,5 +47,7 @@ dependencies {
     compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile 'com.akexorcist:RoundCornerProgressBar:1.2.2'
+    compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
+    //compile 'com.github.jblough:Android-Pdf-Viewer-Library:v1.0'
     //compile 'com.viewpagerindicator:library:2.4.1@aar'
 }

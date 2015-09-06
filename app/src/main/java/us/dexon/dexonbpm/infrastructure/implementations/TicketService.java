@@ -40,6 +40,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
@@ -50,6 +51,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
@@ -84,6 +86,7 @@ public class TicketService implements ITicketService {
     private static String LOAD_WORKFLOW_URL = "api/Incident/GetWFResult";
     private static String RELATED_ACT_URL = "api/Incident/GetActivitiesRelated";
     private static String CREATE_DESCENDANT_URL = "api/Incident/CreateDescendant";
+    private static String PRINT_TICKET_URL = "api/Incident/PrintTicket";
 
     private int columnCount = 6;
     //endregion
@@ -778,6 +781,45 @@ public class TicketService implements ITicketService {
         }
         return finalResponse;
     }
+
+    public PrintTicketResponseDto printTicket(Context context, PrintTicketRequestDto printTicketRequestDto, int reloginCount) {
+        PrintTicketResponseDto finalResponse = new PrintTicketResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += PRINT_TICKET_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(printTicketRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToPrintResult(jsonData);
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), PrintTicketResponseDto.class);
+            Log.e("CallingService: " + PRINT_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                printTicketRequestDto.setLoggedUser(loggedUser);
+                //finalResponse = this.printTicket(context, printTicketRequestDto, reloginCount++);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), PrintTicketResponseDto.class);
+            }
+            Log.e("CallingService: " + PRINT_TICKET_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + PRINT_TICKET_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
     //endregion
 
     //region Private Methods
@@ -1266,6 +1308,19 @@ public class TicketService implements ITicketService {
                 } else if (index == 1) {
                     finalResult.setTicketID(dataArray.get(index).getAsString());
                 }
+            }
+        }
+        return finalResult;
+    }
+
+    private PrintTicketResponseDto convertToPrintResult(JsonElement jsonData) {
+        PrintTicketResponseDto finalResult = new PrintTicketResponseDto();
+        if (jsonData != null && jsonData.isJsonObject()) {
+            JsonObject jsonElement = jsonData.getAsJsonObject();
+            if (jsonElement.has("_buffer")) {
+                finalResult.setBufferData(jsonElement.get("_buffer").getAsString());
+            } else if (jsonElement.has("error")) {
+                finalResult.setBufferData(jsonElement.get("error").getAsString());
             }
         }
         return finalResult;
