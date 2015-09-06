@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
@@ -32,4 +33,6 @@ public class CommonSharedData {
     public static List<ActivityTreeDto> ActivityList;
 
     public static JsonObject OriginalTechnician;
+
+    public static IncidentsActivity IncidentListActivity;
 }

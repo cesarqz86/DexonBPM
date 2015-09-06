@@ -1,5 +1,7 @@
 package us.dexon.dexonbpm.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,10 +18,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
 import us.dexon.dexonbpm.infrastructure.enums.TicketFilter;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
@@ -75,6 +82,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
         // To avoid issues with the Spring RestClient and HttpHeaders
         System.setProperty("http.keepAlive", "false");
+
+        CommonSharedData.IncidentListActivity = this;
     }
 
     @Override
@@ -94,7 +103,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_reloadincidents:{
+            case R.id.action_reloadincidents: {
                 this.executeSearch();
                 break;
             }
@@ -181,7 +190,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         this.startActivity(webIntent);
     }
 
-    public  void  newTicketClick(View view){
+    public void newTicketClick(View view) {
         Intent newTicketIntent = new Intent(this, NewTicketActivity.class);
         newTicketIntent.putExtra("TICKET_ID", "-1");
         this.startActivity(newTicketIntent);
@@ -234,5 +243,23 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_container);
         this.matrixTableAdapter = new MatrixTableAdapter(this, dataList, indexColumnID);
         tableFixHeaders.setAdapter(this.matrixTableAdapter);
+    }
+
+    public void openFamilyCallBack(final String ticketId) {
+        final ProgressDialog progressDialog = CommonService.getCustomProgressDialog(this);
+        progressDialog.show();
+        android.os.Handler handler = new android.os.Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.hide();
+                Activity currentActivity = (Activity) currentContext;
+                Intent incidentDetail = new Intent(currentContext, TicketDetail.class);
+                incidentDetail.putExtra("TICKET_ID", ticketId);
+                currentActivity.startActivity(incidentDetail);
+                currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+            }
+        }, 2000);
     }
 }

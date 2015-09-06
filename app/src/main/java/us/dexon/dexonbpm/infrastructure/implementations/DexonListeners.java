@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -108,57 +109,83 @@ public final class DexonListeners {
         }
 
         public void onClick(View v) {
-            JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
-            JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
-            JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
-            JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+            Log.i("DEXON_DEVELOPMENT", this.fieldKey);
 
-            fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
-            sonData.addProperty("short_description", this.nodeInfo.getElementName());
+            if (CommonValidations.validateEqualsIgnoreCase(this.fieldKey, "family")) {
+                Log.i("DEXON_DEVELOPMENT", this.nodeInfo.getElementId());
 
-            fieldInfo.add("son", sonData);
-            headerInfo.add(this.fieldKey, fieldInfo);
-            ticketJsonInfo.add("headerInfo", headerInfo);
-            ITicketService ticketService = TicketService.getInstance();
-            this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
-            //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
+                Activity currentActivity = (Activity) this.currentContext;
+                Activity parentActivity = null;
+                Intent ticketDetailActivity = null;
 
-            Activity currentActivity = (Activity) this.currentContext;
-            TicketDetail ticketDetail = null;
-            NewTicketActivity newTicket = null;
-            Intent ticketDetailActivity = null;
+                if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+                    parentActivity = (TicketDetail) CommonSharedData.TicketActivity;
+                    ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
+                } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
+                    parentActivity = (NewTicketActivity) CommonSharedData.TicketActivity;
+                    ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
+                }
 
-            if (CommonSharedData.TicketActivity instanceof TicketDetail) {
-                ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-                ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
-            } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
-                newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-                ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
-            }
+                ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                currentActivity.startActivity(ticketDetailActivity);
+                currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+                parentActivity.finish();
+                CommonSharedData.IncidentListActivity.openFamilyCallBack(this.nodeInfo.getElementId());
+            } else {
 
-            if (ticketDetail != null)
-                ticketDetail.inidentsCallBack(this.ticketInfo);
+                JsonObject ticketJsonInfo = this.ticketInfo.getTicketInfo();
+                JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
+                JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
+                JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
 
-            if (newTicket != null)
-                newTicket.inidentsCallBack(this.ticketInfo);
+                fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
+                sonData.addProperty("short_description", this.nodeInfo.getElementName());
 
-            ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            currentActivity.startActivity(ticketDetailActivity);
-            currentActivity.overridePendingTransition(R.anim.right_slide_in,
-                    R.anim.right_slide_out);
-            Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
-            if (isReloadRequired) {
-                Date currentDate = new Date();
+                fieldInfo.add("son", sonData);
+                headerInfo.add(this.fieldKey, fieldInfo);
+                ticketJsonInfo.add("headerInfo", headerInfo);
+                ITicketService ticketService = TicketService.getInstance();
+                this.ticketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
+                //CommonSharedData.TicketActivity.inidentsCallBack(this.ticketInfo);
 
-                SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-                CharSequence currentDateString = dateFormater.format(currentDate);
-                ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
-                //CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+                Activity currentActivity = (Activity) this.currentContext;
+                TicketDetail ticketDetail = null;
+                NewTicketActivity newTicket = null;
+                Intent ticketDetailActivity = null;
+
+                if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+                    ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+                    ticketDetailActivity = new Intent(currentActivity, TicketDetail.class);
+                } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
+                    newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+                    ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
+                }
+
                 if (ticketDetail != null)
-                    ticketDetail.reloadCallback(ticketJsonInfo);
+                    ticketDetail.inidentsCallBack(this.ticketInfo);
 
                 if (newTicket != null)
-                    newTicket.reloadCallback(ticketJsonInfo);
+                    newTicket.inidentsCallBack(this.ticketInfo);
+
+                ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                currentActivity.startActivity(ticketDetailActivity);
+                currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+                Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+                if (isReloadRequired) {
+                    Date currentDate = new Date();
+
+                    SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+                    CharSequence currentDateString = dateFormater.format(currentDate);
+                    ticketJsonInfo.addProperty("LastUpdateTime", currentDateString.toString());
+                    //CommonSharedData.TicketActivity.reloadCallback(ticketJsonInfo);
+                    if (ticketDetail != null)
+                        ticketDetail.reloadCallback(ticketJsonInfo);
+
+                    if (newTicket != null)
+                        newTicket.reloadCallback(ticketJsonInfo);
+                }
             }
         }
     }
