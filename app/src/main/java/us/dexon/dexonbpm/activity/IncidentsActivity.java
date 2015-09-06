@@ -248,6 +248,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
     public void openFamilyCallBack(final String ticketId) {
         final ProgressDialog progressDialog = CommonService.getCustomProgressDialog(this);
         progressDialog.show();
+        // To emulate a 2 seconds time to let the user sees the incident list.
         android.os.Handler handler = new android.os.Handler();
         handler.postDelayed(new Runnable() {
             @Override
