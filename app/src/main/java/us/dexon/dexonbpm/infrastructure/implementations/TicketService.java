@@ -52,6 +52,7 @@ import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
@@ -87,6 +88,7 @@ public class TicketService implements ITicketService {
     private static String RELATED_ACT_URL = "api/Incident/GetActivitiesRelated";
     private static String CREATE_DESCENDANT_URL = "api/Incident/CreateDescendant";
     private static String PRINT_TICKET_URL = "api/Incident/PrintTicket";
+    private static String RECALCULATE_SLA_URL = "api/Incident/RecalculateSLA";
 
     private int columnCount = 6;
     //endregion
@@ -817,6 +819,37 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + PRINT_TICKET_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public TicketResponseDto recalculateSLA(Context context, RecalculateSLARequestDto recalculateSLARequestDto) {
+        TicketResponseDto finalResponse = new TicketResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += RECALCULATE_SLA_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(recalculateSLARequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse = this.convertToTicketData(jsonData);
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
+            Log.e("CallingService: " + RECALCULATE_SLA_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
+            Log.e("CallingService: " + RECALCULATE_SLA_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + RECALCULATE_SLA_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }

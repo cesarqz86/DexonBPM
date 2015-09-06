@@ -56,6 +56,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -183,6 +184,11 @@ public class TicketDetail extends FragmentActivity {
                 printTicketService.execute(printTicketData);
                 break;
             case R.id.button2_menu_opt4:
+                RecalculateSLARequestDto recalculateSLAData = new RecalculateSLARequestDto();
+                recalculateSLAData.setTicketInfo(this.ticketData.getTicketInfo());
+
+                ServiceExecuter.ExecuteRecalculateSLAService recalculateSLAService = serviceExecuter.new ExecuteRecalculateSLAService(this);
+                recalculateSLAService.execute(recalculateSLAData);
                 // Recalculate SLA
                 break;
             case R.id.button2_menu_opt5:

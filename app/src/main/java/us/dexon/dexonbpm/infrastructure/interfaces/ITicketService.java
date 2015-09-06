@@ -17,6 +17,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
@@ -69,4 +70,5 @@ public interface ITicketService {
 
     PrintTicketResponseDto printTicket(Context context, PrintTicketRequestDto printTicketRequestDto, int reloginCount);
 
+    TicketResponseDto recalculateSLA(Context context, RecalculateSLARequestDto recalculateSLARequestDto);
 }
