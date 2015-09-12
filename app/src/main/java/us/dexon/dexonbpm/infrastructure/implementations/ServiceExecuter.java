@@ -726,11 +726,12 @@ public class ServiceExecuter {
                             MessageTypeIcon.Error,
                             false);
                 } else {
+                    boolean closeWindows = (this.currentContext instanceof NewTicketActivity);
                     CommonService.ShowAlertDialog(this.currentContext,
                             R.string.validation_ticket_success_title,
                             R.string.validation_ticket_success_message,
                             MessageTypeIcon.Error,
-                            false);
+                            closeWindows);
                 }
             }
         }

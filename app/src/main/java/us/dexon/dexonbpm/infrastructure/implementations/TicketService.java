@@ -138,7 +138,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 ticketFilter.setLoggedUser(loggedUser);
-                finalResponse = this.getTicketData(context, ticketFilter, reloginCount++);
+                finalResponse = this.getTicketData(context, ticketFilter, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketWrapperResponseDto.class);
             }
@@ -233,7 +233,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 ticketDetail.setLoggedUser(loggedUser);
-                this.getTicketInfo(context, ticketDetail, reloginCount++);
+                this.getTicketInfo(context, ticketDetail, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             }
@@ -273,7 +273,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 recordDetail.setLoggedUser(loggedUser);
-                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             }
@@ -312,7 +312,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 recordDetail.setLoggedUser(loggedUser);
-                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             }
@@ -351,7 +351,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 recordDetail.setLoggedUser(loggedUser);
-                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount++);
+                this.getAllRecordsHeaderTree(context, recordDetail, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             }
@@ -503,7 +503,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 reopenInfo.setLoggedUser(loggedUser);
-                this.reopenTicket(context, reopenInfo, reloginCount++);
+                this.reopenTicket(context, reopenInfo, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), ReopenResponseDto.class);
             }
@@ -543,7 +543,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 reloadInfo.setLoggedUser(loggedUser);
-                this.reloadTicket(context, reloadInfo, reloginCount++);
+                this.reloadTicket(context, reloadInfo, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             }
@@ -582,7 +582,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 saveInfo.setLoggedUser(loggedUser);
-                this.saveTicket(context, saveInfo, reloginCount++);
+                this.saveTicket(context, saveInfo, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             }
@@ -622,7 +622,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 layoutRequestDto.setLoggedUser(loggedUser);
-                this.getAllLayouts(context, layoutRequestDto, reloginCount++);
+                this.getAllLayouts(context, layoutRequestDto, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), RecordHeaderResponseDto.class);
             }
@@ -662,7 +662,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 ticketRequestDto.setLoggedUser(loggedUser);
-                this.getTicketByLayout(context, ticketRequestDto, reloginCount++);
+                this.getTicketByLayout(context, ticketRequestDto, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             }
@@ -733,7 +733,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 relatedActivitiesRequestDto.setLoggedUser(loggedUser);
-                finalResponse = this.getRelatedActivities(context, relatedActivitiesRequestDto, reloginCount++);
+                finalResponse = this.getRelatedActivities(context, relatedActivitiesRequestDto, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), TicketResponseDto.class);
             }
@@ -772,7 +772,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 descendantRequestDto.setLoggedUser(loggedUser);
-                finalResponse = this.createDescendant(context, descendantRequestDto, reloginCount++);
+                finalResponse = this.createDescendant(context, descendantRequestDto, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), DescendantResponseDto.class);
             }
@@ -811,7 +811,7 @@ public class TicketService implements ITicketService {
                 LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
                 LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
                 printTicketRequestDto.setLoggedUser(loggedUser);
-                //finalResponse = this.printTicket(context, printTicketRequestDto, reloginCount++);
+                finalResponse = this.printTicket(context, printTicketRequestDto, reloginCount + 1);
             } else {
                 finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), PrintTicketResponseDto.class);
             }
