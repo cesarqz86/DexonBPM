@@ -1,19 +1,14 @@
 package us.dexon.dexonbpm.model.ReponseDTO;
 
-import com.google.gson.JsonObject;
-
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 
 /**
- * Created by Cesar Quiroz on 8/17/15.
+ * Created by Cesar Quiroz on 9/13/15.
  */
-public class TicketDetailDataDto {
+public class TicketRelatedDataDto {
 
     //region Attributes
     private String fieldName;
-    private String fieldValue;
-    private int Order;
-    private RenderControlType fieldType;
     private String fieldKey;
     private String fieldSonData;
     //endregion
@@ -25,30 +20,6 @@ public class TicketDetailDataDto {
 
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
-    }
-
-    public String getFieldValue() {
-        return fieldValue;
-    }
-
-    public void setFieldValue(String fieldValue) {
-        this.fieldValue = fieldValue;
-    }
-
-    public int getOrder() {
-        return Order;
-    }
-
-    public void setOrder(int order) {
-        Order = order;
-    }
-
-    public RenderControlType getFieldType() {
-        return fieldType;
-    }
-
-    public void setFieldType(RenderControlType fieldType) {
-        this.fieldType = fieldType;
     }
 
     public String getFieldKey() {

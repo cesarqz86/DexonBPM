@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
@@ -19,8 +21,10 @@ import java.util.Date;
 import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
+import us.dexon.dexonbpm.activity.RelatedDataActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
+import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
@@ -143,6 +147,15 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         String rowNumberString = (String) v.getTag(R.id.tag_column_table);
         int rowNumber = Integer.parseInt(rowNumberString);
 
+        if (CommonSharedData.RelatedDataActivity == null) {
+            this.headerClick(rowNumber);
+        } else {
+            this.relatedDataClick(rowNumber);
+        }
+    }
+
+    private void headerClick(int rowNumber) {
+
         JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
         JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
         JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
@@ -151,7 +164,7 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         StringBuilder valueKeyBuilder = new StringBuilder();
         valueKeyBuilder.append(sonData.get("tb_name").getAsString());
         valueKeyBuilder.append("_ID");
-        String valueKey =  valueKeyBuilder.toString();
+        String valueKey = valueKeyBuilder.toString();
         int columnValueID = this.indexColumnID;
         int tempIndex = 0;
         for (String columnName : this.table[0]) {
@@ -171,7 +184,7 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
 
-        Activity currentActivity = (Activity) this.context;
+        Activity currentActivity = this.context;
         TicketDetail ticketDetail = null;
         NewTicketActivity newTicket = null;
         Intent ticketDetailActivity = null;
@@ -207,6 +220,102 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
             if (newTicket != null)
                 newTicket.reloadCallback(ticketJsonInfo);
+        }
+    }
+
+    private void relatedDataClick(int rowNumber) {
+
+        JsonObject relatedData = CommonSharedData.RelatedData;
+        JsonObject fieldInfo = null;
+        if (relatedData.has("multipleValues") && !relatedData.get("multipleValues").isJsonNull()) {
+            JsonArray multipleFields = relatedData.get("multipleValues").getAsJsonArray();
+            for (int index = 0; index < multipleFields.size(); index++) {
+                JsonArray fields = multipleFields.get(index).getAsJsonObject().get("fields").getAsJsonArray();
+                for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                    JsonObject tempObject = fields.get(indexFields).getAsJsonObject();
+                    if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                        fieldInfo = tempObject;
+                        break;
+                    }
+                }
+            }
+        } else {
+            JsonArray fields = relatedData.get("fields").getAsJsonArray();
+            for (int index = 0; index < fields.size(); index++) {
+                JsonObject tempObject = fields.get(index).getAsJsonObject();
+                if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                    fieldInfo = tempObject;
+                    break;
+                }
+            }
+        }
+
+        JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+
+        StringBuilder valueKeyBuilder = new StringBuilder();
+        valueKeyBuilder.append(sonData.get("tb_name").getAsString());
+        valueKeyBuilder.append("_ID");
+        String valueKey = valueKeyBuilder.toString();
+        int columnValueID = this.indexColumnID;
+        int tempIndex = 0;
+        for (String columnName : this.table[0]) {
+            if (columnName.equals(valueKey)) {
+                columnValueID = tempIndex;
+                break;
+            }
+            tempIndex++;
+        }
+
+        fieldInfo.addProperty("Value", this.table[rowNumber][columnValueID]);
+        sonData.addProperty("short_description", this.table[rowNumber][this.indexColumnID]);
+        fieldInfo.add("son", sonData);
+
+        if (relatedData.has("multipleValues") && !relatedData.get("multipleValues").isJsonNull()) {
+            JsonArray multipleFields = relatedData.get("multipleValues").getAsJsonArray();
+            for (int index = 0; index < multipleFields.size(); index++) {
+                JsonObject multipleFieldTemp = multipleFields.get(index).getAsJsonObject();
+                JsonArray fields = multipleFieldTemp.get("fields").getAsJsonArray();
+                for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                    JsonObject tempObject = fields.get(indexFields).getAsJsonObject();
+                    if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                        fields.set(indexFields, fieldInfo);
+                        break;
+                    }
+                }
+                multipleFieldTemp.add("fields", fields);
+                multipleFields.set(index, multipleFieldTemp);
+            }
+            relatedData.add("multipleValues", multipleFields);
+        } else {
+            JsonArray fields = relatedData.get("fields").getAsJsonArray();
+            for (int index = 0; index < fields.size(); index++) {
+                JsonObject tempObject = fields.get(index).getAsJsonObject();
+                if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                    fields.set(index, fieldInfo);
+                    break;
+                }
+            }
+            relatedData.add("fields", fields);
+        }
+
+        Gson gsonSerializer = new Gson();
+        Activity currentActivity = this.context;
+        Intent relatedDataIntent = new Intent(currentActivity, RelatedDataActivity.class);
+        relatedDataIntent.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
+        relatedDataIntent.putExtra("nodeData", gsonSerializer.toJson(relatedData));
+
+        relatedDataIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.context.startActivity(relatedDataIntent);
+        this.context.overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);
+        Boolean isStatus = this.fieldKey.equals("status");
+        Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+        if (isReloadRequired || isStatus) {
+            Date currentDate = new Date();
+
+            SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+            CharSequence currentDateString = dateFormater.format(currentDate);
+            //TODO: Call reload data.
         }
     }
 }

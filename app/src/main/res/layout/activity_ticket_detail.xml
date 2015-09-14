@@ -41,15 +41,13 @@
                 android:orientation="vertical"
                 android:padding="5dp" />
 
-            <!--<ListView
-                android:id="@+id/lstvw_ticketdetail"
+            <LinearLayout
+                android:id="@+id/lstvw_relateddata"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/white_btn_style"
-                android:dividerHeight="1.5sp"
-                android:footerDividersEnabled="true"
-                android:isScrollContainer="false"
-                android:padding="5dp" />-->
+                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                android:padding="5dp" />
 
         </LinearLayout>
 

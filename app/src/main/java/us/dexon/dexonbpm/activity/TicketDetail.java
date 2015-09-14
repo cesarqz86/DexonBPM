@@ -222,12 +222,6 @@ public class TicketDetail extends FragmentActivity {
         CommonSharedData.TicketInfo = responseDto;
 
         this.ticketData = responseDto;
-
-        /*ListView lstvw_ticketdetail = (ListView) this.findViewById(R.id.lstvw_ticketdetail);
-        lstvw_ticketdetail.setScrollContainer(false);
-        TicketDetailAdapter detailAdapter = new TicketDetailAdapter(this, responseDto.getDataList(), responseDto);
-        lstvw_ticketdetail.setAdapter(detailAdapter);*/
-        //this.drawTicket(responseDto);
         CommonService.drawTicket(responseDto, this);
 
         String activityTitle = this.getString(R.string.app_name);

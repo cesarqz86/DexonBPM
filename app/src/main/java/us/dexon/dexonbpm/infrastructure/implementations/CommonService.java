@@ -31,6 +31,7 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
@@ -43,7 +44,6 @@ public class CommonService {
     public static final int ROW_TYPE_HEADER = 1;
     public static final int ROW_TYPE_NORMAL_WHITE = 2;
     public static final int ROW_TYPE_NORMAL_GRAY = 3;
-
 
     //region Public Methods
     public static void AddRowToTable(Activity context, TableLayout tableLayout,
@@ -178,6 +178,41 @@ public class CommonService {
     }
 
     public static void drawTicket(TicketResponseDto responseDto, Context context) {
+        drawHeader(responseDto, context);
+        drawRelatedData(responseDto, context);
+    }
+
+    public static void saveTicket(Context context) {
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(context);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        if (CommonSharedData.TicketInfoUpdated == null) {
+            CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+        }
+
+        JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+        JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
+        saveTicketInfo.add("headerInfo", headerInfo);
+
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+        CharSequence currentDateString = dateFormater.format(currentDate);
+        saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
+
+        SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+        ticketData.setLoggedUser(loggedUser);
+        ticketData.setTicketInfo(saveTicketInfo);
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
+        saveTicketService.execute(ticketData);
+    }
+    //endregion
+
+    //region Private Methods
+    private static void drawHeader(TicketResponseDto responseDto, Context context) {
         Activity currentActivity = (Activity) context;
         LinearLayout lstvw_ticketdetail = (LinearLayout) currentActivity.findViewById(R.id.lstvw_ticketdetail);
         lstvw_ticketdetail.removeAllViews();
@@ -321,35 +356,27 @@ public class CommonService {
         }
     }
 
-    public static void saveTicket(Context context) {
-        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
-        dexonDatabase.setContext(context);
+    private static void drawRelatedData(TicketResponseDto responseDto, Context context) {
+        Activity currentActivity = (Activity) context;
+        LinearLayout lstvw_relateddata = (LinearLayout) currentActivity.findViewById(R.id.lstvw_relateddata);
+        lstvw_relateddata.removeAllViews();
 
-        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+        LayoutInflater inflater = currentActivity.getLayoutInflater();
+        if (responseDto != null && responseDto.getRelatedList() != null && responseDto.getRelatedList().size() > 0) {
+            for (TicketRelatedDataDto itemDetail : responseDto.getRelatedList()) {
+                View rowView = inflater.inflate(R.layout.item_disclosure, null);
+                TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
+                txt_fieldtitle.setText(itemDetail.getFieldName());
+                lstvw_relateddata.addView(rowView);
 
-        if (CommonSharedData.TicketInfoUpdated == null) {
-            CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+                if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                    rowView.setOnClickListener(new DexonListeners.RelatedDataClickListener(
+                            context,
+                            itemDetail,
+                            itemDetail.getFieldName()));
+                }
+            }
         }
-
-        JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-        JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
-        saveTicketInfo.add("headerInfo", headerInfo);
-
-        Date currentDate = new Date();
-        SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-        CharSequence currentDateString = dateFormater.format(currentDate);
-        saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
-
-        SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-        ticketData.setLoggedUser(loggedUser);
-        ticketData.setTicketInfo(saveTicketInfo);
-
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
-        saveTicketService.execute(ticketData);
     }
-    //endregion
-
-    //region Private Methods
     //endregion
 }

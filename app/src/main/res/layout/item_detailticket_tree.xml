@@ -43,6 +43,5 @@
         android:id="@+id/blue_separator"
         android:layout_width="fill_parent"
         android:layout_height="1dip"
-        android:layout_below="@+id/asignados_btn"
         android:background="@color/separator_color" />
 </LinearLayout>

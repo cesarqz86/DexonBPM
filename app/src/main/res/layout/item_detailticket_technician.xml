@@ -79,4 +79,5 @@
             android:text="@string/btn_settome_technician_text" />
 
     </info.hoang8f.android.segmented.SegmentedGroup>
+
 </LinearLayout>

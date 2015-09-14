@@ -24,6 +24,7 @@ public class TicketResponseDto {
     private int technicianSelected;
     private String ticketCode;
     private List<TicketDetailDataDto> dataList;
+    private List<TicketRelatedDataDto> relatedList;
     //endregion
 
     //region Properties
@@ -113,6 +114,14 @@ public class TicketResponseDto {
 
     public void setTicketCode(String ticketCode) {
         this.ticketCode = ticketCode;
+    }
+
+    public List<TicketRelatedDataDto> getRelatedList() {
+        return relatedList;
+    }
+
+    public void setRelatedList(List<TicketRelatedDataDto> relatedList) {
+        this.relatedList = relatedList;
     }
     //endregion
 

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.w3c.dom.Text;
@@ -26,12 +27,14 @@ import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
+import us.dexon.dexonbpm.activity.RelatedDataActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
@@ -110,7 +113,14 @@ public final class DexonListeners {
 
         public void onClick(View v) {
             Log.i("DEXON_DEVELOPMENT", this.fieldKey);
+            if (CommonSharedData.RelatedDataActivity == null) {
+                this.headerClick();
+            } else {
+                this.relatedDataClick();
+            }
+        }
 
+        private void headerClick() {
             if (CommonValidations.validateEqualsIgnoreCase(this.fieldKey, "family")) {
                 Log.i("DEXON_DEVELOPMENT", this.nodeInfo.getElementId());
 
@@ -125,6 +135,8 @@ public final class DexonListeners {
                     parentActivity = (NewTicketActivity) CommonSharedData.TicketActivity;
                     ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
                 }
+
+                CommonSharedData.TreeData = null;
 
                 ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 currentActivity.startActivity(ticketDetailActivity);
@@ -188,6 +200,87 @@ public final class DexonListeners {
                 }
             }
         }
+
+        private void relatedDataClick() {
+            JsonObject relatedData = CommonSharedData.RelatedData;
+            JsonObject fieldInfo = null;
+            if (relatedData.has("multipleValues") && !relatedData.get("multipleValues").isJsonNull()) {
+                JsonArray multipleFields = relatedData.get("multipleValues").getAsJsonArray();
+                for (int index = 0; index < multipleFields.size(); index++) {
+                    JsonArray fields = multipleFields.get(index).getAsJsonObject().get("fields").getAsJsonArray();
+                    for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                        JsonObject tempObject = fields.get(indexFields).getAsJsonObject();
+                        if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                            fieldInfo = tempObject;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                JsonArray fields = relatedData.get("fields").getAsJsonArray();
+                for (int index = 0; index < fields.size(); index++) {
+                    JsonObject tempObject = fields.get(index).getAsJsonObject();
+                    if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                        fieldInfo = tempObject;
+                        break;
+                    }
+                }
+            }
+
+            JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
+
+            fieldInfo.addProperty("Value", this.nodeInfo.getElementId());
+            sonData.addProperty("short_description", this.nodeInfo.getElementName());
+            fieldInfo.add("son", sonData);
+
+            if (relatedData.has("multipleValues") && !relatedData.get("multipleValues").isJsonNull()) {
+                JsonArray multipleFields = relatedData.get("multipleValues").getAsJsonArray();
+                for (int index = 0; index < multipleFields.size(); index++) {
+                    JsonObject multipleFieldTemp = multipleFields.get(index).getAsJsonObject();
+                    JsonArray fields = multipleFieldTemp.get("fields").getAsJsonArray();
+                    for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                        JsonObject tempObject = fields.get(indexFields).getAsJsonObject();
+                        if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                            fields.set(indexFields, fieldInfo);
+                            break;
+                        }
+                    }
+                    multipleFieldTemp.add("fields", fields);
+                    multipleFields.set(index, multipleFieldTemp);
+                }
+                relatedData.add("multipleValues", multipleFields);
+            } else {
+                JsonArray fields = relatedData.get("fields").getAsJsonArray();
+                for (int index = 0; index < fields.size(); index++) {
+                    JsonObject tempObject = fields.get(index).getAsJsonObject();
+                    if (CommonValidations.validateEqualsIgnoreCase(tempObject.get("field_name").getAsString(), this.fieldKey)) {
+                        fields.set(index, fieldInfo);
+                        break;
+                    }
+                }
+                relatedData.add("fields", fields);
+            }
+
+            Gson gsonSerializer = new Gson();
+            Activity currentActivity = (Activity) this.currentContext;
+            Intent relatedDataIntent = new Intent(currentActivity, RelatedDataActivity.class);
+            relatedDataIntent.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
+            relatedDataIntent.putExtra("nodeData", gsonSerializer.toJson(relatedData));
+
+            relatedDataIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            currentActivity.startActivity(relatedDataIntent);
+            currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+            Boolean isStatus = this.fieldKey.equals("status");
+            Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
+            if (isReloadRequired || isStatus) {
+                Date currentDate = new Date();
+
+                SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+                CharSequence currentDateString = dateFormater.format(currentDate);
+                //TODO: Call reload data.
+            }
+        }
     }
 
     public static class TableClickListener implements View.OnClickListener {
@@ -203,7 +296,13 @@ public final class DexonListeners {
         }
 
         public void onClick(View v) {
-            Intent tableDetailIntent = new Intent(CommonSharedData.TicketActivity, TableActivity.class);
+            Activity mainActivity = CommonSharedData.TicketActivity;
+
+            if (CommonSharedData.RelatedDataActivity != null) {
+                mainActivity = CommonSharedData.RelatedDataActivity;
+            }
+
+            Intent tableDetailIntent = new Intent(mainActivity, TableActivity.class);
             tableDetailIntent.putExtra("sonData", this.sonData);
             tableDetailIntent.putExtra("fieldKey", this.fieldKey);
             CommonSharedData.TicketActivity.startActivityForResult(tableDetailIntent, 0);
@@ -384,6 +483,31 @@ public final class DexonListeners {
             listViewDetailIntent.putExtra("activityTitle", this.selectedField);
             listViewDetailIntent.putExtra("position", this.position);
             CommonSharedData.TicketActivity.startActivityForResult(listViewDetailIntent, 0);
+            CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class RelatedDataClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final TicketRelatedDataDto nodeInfo;
+        private final String selectedField;
+
+        public RelatedDataClickListener(Context context,
+                                        TicketRelatedDataDto treeData,
+                                        String fieldName) {
+            this.currentContext = context;
+            this.nodeInfo = treeData;
+            this.selectedField = fieldName;
+        }
+
+        public void onClick(View v) {
+
+            Intent relatedDataIntent = new Intent(CommonSharedData.TicketActivity, RelatedDataActivity.class);
+            relatedDataIntent.putExtra("activityTitle", this.selectedField);
+            relatedDataIntent.putExtra("nodeData", this.nodeInfo.getFieldSonData());
+            CommonSharedData.TicketActivity.startActivityForResult(relatedDataIntent, 0);
             CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }

@@ -45,6 +45,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
@@ -472,6 +473,20 @@ public class TicketService implements ITicketService {
                 });
             }
             finalResult.setDataList(finalDataList);
+
+            // Related data
+            List<TicketRelatedDataDto> relatedDataList = new ArrayList<>();
+            JsonArray relatedData = ticketObject.getAsJsonArray("relatedData");
+            TicketRelatedDataDto tempRelatedData;
+            for (int index = 0; index < relatedData.size(); index++) {
+                JsonObject relatedDataItem = relatedData.get(index).getAsJsonObject();
+                tempRelatedData = new TicketRelatedDataDto();
+                tempRelatedData.setFieldName(relatedDataItem.get("tb_name").getAsString());
+                tempRelatedData.setFieldKey(String.valueOf(index));
+                tempRelatedData.setFieldSonData(gsonSerializer.toJson(relatedDataItem));
+                relatedDataList.add(tempRelatedData);
+            }
+            finalResult.setRelatedList(relatedDataList);
         }
         return finalResult;
     }
@@ -998,6 +1013,20 @@ public class TicketService implements ITicketService {
                 });
             }
             finalResult.setDataList(finalDataList);
+
+            // Related data
+            List<TicketRelatedDataDto> relatedDataList = new ArrayList<>();
+            JsonArray relatedData = ticketObject.getAsJsonArray("relatedData");
+            TicketRelatedDataDto tempRelatedData;
+            for (int index = 0; index < relatedData.size(); index++) {
+                JsonObject relatedDataItem = relatedData.get(index).getAsJsonObject();
+                tempRelatedData = new TicketRelatedDataDto();
+                tempRelatedData.setFieldName(relatedDataItem.get("tb_name").getAsString());
+                tempRelatedData.setFieldKey(String.valueOf(index));
+                tempRelatedData.setFieldSonData(gsonSerializer.toJson(relatedDataItem));
+                relatedDataList.add(tempRelatedData);
+            }
+            finalResult.setRelatedList(relatedDataList);
         }
         return finalResult;
     }

@@ -26,6 +26,8 @@ public class CommonSharedData {
 
     public static Activity ActivityActivity;
 
+    public static Activity RelatedDataActivity;
+
     public static RecordHeaderResponseDto TreeData;
 
     public static ActivityTreeDto NewActivityData;
@@ -35,4 +37,6 @@ public class CommonSharedData {
     public static JsonObject OriginalTechnician;
 
     public static IncidentsActivity IncidentListActivity;
+
+    public static JsonObject RelatedData;
 }
