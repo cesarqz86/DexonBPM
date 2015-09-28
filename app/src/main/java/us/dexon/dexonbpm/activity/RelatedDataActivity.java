@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -29,6 +30,9 @@ import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 
 public class RelatedDataActivity extends FragmentActivity {
 
@@ -83,6 +87,23 @@ public class RelatedDataActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         CommonSharedData.RelatedDataActivity = null;
+
+        this.updateTicketInfo();
+
+        TicketDetail ticketDetail = null;
+        NewTicketActivity newTicket = null;
+
+        if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+            ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+        } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
+            newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+        }
+
+        if (ticketDetail != null)
+            ticketDetail.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
+
+        if (newTicket != null)
+            newTicket.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
     }
 
     public void drawRelatedData(JsonObject jsonData) {
@@ -108,6 +129,12 @@ public class RelatedDataActivity extends FragmentActivity {
     private void drawMultipleRelatedData(JsonObject jsonData, LayoutInflater inflater) {
         JsonArray fields = jsonData.get("multipleValues").getAsJsonArray();
         for (int index = 0; index < fields.size(); index++) {
+            JsonObject tempObject = fields.get(index).getAsJsonObject();
+            View rowView = inflater.inflate(R.layout.item_title_delete, null);
+            TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
+            txt_fieldtitle.setText(tempObject.get("tb_name").getAsString());
+            this.lstvw_tree_detail.addView(rowView);
+
             this.drawSingleRelatedData(fields.get(index).getAsJsonObject(), inflater);
         }
     }
@@ -277,23 +304,142 @@ public class RelatedDataActivity extends FragmentActivity {
         int childcount = this.lstvw_tree_detail.getChildCount();
         for (int i = 0; i < childcount; i++) {
             View rowView = this.lstvw_tree_detail.getChildAt(i);
-            String fieldKey = rowView.getTag().toString();
 
-            if (finalResult.has("multipleValues") && !finalResult.get("multipleValues").isJsonNull()) {
-                JsonArray fields = finalResult.get("multipleValues").getAsJsonArray();
-                for (int index = 0; index < fields.size(); index++) {
-                    JsonArray innerFields = finalResult.get("fields").getAsJsonArray();
-                    for (int innerIndex = 0; index < innerFields.size(); index++) {
+            if (rowView.getTag() != null) {
+                String fieldKey = rowView.getTag().toString();
 
+                if (CommonValidations.validateEmpty(fieldKey)) {
+                    if (this.jsonNodeData.has("multipleValues") && !this.jsonNodeData.get("multipleValues").isJsonNull()) {
+                        JsonArray multipleValues = this.jsonNodeData.get("multipleValues").getAsJsonArray();
+
+                        for (int index = 0; index < multipleValues.size(); index++) {
+
+                            JsonObject tempMultipleValues = multipleValues.get(index).getAsJsonObject();
+                            JsonArray fields = tempMultipleValues.get("fields").getAsJsonArray();
+                            for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                                JsonObject tempField = fields.get(indexFields).getAsJsonObject();
+                                String tempFieldKey = tempField.get("field_name").getAsString();
+                                if (CommonValidations.validateEqualsIgnoreCase(fieldKey, tempFieldKey)) {
+                                    RenderControlType controlType = RenderControlType.values()[tempField.get("render_ctl").getAsInt()];
+                                    String value = this.getValueByType(rowView, controlType);
+                                    if (CommonValidations.validateEmpty(value)) {
+                                        tempField.addProperty("Value", value);
+                                        fields.set(indexFields, tempField);
+                                        break;
+                                    }
+                                }
+                            }
+                            tempMultipleValues.add("fields", fields);
+                            multipleValues.set(index, tempMultipleValues);
+                        }
+                        this.jsonNodeData.add("multipleValues", multipleValues);
+                    } else {
+                        JsonArray fields = this.jsonNodeData.get("fields").getAsJsonArray();
+                        for (int indexFields = 0; indexFields < fields.size(); indexFields++) {
+                            JsonObject tempField = fields.get(indexFields).getAsJsonObject();
+                            String tempFieldKey = tempField.get("field_name").getAsString();
+                            if (CommonValidations.validateEqualsIgnoreCase(fieldKey, tempFieldKey)) {
+                                RenderControlType controlType = RenderControlType.values()[tempField.get("render_ctl").getAsInt()];
+                                String value = this.getValueByType(rowView, controlType);
+                                if (CommonValidations.validateEmpty(value)) {
+                                    tempField.addProperty("Value", value);
+                                    fields.set(indexFields, tempField);
+                                    break;
+                                }
+                            }
+                        }
+                        this.jsonNodeData.add("fields", fields);
                     }
-                }
-            } else {
-                JsonArray fields = finalResult.get("fields").getAsJsonArray();
-                for (int index = 0; index < fields.size(); index++) {
-
                 }
             }
         }
         return finalResult;
+    }
+
+    private String getValueByType(View rowView, RenderControlType controlType) {
+        String value = "";
+        switch (controlType) {
+            case DXControlsLabel: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            case DXControlsFloat:
+            case DXControlsCurrency: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            case DXControlsCharacter:
+            case DXControlsLine: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            case DXControlsPassword: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            case DXControlsPhone: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            case DXControlsCheckbox: {
+                ToggleButton txt_fieldvalue = (ToggleButton) rowView.findViewById(R.id.txt_fieldvalue);
+                value = String.valueOf(txt_fieldvalue.isChecked());
+                break;
+            }
+            case DXControlsDate: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+
+                /*String dateString = fieldValue;
+                Date date = new Date();
+                if (CommonValidations.validateEmpty(dateString)) {
+                    try {
+                        date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
+                        dateString = new SimpleDateFormat("dd/MMM/yyyy").format(date);
+                    } catch (Exception ex) {
+                        Log.e("Converting Date: ", ex.getMessage(), ex);
+                    }
+                }*/
+                break;
+            }
+            case DXControlsMultiline: {
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+            default: {
+                EditText txt_fieldvalue = (EditText) rowView.findViewById(R.id.txt_fieldvalue);
+                value = txt_fieldvalue.getText().toString();
+                break;
+            }
+        }
+        return value;
+    }
+
+    public void updateTicketInfo() {
+
+        this.jsonNodeData = this.getDataFromView();
+
+        if (CommonSharedData.TicketInfoUpdated == null) {
+            CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+        }
+        String relatedDataKey = this.jsonNodeData.get("tb_name").getAsString();
+        JsonObject ticketJson = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+        JsonArray relatedData = ticketJson.getAsJsonArray("relatedData");
+        for (int index = 0; index < relatedData.size(); index++) {
+            JsonObject tempRelatedData = relatedData.get(index).getAsJsonObject();
+            String tempKey = tempRelatedData.get("tb_name").getAsString();
+            if (CommonValidations.validateEqualsIgnoreCase(relatedDataKey, tempKey)) {
+                relatedData.set(index, this.jsonNodeData);
+                break;
+            }
+        }
+        ticketJson.add("relatedData", relatedData);
+        ITicketService ticketService = TicketService.getInstance();
+        CommonSharedData.TicketInfoUpdated = ticketService.convertToTicketData(ticketJson, R.id.btn_setmanual_technician, null);
     }
 }
