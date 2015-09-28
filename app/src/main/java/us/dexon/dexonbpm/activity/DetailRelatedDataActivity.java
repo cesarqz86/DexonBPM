@@ -1,13 +1,13 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -25,97 +25,96 @@ import java.util.Date;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
-import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
+import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 
-public class RelatedDataActivity extends FragmentActivity {
+public class DetailRelatedDataActivity extends FragmentActivity {
 
     private String nodeData;
     private JsonObject jsonNodeData;
-    private Menu menu;
-    private LinearLayout lstvw_tree_detail;
+    private LinearLayout lstvw_ticketdetail;
+    private JsonArray detailArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_related_data);
-
-        this.lstvw_tree_detail = (LinearLayout) this.findViewById(R.id.lstvw_tree_detail);
+        setContentView(R.layout.activity_detail_related_data);
+        this.lstvw_ticketdetail = (LinearLayout) this.findViewById(R.id.lstvw_ticketdetail);
 
         JsonParser gsonSerializer = new JsonParser();
 
         Intent currentIntent = this.getIntent();
-        String activityTitle = currentIntent.getStringExtra("activityTitle");
-        this.setTitle(activityTitle);
-
-        this.nodeData = currentIntent.getStringExtra("nodeData");
+        this.nodeData = currentIntent.getStringExtra("RelatedData");
         this.jsonNodeData = gsonSerializer.parse(this.nodeData).getAsJsonObject();
-        CommonSharedData.RelatedData = jsonNodeData;
-        this.drawRelatedData(jsonNodeData);
 
-        CommonSharedData.RelatedDataActivity = this;
+        this.drawDetailRelatedData(this.jsonNodeData);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        this.menu = menu;
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_related_data, menu);
-        return super.onCreateOptionsMenu(menu);
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_save: {
-                this.jsonNodeData = this.getDataFromView();
-                CommonService.saveRelatedData(this, this.jsonNodeData);
-                break;
-            }
+    public void newDetailData(View view) {
+
+        if (this.detailArray != null && this.detailArray.size() > 0) {
+            CleanEntityRequestDto ticketData = new CleanEntityRequestDto();
+            ticketData.setFieldInformation(this.detailArray.get(0).getAsJsonObject());
+
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteCleanEntityService saveTicketService = serviceExecuter.new ExecuteCleanEntityService(this);
+            saveTicketService.execute(ticketData);
         }
-        return super.onOptionsItemSelected(item);
+
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        CommonSharedData.RelatedDataActivity = null;
-    }
-
-    public void drawRelatedData(JsonObject jsonData) {
-        this.lstvw_tree_detail.removeAllViews();
+    public void drawDetailRelatedData(JsonObject jsonData) {
+        this.lstvw_ticketdetail.removeAllViews();
         LayoutInflater inflater = this.getLayoutInflater();
 
-        if (jsonData.has("multipleValues") && !jsonData.get("multipleValues").isJsonNull()) {
-            this.drawMultipleRelatedData(jsonData, inflater);
-        } else {
-            this.drawSingleRelatedData(jsonData, inflater);
-        }
-
-        if (jsonData.has("details")) {
-            View rowView = inflater.inflate(R.layout.item_disclosure, null);
+        this.detailArray = jsonData.get("details").getAsJsonArray();
+        for (int index = 0; index < this.detailArray.size(); index++) {
+            JsonObject tempObject = this.detailArray.get(index).getAsJsonObject();
+            View rowView = inflater.inflate(R.layout.item_title_delete, null);
             TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
-            txt_fieldtitle.setText(this.getResources().getString(R.string.txt_relateddata_detail_title));
-            txt_fieldtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
-            rowView.setOnClickListener(new DexonListeners.DetailRelatedDataClickListener(this, this.nodeData));
-            this.lstvw_tree_detail.addView(rowView);
+            txt_fieldtitle.setText(tempObject.get("tb_name").getAsString());
+            this.lstvw_ticketdetail.addView(rowView);
+
+            this.drawSingleRelatedData(tempObject, inflater);
+
+            if ((index + 1) < this.detailArray.size()) {
+                rowView = inflater.inflate(R.layout.item_empty_row, null);
+                this.lstvw_ticketdetail.addView(rowView);
+            }
         }
     }
 
-    private void drawMultipleRelatedData(JsonObject jsonData, LayoutInflater inflater) {
-        JsonArray fields = jsonData.get("multipleValues").getAsJsonArray();
-        for (int index = 0; index < fields.size(); index++) {
-            this.drawSingleRelatedData(fields.get(index).getAsJsonObject(), inflater);
+    public void callBackAddDetail(CleanEntityResponseDto responseDto) {
+        if (this.detailArray != null && this.detailArray.size() > 0
+                && responseDto != null && responseDto.getRecordObject() != null) {
+            this.detailArray.add(responseDto.getRecordObject());
+            this.jsonNodeData.add("details", this.detailArray);
+            this.drawDetailRelatedData(this.jsonNodeData);
         }
     }
 
     private void drawSingleRelatedData(JsonObject jsonData, LayoutInflater inflater) {
         JsonArray fields = jsonData.get("fields").getAsJsonArray();
         for (int index = 0; index < fields.size(); index++) {
-            this.drawRelatedDataControls(fields.get(index).getAsJsonObject(), inflater);
+            if (!fields.get(index).isJsonNull()) {
+                this.drawRelatedDataControls(fields.get(index).getAsJsonObject(), inflater);
+            }
         }
     }
 
@@ -268,32 +267,7 @@ public class RelatedDataActivity extends FragmentActivity {
                 }
             }
             rowView.setTag(fieldKey);
-            this.lstvw_tree_detail.addView(rowView);
+            this.lstvw_ticketdetail.addView(rowView);
         }
-    }
-
-    private JsonObject getDataFromView() {
-        JsonObject finalResult = this.jsonNodeData;
-        int childcount = this.lstvw_tree_detail.getChildCount();
-        for (int i = 0; i < childcount; i++) {
-            View rowView = this.lstvw_tree_detail.getChildAt(i);
-            String fieldKey = rowView.getTag().toString();
-
-            if (finalResult.has("multipleValues") && !finalResult.get("multipleValues").isJsonNull()) {
-                JsonArray fields = finalResult.get("multipleValues").getAsJsonArray();
-                for (int index = 0; index < fields.size(); index++) {
-                    JsonArray innerFields = finalResult.get("fields").getAsJsonArray();
-                    for (int innerIndex = 0; index < innerFields.size(); index++) {
-
-                    }
-                }
-            } else {
-                JsonArray fields = finalResult.get("fields").getAsJsonArray();
-                for (int index = 0; index < fields.size(); index++) {
-
-                }
-            }
-        }
-        return finalResult;
     }
 }

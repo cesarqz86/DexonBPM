@@ -9,14 +9,15 @@
         android:id="@+id/txt_fieldtitle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/white_btn_style"
+        android:background="@drawable/related_data_style"
         android:drawableRight="@drawable/ic_arrow"
         android:gravity="center_vertical"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:singleLine="true"
-        android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textColor="@color/related_data_text_color"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
     <View
         android:id="@+id/blue_separator"

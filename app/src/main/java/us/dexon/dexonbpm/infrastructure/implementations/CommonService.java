@@ -34,6 +34,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 
 /**
@@ -209,6 +210,29 @@ public class CommonService {
         ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
         saveTicketService.execute(ticketData);
     }
+
+    public static void saveRelatedData(Context context, JsonObject jsonData) {
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(context);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        if (CommonSharedData.TicketInfoUpdated == null) {
+            CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+        }
+
+        JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+        String uniqueCode = saveTicketInfo.get("uniqueCode").getAsString();
+
+        SaveRecordRequestDto ticketData = new SaveRecordRequestDto();
+        ticketData.setLoggedUser(loggedUser);
+        ticketData.setFieldInformation(jsonData);
+        ticketData.setIncidentCode(uniqueCode);
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteSaveRecordService saveTicketService = serviceExecuter.new ExecuteSaveRecordService(context);
+        saveTicketService.execute(ticketData);
+    }
     //endregion
 
     //region Private Methods
@@ -219,8 +243,9 @@ public class CommonService {
 
         LayoutInflater inflater = currentActivity.getLayoutInflater();
         if (responseDto != null && responseDto.getDataList() != null && responseDto.getDataList().size() > 0) {
+            View rowView = null;
             for (TicketDetailDataDto itemDetail : responseDto.getDataList()) {
-                View rowView = inflater.inflate(R.layout.item_detailticket, null);
+                rowView = inflater.inflate(R.layout.item_detailticket, null);
                 RenderControlType controlType = itemDetail.getFieldType();
                 switch (controlType) {
                     case DXControlsTree: {
@@ -258,9 +283,10 @@ public class CommonService {
                         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
 
                         String dateString = itemDetail.getFieldValue();
+                        Date date = new Date();
                         if (CommonValidations.validateEmpty(dateString)) {
                             try {
-                                Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
+                                date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(dateString);
                                 dateString = new SimpleDateFormat("dd/MMM/yyyy").format(date);
                             } catch (Exception ex) {
                                 Log.e("Converting Date: ", ex.getMessage(), ex);
@@ -269,6 +295,9 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(dateString);
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                            txt_fieldvalue.setOnClickListener(new DexonListeners.DateClickListener(context, "", date, txt_fieldvalue));
+                        }
                         break;
                     }
                     case DXControlsGridWithOptions: {
@@ -339,6 +368,10 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
+                        txt_fieldvalue.setEnabled(false);
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                            txt_fieldvalue.setEnabled(true);
+                        }
                         //txt_fieldvalue.setMovementMethod(new ScrollingMovementMethod());
                         break;
                     }
@@ -352,6 +385,12 @@ public class CommonService {
                     }
                 }
                 lstvw_ticketdetail.addView(rowView);
+            }
+
+            // Hack to remove the last row line
+            if (rowView != null) {
+                View separator = rowView.findViewById(R.id.blue_separator);
+                separator.setVisibility(View.INVISIBLE);
             }
         }
     }

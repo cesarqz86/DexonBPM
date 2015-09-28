@@ -38,11 +38,13 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.SaveRecordResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
@@ -50,6 +52,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
@@ -58,6 +61,7 @@ import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
@@ -90,6 +94,8 @@ public class TicketService implements ITicketService {
     private static String CREATE_DESCENDANT_URL = "api/Incident/CreateDescendant";
     private static String PRINT_TICKET_URL = "api/Incident/PrintTicket";
     private static String RECALCULATE_SLA_URL = "api/Incident/RecalculateSLA";
+    private static String SAVE_RECORD_URL = "api/Incident/SaveRecord";
+    private static String CLEAN_ENTITY_URL = "api/Helper/CleanEntity";
 
     private int columnCount = 6;
     //endregion
@@ -865,6 +871,76 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + RECALCULATE_SLA_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public SaveRecordResponseDto saveRercord(Context context, SaveRecordRequestDto saveRecordRequestDto, int reloginCount) {
+        SaveRecordResponseDto finalResponse = new SaveRecordResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += SAVE_RECORD_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(saveRecordRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse.setRecordObject(jsonData.getAsJsonObject());
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), SaveRecordResponseDto.class);
+            Log.e("CallingService: " + SAVE_RECORD_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                saveRecordRequestDto.setLoggedUser(loggedUser);
+                finalResponse = this.saveRercord(context, saveRecordRequestDto, reloginCount + 1);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), SaveRecordResponseDto.class);
+            }
+            Log.e("CallingService: " + SAVE_RECORD_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + SAVE_RECORD_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public CleanEntityResponseDto cleanEntity(Context context, CleanEntityRequestDto cleanEntityRequestDto) {
+        CleanEntityResponseDto finalResponse = new CleanEntityResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += CLEAN_ENTITY_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(cleanEntityRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse.setRecordObject(jsonData.getAsJsonObject());
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), CleanEntityResponseDto.class);
+            Log.e("CallingService: " + CLEAN_ENTITY_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), CleanEntityResponseDto.class);
+            Log.e("CallingService: " + CLEAN_ENTITY_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + CLEAN_ENTITY_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }

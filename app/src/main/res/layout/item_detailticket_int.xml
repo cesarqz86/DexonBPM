@@ -32,6 +32,7 @@
             android:background="@drawable/item_int_background"
             android:gravity="right|center_vertical"
             android:inputType="number"
+            android:numeric="integer"
             android:singleLine="true"
             android:textColor="@color/gray_darker"
             android:textSize="15sp" />

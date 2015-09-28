@@ -6,15 +6,18 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
+import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.SaveRecordResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
@@ -22,6 +25,7 @@ import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
@@ -71,4 +75,8 @@ public interface ITicketService {
     PrintTicketResponseDto printTicket(Context context, PrintTicketRequestDto printTicketRequestDto, int reloginCount);
 
     TicketResponseDto recalculateSLA(Context context, RecalculateSLARequestDto recalculateSLARequestDto);
+
+    SaveRecordResponseDto saveRercord(Context context, SaveRecordRequestDto saveRecordRequestDto, int reloginCount);
+
+    CleanEntityResponseDto cleanEntity(Context context, CleanEntityRequestDto cleanEntityRequestDto);
 }

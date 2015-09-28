@@ -14,6 +14,7 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ActivityListActivity;
 import us.dexon.dexonbpm.activity.ActivityOptionsTableActivity;
+import us.dexon.dexonbpm.activity.DetailRelatedDataActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
@@ -27,17 +28,20 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.SaveRecordResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TechnicianResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketWrapperResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
@@ -47,6 +51,7 @@ import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RelatedActivitiesRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReloadRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ReopenRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.SaveTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketByLayoutRequestDto;
@@ -1047,6 +1052,97 @@ public class ServiceExecuter {
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
                     CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteSaveRecordService extends AsyncTask<SaveRecordRequestDto, Void, SaveRecordResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private SaveRecordRequestDto ticketRequest;
+
+        public ExecuteSaveRecordService(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected SaveRecordResponseDto doInBackground(SaveRecordRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.saveRercord(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(SaveRecordResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+                    CommonService.ShowAlertDialog(this.currentContext,
+                            R.string.validation_related_success_title,
+                            R.string.validation_related_success_message,
+                            MessageTypeIcon.Error,
+                            false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteCleanEntityService extends AsyncTask<CleanEntityRequestDto, Void, CleanEntityResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private CleanEntityRequestDto ticketRequest;
+
+        public ExecuteCleanEntityService(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected CleanEntityResponseDto doInBackground(CleanEntityRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.cleanEntity(this.currentContext, this.ticketRequest);
+        }
+
+        protected void onPostExecute(CleanEntityResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+                    if (this.currentContext instanceof DetailRelatedDataActivity) {
+                        DetailRelatedDataActivity activity = (DetailRelatedDataActivity) this.currentContext;
+                        activity.callBackAddDetail(responseData);
+                    }
                 }
             }
         }

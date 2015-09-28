@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="us.dexon.dexonbpm.activity.IncidentsActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/footer_container"
+        android:background="@drawable/white_btn_style">
+
+        <LinearLayout
+            android:id="@+id/lstvw_ticketdetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:orientation="vertical"
+            android:padding="5dp" />
+
+    </ScrollView>
+
+
+    <RelativeLayout
+        android:id="@+id/footer_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/blue_light"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/dexon_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:onClick="logoClick"
+            android:src="@drawable/logo_mini" />
+
+        <ImageButton
+            android:id="@+id/plus_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:background="@android:color/transparent"
+            android:onClick="newDetailData"
+            android:src="@drawable/ic_plus" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

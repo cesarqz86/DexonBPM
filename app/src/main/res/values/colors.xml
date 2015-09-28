@@ -41,4 +41,10 @@
 
     <color name="separator_color">#757378</color>
 
+    <color name="related_data_text_color">#114395</color>
+    <color name="related_data_title_color">#C00000</color>
+    <color name="related_data_separator_color">#254495</color>
+    <color name="related_data_separator2_color">#254491</color>
+    <color name="related_data_delete_color">#0665FF</color>
+
 </resources>

@@ -39,6 +39,10 @@
     <string name="txt_activity_enddate">Fecha de Fin</string>
     <string name="txt_activity_comments">Comentario</string>
 
+    <string name="txt_relateddata_title">Datos Relacionados</string>
+    <string name="txt_relateddata_detail_title">Detalle Maestro</string>
+    <string name="txt_relateddata_delete_title">Delete</string>
+
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Cerrar Sesión</string>
@@ -57,5 +61,6 @@
     <string name="activity_workflow_title">Workflow</string>
     <string name="title_activity_activity_list">Actividades</string>
     <string name="activity_print_ticket">Print Ticket</string>
+    <string name="activity_detail_relateddata_title">Detalle Maestro</string>
 
 </resources>

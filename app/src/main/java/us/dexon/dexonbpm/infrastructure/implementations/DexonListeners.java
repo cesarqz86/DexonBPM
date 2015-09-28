@@ -1,11 +1,13 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,12 +19,14 @@ import com.google.gson.JsonObject;
 import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ActivityDetailActivity;
+import us.dexon.dexonbpm.activity.DetailRelatedDataActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
@@ -509,6 +513,85 @@ public final class DexonListeners {
             relatedDataIntent.putExtra("nodeData", this.nodeInfo.getFieldSonData());
             CommonSharedData.TicketActivity.startActivityForResult(relatedDataIntent, 0);
             CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class DateClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final String selectedField;
+        private final TextView textView;
+        private final Date currentDate;
+
+        public DateClickListener(Context context,
+                                 String fieldName,
+                                 Date date,
+                                 TextView control) {
+            this.currentContext = context;
+            this.selectedField = fieldName;
+            this.currentDate = date;
+            this.textView = control;
+        }
+
+        public void onClick(View v) {
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(this.currentDate);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this.currentContext,
+                    new DexonListeners.FinalDateClickListener(this.textView),
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+
+            datePickerDialog.show();
+
+        }
+    }
+
+    public static class FinalDateClickListener implements DatePickerDialog.OnDateSetListener {
+
+        private final TextView textView;
+
+        public FinalDateClickListener(TextView control) {
+            this.textView = control;
+        }
+
+        public void onDateSet(DatePicker view,
+                              int year,
+                              int monthOfYear,
+                              int dayOfMonth) {
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, monthOfYear);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            String dateString = new SimpleDateFormat("dd/MMM/yyyy").format(calendar.getTime());
+            this.textView.setText(dateString);
+
+            //TODO: Include the logic to set the value in the Json.
+        }
+    }
+
+    public static class DetailRelatedDataClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final String jsonObject;
+
+        public DetailRelatedDataClickListener(Context context,
+                                              String objectData) {
+            this.currentContext = context;
+            this.jsonObject = objectData;
+        }
+
+        public void onClick(View v) {
+            Activity currentActivity = (Activity) this.currentContext;
+            Intent detailRelatedData = new Intent(this.currentContext, DetailRelatedDataActivity.class);
+            detailRelatedData.putExtra("RelatedData", this.jsonObject);
+            currentActivity.startActivityForResult(detailRelatedData, 0);
+            currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }
     }
