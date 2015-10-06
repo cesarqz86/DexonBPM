@@ -184,6 +184,10 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
 
+        if(CommonValidations.validateEqualsIgnoreCase(valueKey, "HD_TECHNICIAN_ID")){
+            CommonSharedData.OriginalTechnician = CommonSharedData.TicketInfo.getCurrentTechnician();
+        }
+
         Activity currentActivity = this.context;
         TicketDetail ticketDetail = null;
         NewTicketActivity newTicket = null;

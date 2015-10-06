@@ -11,6 +11,7 @@ import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 
 /**
@@ -36,7 +37,11 @@ public class CommonSharedData {
 
     public static JsonObject OriginalTechnician;
 
+    public static JsonObject OriginalState;
+
     public static IncidentsActivity IncidentListActivity;
 
     public static JsonObject RelatedData;
+
+    public static TicketRelatedDataDto SelectedRelatedData;
 }

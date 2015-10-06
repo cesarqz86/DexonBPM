@@ -2,6 +2,7 @@ package us.dexon.dexonbpm.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -30,9 +32,12 @@ import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
+import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
+import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 
 public class RelatedDataActivity extends FragmentActivity {
 
@@ -40,6 +45,8 @@ public class RelatedDataActivity extends FragmentActivity {
     private JsonObject jsonNodeData;
     private Menu menu;
     private LinearLayout lstvw_tree_detail;
+    private RelativeLayout footer_container;
+    private JsonArray multipleValuesArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,7 @@ public class RelatedDataActivity extends FragmentActivity {
         setContentView(R.layout.activity_related_data);
 
         this.lstvw_tree_detail = (LinearLayout) this.findViewById(R.id.lstvw_tree_detail);
+        this.footer_container = (RelativeLayout) this.findViewById(R.id.footer_container);
 
         JsonParser gsonSerializer = new JsonParser();
 
@@ -54,10 +62,12 @@ public class RelatedDataActivity extends FragmentActivity {
         String activityTitle = currentIntent.getStringExtra("activityTitle");
         this.setTitle(activityTitle);
 
-        this.nodeData = currentIntent.getStringExtra("nodeData");
-        this.jsonNodeData = gsonSerializer.parse(this.nodeData).getAsJsonObject();
-        CommonSharedData.RelatedData = jsonNodeData;
-        this.drawRelatedData(jsonNodeData);
+        if (CommonSharedData.SelectedRelatedData != null) {
+            this.nodeData = CommonSharedData.SelectedRelatedData.getFieldSonData();
+            this.jsonNodeData = gsonSerializer.parse(this.nodeData).getAsJsonObject();
+            CommonSharedData.RelatedData = jsonNodeData;
+            this.drawRelatedData(jsonNodeData);
+        }
 
         CommonSharedData.RelatedDataActivity = this;
     }
@@ -104,6 +114,28 @@ public class RelatedDataActivity extends FragmentActivity {
 
         if (newTicket != null)
             newTicket.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
+
+        CommonSharedData.SelectedRelatedData = null;
+    }
+
+    public void logoClick(View view) {
+        Intent webIntent = new Intent();
+        webIntent.setAction(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
+        this.startActivity(webIntent);
+    }
+
+    public void newDetailData(View view) {
+
+        if (this.multipleValuesArray != null && this.multipleValuesArray.size() > 0) {
+            CleanEntityRequestDto ticketData = new CleanEntityRequestDto();
+            ticketData.setFieldInformation(this.multipleValuesArray.get(0).getAsJsonObject());
+
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteCleanEntityService saveTicketService = serviceExecuter.new ExecuteCleanEntityService(this);
+            saveTicketService.execute(ticketData);
+        }
     }
 
     public void drawRelatedData(JsonObject jsonData) {
@@ -113,6 +145,7 @@ public class RelatedDataActivity extends FragmentActivity {
         if (jsonData.has("multipleValues") && !jsonData.get("multipleValues").isJsonNull()) {
             this.drawMultipleRelatedData(jsonData, inflater);
         } else {
+            this.footer_container.setVisibility(View.INVISIBLE);
             this.drawSingleRelatedData(jsonData, inflater);
         }
 
@@ -128,6 +161,7 @@ public class RelatedDataActivity extends FragmentActivity {
 
     private void drawMultipleRelatedData(JsonObject jsonData, LayoutInflater inflater) {
         JsonArray fields = jsonData.get("multipleValues").getAsJsonArray();
+        this.multipleValuesArray = fields;
         for (int index = 0; index < fields.size(); index++) {
             JsonObject tempObject = fields.get(index).getAsJsonObject();
             View rowView = inflater.inflate(R.layout.item_title_delete, null);
@@ -412,7 +446,7 @@ public class RelatedDataActivity extends FragmentActivity {
                 break;
             }
             default: {
-                EditText txt_fieldvalue = (EditText) rowView.findViewById(R.id.txt_fieldvalue);
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
                 value = txt_fieldvalue.getText().toString();
                 break;
             }
@@ -441,5 +475,13 @@ public class RelatedDataActivity extends FragmentActivity {
         ticketJson.add("relatedData", relatedData);
         ITicketService ticketService = TicketService.getInstance();
         CommonSharedData.TicketInfoUpdated = ticketService.convertToTicketData(ticketJson, R.id.btn_setmanual_technician, null);
+    }
+
+    public void callBackAddDetail(CleanEntityResponseDto responseDto) {
+        if (this.multipleValuesArray != null && responseDto != null && responseDto.getRecordObject() != null) {
+            this.multipleValuesArray.add(responseDto.getRecordObject());
+            this.jsonNodeData.add("multipleValues", this.multipleValuesArray);
+            this.drawRelatedData(this.jsonNodeData);
+        }
     }
 }

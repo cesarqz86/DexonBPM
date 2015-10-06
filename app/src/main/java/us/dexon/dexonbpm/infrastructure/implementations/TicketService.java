@@ -1438,15 +1438,10 @@ public class TicketService implements ITicketService {
 
     private DescendantResponseDto convertToDescendant(JsonElement jsonData) {
         DescendantResponseDto finalResult = new DescendantResponseDto();
-        if (jsonData != null && jsonData.isJsonArray()) {
-            JsonArray dataArray = jsonData.getAsJsonArray();
-            for (int index = 0; index < dataArray.size(); index++) {
-                if (index == 0) {
-                    finalResult.setTicketName(dataArray.get(index).getAsString());
-                } else if (index == 1) {
-                    finalResult.setTicketID(dataArray.get(index).getAsString());
-                }
-            }
+        if (jsonData != null && jsonData.isJsonObject()) {
+            JsonObject jsonObject = jsonData.getAsJsonObject();
+            finalResult.setTicketName(jsonObject.get("ShortDescription").getAsString());
+            finalResult.setTicketID(jsonObject.get("IncidentID").getAsString());
         }
         return finalResult;
     }

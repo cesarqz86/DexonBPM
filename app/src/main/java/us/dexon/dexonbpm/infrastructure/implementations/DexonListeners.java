@@ -508,9 +508,11 @@ public final class DexonListeners {
 
         public void onClick(View v) {
 
+            CommonSharedData.SelectedRelatedData = this.nodeInfo;
+
             Intent relatedDataIntent = new Intent(CommonSharedData.TicketActivity, RelatedDataActivity.class);
             relatedDataIntent.putExtra("activityTitle", this.selectedField);
-            relatedDataIntent.putExtra("nodeData", this.nodeInfo.getFieldSonData());
+            //relatedDataIntent.putExtra("nodeData", this.nodeInfo.getFieldSonData());
             CommonSharedData.TicketActivity.startActivityForResult(relatedDataIntent, 0);
             CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);

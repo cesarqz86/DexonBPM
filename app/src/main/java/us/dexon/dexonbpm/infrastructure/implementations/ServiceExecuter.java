@@ -19,6 +19,7 @@ import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
+import us.dexon.dexonbpm.activity.RelatedDataActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.activity.WorkflowGridActivity;
@@ -371,7 +372,9 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                CommonSharedData.OriginalTechnician = responseData.getCurrentTechnician();
+                if (CommonSharedData.OriginalTechnician == null) {
+                    CommonSharedData.OriginalTechnician = responseData.getCurrentTechnician();
+                }
 
                 if (this.currentContext instanceof TicketDetail) {
                     TicketDetail ticketDetail = (TicketDetail) this.currentContext;
@@ -1141,6 +1144,11 @@ public class ServiceExecuter {
                 } else {
                     if (this.currentContext instanceof DetailRelatedDataActivity) {
                         DetailRelatedDataActivity activity = (DetailRelatedDataActivity) this.currentContext;
+                        activity.callBackAddDetail(responseData);
+                    }
+
+                    if(this.currentContext instanceof RelatedDataActivity){
+                        RelatedDataActivity activity = (RelatedDataActivity) this.currentContext;
                         activity.callBackAddDetail(responseData);
                     }
                 }

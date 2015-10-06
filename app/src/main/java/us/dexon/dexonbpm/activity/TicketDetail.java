@@ -205,6 +205,12 @@ public class TicketDetail extends FragmentActivity {
         CommonSharedData.TreeData = null;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CommonSharedData.OriginalTechnician = null;
+    }
+
     public void logoClick(View view) {
         Intent webIntent = new Intent();
         webIntent.setAction(Intent.ACTION_VIEW);

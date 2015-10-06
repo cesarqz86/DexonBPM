@@ -84,6 +84,12 @@ public class NewTicketActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CommonSharedData.OriginalTechnician = null;
+    }
+
     public void selectPlantilla_Click(View view) {
         Intent plantillaTreeView = new Intent(this, PlantillaListViewActivity.class);
         plantillaTreeView.putExtra("fieldKey", "HD_INCIDENT_LAYOUT_ID");
