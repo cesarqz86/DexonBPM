@@ -15,12 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:paddingLeft="10dp"
             android:background="@drawable/white_btn_style"
             android:gravity="center_vertical"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
-            android:textColor="@color/black"
+            android:textColor="@color/black_gray"
             android:textSize="15sp" />
 
         <EditText

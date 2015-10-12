@@ -39,12 +39,13 @@
     <color name="pager_not_selected">#E5E5E5</color>
     <color name="pager_selected">#949494</color>
 
-    <color name="separator_color">#757378</color>
+    <color name="separator_color">#cdc9c9</color>
 
     <color name="related_data_text_color">#114395</color>
-    <color name="related_data_title_color">#C00000</color>
-    <color name="related_data_separator_color">#254495</color>
-    <color name="related_data_separator2_color">#254491</color>
+    <color name="related_data_title_color">#cd2f2f</color>
+    <color name="related_data_separator_color">#005ba4</color>
+    <color name="related_data_separator2_color">#005ba4</color>
     <color name="related_data_delete_color">#0665FF</color>
+    <color name="black_gray">#4e4c4c</color>
 
 </resources>

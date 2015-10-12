@@ -20,9 +20,10 @@
             android:layout_weight="1"
             android:background="@drawable/white_btn_style"
             android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
-            android:textColor="@color/black"
+            android:textColor="@color/black_gray"
             android:textSize="15sp" />
 
         <TextView

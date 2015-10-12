@@ -13,9 +13,10 @@
         android:drawableRight="@drawable/ic_arrow"
         android:gravity="center_vertical"
         android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
         android:paddingTop="10dp"
         android:singleLine="true"
-        android:textColor="@color/related_data_text_color"
+        android:textColor="@color/blue_buttons"
         android:textSize="15sp"
         android:textStyle="bold" />
 

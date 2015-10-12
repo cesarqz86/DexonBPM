@@ -14,9 +14,11 @@
         android:drawablePadding="5dp"
         android:drawableRight="@drawable/ic_arrow"
         android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:paddingTop="10dp"
         android:singleLine="true"
-        android:textColor="@color/gray_darker"
-        android:textSize="10sp" />
+        android:textColor="@color/black_gray"
+        android:textSize="15sp" />
 
 </LinearLayout>
