@@ -229,6 +229,8 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
     private void relatedDataClick(int rowNumber) {
 
+        CommonSharedData.IsOnClick = true;
+
         JsonObject relatedData = CommonSharedData.RelatedData;
         JsonObject fieldInfo = null;
         if (relatedData.has("multipleValues") && !relatedData.get("multipleValues").isJsonNull()) {
@@ -306,7 +308,9 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         Activity currentActivity = this.context;
         Intent relatedDataIntent = new Intent(currentActivity, RelatedDataActivity.class);
         relatedDataIntent.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
-        relatedDataIntent.putExtra("nodeData", gsonSerializer.toJson(relatedData));
+        //relatedDataIntent.putExtra("nodeData", gsonSerializer.toJson(relatedData));
+
+        CommonSharedData.SelectedRelatedData.setFieldSonData(gsonSerializer.toJson(relatedData));
 
         relatedDataIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         this.context.startActivity(relatedDataIntent);

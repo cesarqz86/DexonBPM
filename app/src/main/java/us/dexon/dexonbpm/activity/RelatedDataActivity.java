@@ -96,26 +96,30 @@ public class RelatedDataActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CommonSharedData.RelatedDataActivity = null;
 
-        this.updateTicketInfo();
+        if(!CommonSharedData.IsOnClick) {
+            this.updateTicketInfo();
 
-        TicketDetail ticketDetail = null;
-        NewTicketActivity newTicket = null;
+            TicketDetail ticketDetail = null;
+            NewTicketActivity newTicket = null;
 
-        if (CommonSharedData.TicketActivity instanceof TicketDetail) {
-            ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
-        } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
-            newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            if (CommonSharedData.TicketActivity instanceof TicketDetail) {
+                ticketDetail = (TicketDetail) CommonSharedData.TicketActivity;
+            } else if (CommonSharedData.TicketActivity instanceof NewTicketActivity) {
+                newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+            }
+
+            if (ticketDetail != null)
+                ticketDetail.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
+
+            if (newTicket != null)
+                newTicket.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
+
+            CommonSharedData.SelectedRelatedData = null;
+            CommonSharedData.RelatedDataActivity = null;
         }
 
-        if (ticketDetail != null)
-            ticketDetail.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
-
-        if (newTicket != null)
-            newTicket.inidentsCallBack(CommonSharedData.TicketInfoUpdated);
-
-        CommonSharedData.SelectedRelatedData = null;
+        CommonSharedData.IsOnClick = false;
     }
 
     public void logoClick(View view) {
