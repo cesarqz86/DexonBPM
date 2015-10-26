@@ -13,6 +13,12 @@
         android:id="@+id/button2_menu_opt4"
         android:title="@string/menu_recalculate_sla" />
     <item
+        android:id="@+id/button2_menu_opt6"
+        android:title="@string/menu_history" />
+    <item
+        android:id="@+id/button2_menu_opt7"
+        android:title="@string/menu_attachment" />
+    <item
         android:id="@+id/button2_menu_opt5"
         android:title="@string/menu_cancel_label" />
 </menu>

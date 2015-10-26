@@ -16,6 +16,7 @@ public class TicketDetailDataDto {
     private RenderControlType fieldType;
     private String fieldKey;
     private String fieldSonData;
+    private JsonObject fieldJsonObject;
     //endregion
 
     //region Properties
@@ -65,6 +66,14 @@ public class TicketDetailDataDto {
 
     public void setFieldSonData(String fieldSonData) {
         this.fieldSonData = fieldSonData;
+    }
+
+    public JsonObject getFieldJsonObject() {
+        return fieldJsonObject;
+    }
+
+    public void setFieldJsonObject(JsonObject fieldJsonObject) {
+        this.fieldJsonObject = fieldJsonObject;
     }
     //endregion
 

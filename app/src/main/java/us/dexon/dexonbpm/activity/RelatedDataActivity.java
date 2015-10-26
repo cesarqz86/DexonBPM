@@ -41,12 +41,13 @@ import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 
 public class RelatedDataActivity extends FragmentActivity {
 
-    private String nodeData;
+    private JsonObject nodeData;
     private JsonObject jsonNodeData;
     private Menu menu;
     private LinearLayout lstvw_tree_detail;
     private RelativeLayout footer_container;
     private JsonArray multipleValuesArray;
+    private LinearLayout linear_plantilla;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class RelatedDataActivity extends FragmentActivity {
 
         this.lstvw_tree_detail = (LinearLayout) this.findViewById(R.id.lstvw_tree_detail);
         this.footer_container = (RelativeLayout) this.findViewById(R.id.footer_container);
+        this.linear_plantilla = (LinearLayout) this.findViewById(R.id.linear_plantilla);
 
         JsonParser gsonSerializer = new JsonParser();
 
@@ -64,7 +66,7 @@ public class RelatedDataActivity extends FragmentActivity {
 
         if (CommonSharedData.SelectedRelatedData != null) {
             this.nodeData = CommonSharedData.SelectedRelatedData.getFieldSonData();
-            this.jsonNodeData = gsonSerializer.parse(this.nodeData).getAsJsonObject();
+            this.jsonNodeData = this.nodeData;
             CommonSharedData.RelatedData = jsonNodeData;
             this.drawRelatedData(jsonNodeData);
         }
@@ -97,7 +99,7 @@ public class RelatedDataActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        if(!CommonSharedData.IsOnClick) {
+        if (CommonSharedData.IsOnClick == null || (CommonSharedData.IsOnClick != null && !CommonSharedData.IsOnClick)) {
             this.updateTicketInfo();
 
             TicketDetail ticketDetail = null;
@@ -153,13 +155,20 @@ public class RelatedDataActivity extends FragmentActivity {
             this.drawSingleRelatedData(jsonData, inflater);
         }
 
-        if (jsonData.has("details")) {
+        if (jsonData.has("details") && !jsonData.get("details").isJsonNull()) {
             View rowView = inflater.inflate(R.layout.item_disclosure, null);
             TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
             txt_fieldtitle.setText(this.getResources().getString(R.string.txt_relateddata_detail_title));
             txt_fieldtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
             rowView.setOnClickListener(new DexonListeners.DetailRelatedDataClickListener(this, this.nodeData));
             this.lstvw_tree_detail.addView(rowView);
+        }
+
+        if (jsonData.has("record_ID") && jsonData.get("record_ID").getAsInt() == -1 &&
+                jsonData.has("edit_in_place") && jsonData.get("edit_in_place").getAsBoolean()) {
+            this.linear_plantilla.setVisibility(View.VISIBLE);
+        } else {
+            this.linear_plantilla.setVisibility(View.GONE);
         }
     }
 
@@ -197,10 +206,10 @@ public class RelatedDataActivity extends FragmentActivity {
             if (jsonField.has("son") && !jsonField.get("son").isJsonNull()) {
                 JsonObject sonObject = jsonField.get("son").getAsJsonObject();
                 if (sonObject.has("short_description") && !sonObject.get("short_description").isJsonNull()) {
-                    fieldValue = sonObject.get("short_description").getAsString();
+                    fieldValue = sonObject.get("short_description").isJsonNull() ? "" : sonObject.get("short_description").getAsString();
                 }
             } else if (jsonField.has("Value")) {
-                fieldValue = jsonField.get("Value").getAsString();
+                fieldValue = jsonField.get("Value").isJsonNull() ? "" : jsonField.get("Value").getAsString();
             }
 
             switch (controlType) {
@@ -315,12 +324,15 @@ public class RelatedDataActivity extends FragmentActivity {
                     break;
                 }
                 case DXControlsMultiline: {
-                    rowView = inflater.inflate(R.layout.item_detailticket_text_multi, null);
+                    rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
                     TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                     TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
 
                     txt_fieldtitle.setText(fieldName);
                     txt_fieldvalue.setText(fieldValue);
+                    rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
+                            this,
+                            jsonField));
                     break;
                 }
                 default: {

@@ -309,7 +309,7 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         Intent relatedDataIntent = new Intent(currentActivity, RelatedDataActivity.class);
         relatedDataIntent.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
 
-        CommonSharedData.SelectedRelatedData.setFieldSonData(gsonSerializer.toJson(relatedData));
+        CommonSharedData.SelectedRelatedData.setFieldSonData(relatedData);
 
         relatedDataIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         this.context.startActivity(relatedDataIntent);

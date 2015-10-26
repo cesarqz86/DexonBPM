@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.infrastructure.implementations;
 
 import android.content.Context;
+import android.os.DropBoxManager;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -29,9 +30,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
@@ -489,7 +492,7 @@ public class TicketService implements ITicketService {
                 tempRelatedData = new TicketRelatedDataDto();
                 tempRelatedData.setFieldName(relatedDataItem.get("tb_name").getAsString());
                 tempRelatedData.setFieldKey(String.valueOf(index));
-                tempRelatedData.setFieldSonData(gsonSerializer.toJson(relatedDataItem));
+                tempRelatedData.setFieldSonData(relatedDataItem);
                 relatedDataList.add(tempRelatedData);
             }
             finalResult.setRelatedList(relatedDataList);
@@ -959,6 +962,7 @@ public class TicketService implements ITicketService {
             JsonArray arrayData = jsonElement.getAsJsonArray();
             String ticketString;
             String[] ticketResponseData;
+            String[] headerData = null;
             LinkedHashMap<String, String> ticketDataList;
             LinkedHashMap<String, String> ticketDataListTemp;
             int finalSize = arrayData.size() + 1;
@@ -974,12 +978,17 @@ public class TicketService implements ITicketService {
                 ticketDataList.put("TICKET", ticketID);
                 ticketDataList.putAll(ticketDataListTemp);
 
-                ticketResponseData = ticketDataList.values().toArray(new String[0]);
                 if (indexPosition == 0) {
-                    finalResponse[indexPosition] = ticketDataList.keySet().toArray(new String[0]);
+                    String[] headerTempArray = ticketDataList.keySet().toArray(new String[0]);
+                    headerTempArray = this.arrangeHeaderArray(headerTempArray);
+                    finalResponse[indexPosition] = headerTempArray;
+                    headerData = finalResponse[indexPosition];
                     columnCount = finalResponse[indexPosition].length;
                     indexPosition++;
                 }
+                this.setMissingFields(ticketDataList, headerData);
+
+                ticketResponseData = ticketDataList.values().toArray(new String[0]);
                 finalResponse[indexPosition] = ticketResponseData;
                 indexPosition++;
             }
@@ -987,6 +996,40 @@ public class TicketService implements ITicketService {
             finalResponse = this.getEmptyData("TICKET");
         }
         return finalResponse;
+    }
+
+    private String[] arrangeHeaderArray(String[] headerTempArray) {
+        String[] result = new String[headerTempArray.length];
+        LinkedHashMap<String, String> hm = new LinkedHashMap<>();
+        for (String headerTitle : headerTempArray){
+            hm.put(headerTitle, headerTitle);
+        }
+
+        Set set = hm.entrySet();
+        Iterator i = set.iterator();
+        int index = 0;
+        while (i.hasNext()){
+            Map.Entry me = (Map.Entry)i.next();
+            result[index] = String.valueOf(me.getKey());
+            index++;
+        }
+        return result;
+    }
+
+    private void setMissingFields(LinkedHashMap<String, String> ticketDataListTemp, String[] headerData) {
+        LinkedHashMap<String, String> hm = new LinkedHashMap<>();
+        if (headerData != null && headerData.length > 0) {
+            for (String headerTitle : headerData) {
+                if (ticketDataListTemp.get(headerTitle) == null) {
+                    hm.put(headerTitle, "");
+                } else {
+                    hm.put(headerTitle, ticketDataListTemp.get(headerTitle));
+                }
+            }
+
+            ticketDataListTemp.clear();
+            ticketDataListTemp.putAll(hm);
+        }
     }
 
     private void saveJsonToDB(JsonElement jsonElement) throws IOException {
@@ -1064,6 +1107,7 @@ public class TicketService implements ITicketService {
                         tempDataList.setFieldKey(headerInfoData.getKey());
                         tempDataList.setOrder(tempData.get("order").getAsInt());
                         tempDataList.setFieldValue(this.getValueFromTicketField(tempData, controlType));
+                        tempDataList.setFieldJsonObject(tempData);
 
                         if (tempData.has("son")) {
                             JsonElement sonElement = tempData.get("son");
@@ -1099,7 +1143,7 @@ public class TicketService implements ITicketService {
                 tempRelatedData = new TicketRelatedDataDto();
                 tempRelatedData.setFieldName(relatedDataItem.get("tb_name").getAsString());
                 tempRelatedData.setFieldKey(String.valueOf(index));
-                tempRelatedData.setFieldSonData(gsonSerializer.toJson(relatedDataItem));
+                tempRelatedData.setFieldSonData(relatedDataItem);
                 relatedDataList.add(tempRelatedData);
             }
             finalResult.setRelatedList(relatedDataList);

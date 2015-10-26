@@ -38,7 +38,6 @@ import us.dexon.dexonbpm.model.RequestDTO.SaveRecordRequestDto;
 
 public class DetailRelatedDataActivity extends FragmentActivity {
 
-    private String nodeData;
     private JsonObject jsonNodeData;
     private LinearLayout lstvw_ticketdetail;
     private JsonArray detailArray;
@@ -49,13 +48,17 @@ public class DetailRelatedDataActivity extends FragmentActivity {
         setContentView(R.layout.activity_detail_related_data);
         this.lstvw_ticketdetail = (LinearLayout) this.findViewById(R.id.lstvw_ticketdetail);
 
-        JsonParser gsonSerializer = new JsonParser();
+        if (CommonSharedData.RelatedDataDetail != null) {
+            this.jsonNodeData = CommonSharedData.RelatedDataDetail;
+            this.drawDetailRelatedData(this.jsonNodeData);
+        }
+    }
 
-        Intent currentIntent = this.getIntent();
-        this.nodeData = currentIntent.getStringExtra("RelatedData");
-        this.jsonNodeData = gsonSerializer.parse(this.nodeData).getAsJsonObject();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-        this.drawDetailRelatedData(this.jsonNodeData);
+        CommonSharedData.RelatedDataDetail = null;
     }
 
     public void logoClick(View view) {
@@ -134,7 +137,7 @@ public class DetailRelatedDataActivity extends FragmentActivity {
                     fieldValue = sonObject.get("short_description").getAsString();
                 }
             } else if (jsonField.has("Value")) {
-                fieldValue = jsonField.get("Value").getAsString();
+                fieldValue = (jsonField.get("Value").isJsonNull()) ? "" : jsonField.get("Value").getAsString();
             }
 
             switch (controlType) {

@@ -191,6 +191,21 @@ public class TicketDetail extends FragmentActivity {
                 recalculateSLAService.execute(recalculateSLAData);
                 // Recalculate SLA
                 break;
+            case R.id.button2_menu_opt6:
+                Intent historyIntent = new Intent(this, HistoryActivity.class);
+                historyIntent.putExtra("ViewTitle", this.getTitle());
+                CommonSharedData.TicketActivity.startActivityForResult(historyIntent, 0);
+                CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+                // See history
+                break;
+            case R.id.button2_menu_opt7:
+                Intent attachmentIntent = new Intent(this, AttachmentActivity.class);
+                CommonSharedData.TicketActivity.startActivityForResult(attachmentIntent, 0);
+                CommonSharedData.TicketActivity.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+                // Attachments
+                break;
             case R.id.button2_menu_opt5:
                 // Cancel does nothing
                 break;

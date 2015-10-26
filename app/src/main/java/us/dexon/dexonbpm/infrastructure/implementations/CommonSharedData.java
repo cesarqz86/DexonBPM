@@ -43,6 +43,10 @@ public class CommonSharedData {
 
     public static JsonObject RelatedData;
 
+    public static JsonObject RelatedDataDetail;
+
+    public static JsonObject MultilineData;
+
     public static TicketRelatedDataDto SelectedRelatedData;
 
     public static Boolean IsOnClick;

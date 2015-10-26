@@ -19,12 +19,16 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import retrofit.converter.GsonConverter;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
@@ -221,13 +225,10 @@ public class CommonService {
             CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
         }
 
-        JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
-        String uniqueCode = saveTicketInfo.get("uniqueCode").getAsString();
-
         SaveRecordRequestDto ticketData = new SaveRecordRequestDto();
         ticketData.setLoggedUser(loggedUser);
         ticketData.setFieldInformation(jsonData);
-        ticketData.setIncidentCode(uniqueCode);
+        ticketData.setLoadRelatedData(true);
 
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteSaveRecordService saveTicketService = serviceExecuter.new ExecuteSaveRecordService(context);
@@ -362,15 +363,20 @@ public class CommonService {
                         break;
                     }
                     case DXControlsMultiline: {
-                        rowView = inflater.inflate(R.layout.item_detailticket_text_multi, null);
+                        //rowView = inflater.inflate(R.layout.item_detailticket_text_multi, null);
+                        rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
                         TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        txt_fieldvalue.setEnabled(false);
+                        //txt_fieldvalue.setEnabled(false);
                         if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
-                            txt_fieldvalue.setEnabled(true);
+                            //txt_fieldvalue.setEnabled(true);
+
+                            rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
+                                    context,
+                                    itemDetail.getFieldJsonObject()));
                         }
                         //txt_fieldvalue.setMovementMethod(new ScrollingMovementMethod());
                         break;

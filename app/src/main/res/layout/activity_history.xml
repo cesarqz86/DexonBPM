@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/item_int_background">
+
+    <LinearLayout
+        android:id="@+id/lstvw_historydata"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white_btn_style"
+        android:orientation="vertical"
+        android:padding="5dp" />
+
+</ScrollView>

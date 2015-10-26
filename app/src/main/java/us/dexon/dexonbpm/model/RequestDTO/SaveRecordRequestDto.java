@@ -18,9 +18,8 @@ public class SaveRecordRequestDto {
     @SerializedName("loggedUserModel")
     private LoginResponseDto loggedUser;
 
-    @SerializedName("uniqueCodeIncident")
-    private String incidentCode;
-
+    @SerializedName("loadRelatedData")
+    private boolean loadRelatedData;
     //endregion
 
     //region Properties
@@ -32,20 +31,20 @@ public class SaveRecordRequestDto {
         this.loggedUser = loggedUser;
     }
 
-    public String getIncidentCode() {
-        return incidentCode;
-    }
-
-    public void setIncidentCode(String incidentCode) {
-        this.incidentCode = incidentCode;
-    }
-
     public JsonObject getFieldInformation() {
         return fieldInformation;
     }
 
     public void setFieldInformation(JsonObject fieldInformation) {
         this.fieldInformation = fieldInformation;
+    }
+
+    public boolean isLoadRelatedData() {
+        return loadRelatedData;
+    }
+
+    public void setLoadRelatedData(boolean loadRelatedData) {
+        this.loadRelatedData = loadRelatedData;
     }
     //endregion
 

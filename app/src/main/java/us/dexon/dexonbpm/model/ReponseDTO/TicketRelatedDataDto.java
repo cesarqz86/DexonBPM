@@ -1,5 +1,7 @@
 package us.dexon.dexonbpm.model.ReponseDTO;
 
+import com.google.gson.JsonObject;
+
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 
 /**
@@ -10,7 +12,7 @@ public class TicketRelatedDataDto {
     //region Attributes
     private String fieldName;
     private String fieldKey;
-    private String fieldSonData;
+    private JsonObject fieldSonData;
     //endregion
 
     //region Properties
@@ -30,11 +32,11 @@ public class TicketRelatedDataDto {
         this.fieldKey = fieldKey;
     }
 
-    public String getFieldSonData() {
+    public JsonObject getFieldSonData() {
         return fieldSonData;
     }
 
-    public void setFieldSonData(String fieldSonData) {
+    public void setFieldSonData(JsonObject fieldSonData) {
         this.fieldSonData = fieldSonData;
     }
     //endregion

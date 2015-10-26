@@ -29,6 +29,7 @@ import us.dexon.dexonbpm.activity.ActivityDetailActivity;
 import us.dexon.dexonbpm.activity.DetailRelatedDataActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
+import us.dexon.dexonbpm.activity.MultiLineActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
 import us.dexon.dexonbpm.activity.RelatedDataActivity;
@@ -270,6 +271,7 @@ public final class DexonListeners {
             Intent relatedDataIntent = new Intent(currentActivity, RelatedDataActivity.class);
             relatedDataIntent.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
             relatedDataIntent.putExtra("nodeData", gsonSerializer.toJson(relatedData));
+            CommonSharedData.IsOnClick = false;
 
             relatedDataIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             currentActivity.startActivity(relatedDataIntent);
@@ -580,10 +582,10 @@ public final class DexonListeners {
     public static class DetailRelatedDataClickListener implements View.OnClickListener {
 
         private final Context currentContext;
-        private final String jsonObject;
+        private final JsonObject jsonObject;
 
         public DetailRelatedDataClickListener(Context context,
-                                              String objectData) {
+                                              JsonObject objectData) {
             this.currentContext = context;
             this.jsonObject = objectData;
         }
@@ -591,8 +593,29 @@ public final class DexonListeners {
         public void onClick(View v) {
             Activity currentActivity = (Activity) this.currentContext;
             Intent detailRelatedData = new Intent(this.currentContext, DetailRelatedDataActivity.class);
-            detailRelatedData.putExtra("RelatedData", this.jsonObject);
+            CommonSharedData.RelatedDataDetail = this.jsonObject;
             currentActivity.startActivityForResult(detailRelatedData, 0);
+            currentActivity.overridePendingTransition(R.anim.right_slide_in,
+                    R.anim.right_slide_out);
+        }
+    }
+
+    public static class MultilineClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final JsonObject jsonObject;
+
+        public MultilineClickListener(Context context,
+                                      JsonObject objectData) {
+            this.currentContext = context;
+            this.jsonObject = objectData;
+        }
+
+        public void onClick(View v) {
+            Activity currentActivity = (Activity) this.currentContext;
+            CommonSharedData.MultilineData = this.jsonObject;
+            Intent multilineIntent = new Intent(this.currentContext, MultiLineActivity.class);
+            currentActivity.startActivityForResult(multilineIntent, 0);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }

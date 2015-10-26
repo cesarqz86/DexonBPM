@@ -76,7 +76,8 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
 
         ((TextView) convertView).setText(table[row + 1][column + 1]);
         if(rowType != R.layout.row_header && this.indexColumnID > -1) {
-            convertView.setTag(R.string.tag_id_ticket, table[row + 1][this.indexColumnID].toString());
+            String tagValue = String.valueOf(table[row + 1][this.indexColumnID]);
+            convertView.setTag(R.string.tag_id_ticket, tagValue);
             convertView.setOnClickListener(this);
         }
         return convertView;

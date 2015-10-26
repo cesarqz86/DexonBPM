@@ -228,10 +228,6 @@ public class ServiceExecuter {
                     incidentsActivity.ticketListData = responseData.getTicketArrayData();
                     incidentsActivity.inidentsCallBack(responseData.getTicketArrayData());
                 }
-
-                if ((responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) || CommonValidations.validateArrayNullOrEmpty(responseData.getTicketArrayData())) {
-                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
-                }
             }
         }
     }

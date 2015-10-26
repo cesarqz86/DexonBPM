@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dexon BPM</string>
+    <string name="app_name">Dexon</string>
     <string name="dexon_website">http://dexon.us/</string>
 
     <!-- Hints -->
@@ -43,6 +43,8 @@
     <string name="txt_relateddata_detail_title">Detalle Maestro</string>
     <string name="txt_relateddata_delete_title">Delete</string>
 
+    <string name="txt_attachment_title">Attachments</string>
+
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
     <string name="menu_exit_label">Cerrar Sesión</string>
@@ -53,6 +55,8 @@
     <string name="menu_create_brother">Crear Hermano</string>
     <string name="menu_print_ticket">Imprimir Ticket</string>
     <string name="menu_recalculate_sla">Recalcular SLA</string>
+    <string name="menu_history">Historial</string>
+    <string name="menu_attachment">Adjuntos</string>
 
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>
@@ -62,5 +66,6 @@
     <string name="title_activity_activity_list">Actividades</string>
     <string name="activity_print_ticket">Print Ticket</string>
     <string name="activity_detail_relateddata_title">Detalle Maestro</string>
+    <string name="activity_attachment_title">Adjuntos</string>
 
 </resources>
