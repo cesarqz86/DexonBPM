@@ -100,6 +100,7 @@
             android:name=".activity.AttachmentActivity"
             android:label="@string/activity_attachment_title"
             android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity android:name=".activity.PlantillaTableActivity"></activity>
     </application>
 
 </manifest>

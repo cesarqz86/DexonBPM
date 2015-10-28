@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import java.util.zip.Inflater;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.ProgressPagerAdapter;
 import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
+import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
@@ -331,20 +333,31 @@ public class TicketDetail extends FragmentActivity {
                 fileWriter.flush();
                 fileWriter.close();
 
-                Intent pdfIntent = new Intent(this, WebViewActivity.class);
-                //pdfIntent.putExtra("PdfData", printTicketResponseDto.getBufferData());
-                String filePathString = Environment.getExternalStorageDirectory() + "/temp.pdf";
-                pdfIntent.putExtra("PdfUrl", filePathString);
+                //Intent pdfIntent = new Intent(this, WebViewActivity.class);
+                ////pdfIntent.putExtra("PdfData", printTicketResponseDto.getBufferData());
+                //String filePathString = Environment.getExternalStorageDirectory() + "/temp.pdf";
+                //pdfIntent.putExtra("PdfUrl", filePathString);
 
-                /*Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
-                //pdfIntent.addCategory(Intent.CATEGORY_BROWSABLE);
-                String finalPath = "file://" + Environment.getExternalStorageDirectory() + "/temp.pdf";
-                //pdfIntent.setDataAndType(Uri.parse(finalPath), "application/pdf");
-                pdfIntent.setDataAndType(Uri.fromFile(filePath), "application/pdf");*/
-                this.startActivity(pdfIntent);
-                this.overridePendingTransition(R.anim.right_slide_in,
-                        R.anim.right_slide_out);
+                ///*Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
+                ////pdfIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+                //String finalPath = "file://" + Environment.getExternalStorageDirectory() + "/temp.pdf";
+                ////pdfIntent.setDataAndType(Uri.parse(finalPath), "application/pdf");
+                //pdfIntent.setDataAndType(Uri.fromFile(filePath), "application/pdf");*/
+                //this.startActivity(pdfIntent);
+                //this.overridePendingTransition(R.anim.right_slide_in,
+                //        R.anim.right_slide_out);
+                Intent intent = new Intent();
+                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(filePath), "application/pdf");
+                this.startActivityForResult(intent, 10);
+                this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
 
+            } catch (ActivityNotFoundException ex) {
+                CommonService.ShowAlertDialog(this,
+                        R.string.validation_attachment_success_title,
+                        R.string.validation_no_app_for_attachment,
+                        MessageTypeIcon.Error,
+                        false);
             } catch (Exception e) {
                 Log.e("Error loading PDF data", e.getMessage());
             }

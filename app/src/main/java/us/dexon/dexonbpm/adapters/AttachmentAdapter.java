@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
 
 /**
@@ -32,6 +33,10 @@ public class AttachmentAdapter extends ArrayAdapter<AttachmentDto> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View rowView = inflater.inflate(R.layout.item_tree_regular, parent, false);
+
+        rowView.setOnClickListener(new DexonListeners.DocumentClickListener(
+                rowView.getContext(),
+                values.get(position)));
 
         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
         txt_fieldvalue.setText(values.get(position).getAttachmentName());

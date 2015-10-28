@@ -4,16 +4,23 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.util.Base64;
+import android.webkit.MimeTypeMap;
 
 import com.google.gson.JsonObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ActivityListActivity;
 import us.dexon.dexonbpm.activity.ActivityOptionsTableActivity;
+import us.dexon.dexonbpm.activity.AttachmentActivity;
 import us.dexon.dexonbpm.activity.DetailRelatedDataActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
@@ -22,6 +29,7 @@ import us.dexon.dexonbpm.activity.PlantillaListViewActivity;
 import us.dexon.dexonbpm.activity.RelatedDataActivity;
 import us.dexon.dexonbpm.activity.TableActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
+import us.dexon.dexonbpm.activity.WebViewActivity;
 import us.dexon.dexonbpm.activity.WorkflowGridActivity;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
@@ -31,6 +39,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.DocumentInfoResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ForgotPassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
@@ -44,6 +53,7 @@ import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ChangePassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.DocumentInfoRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.ForgotPassRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
@@ -1143,10 +1153,58 @@ public class ServiceExecuter {
                         activity.callBackAddDetail(responseData);
                     }
 
-                    if(this.currentContext instanceof RelatedDataActivity){
+                    if (this.currentContext instanceof RelatedDataActivity) {
                         RelatedDataActivity activity = (RelatedDataActivity) this.currentContext;
                         activity.callBackAddDetail(responseData);
                     }
+                }
+            }
+        }
+    }
+
+    public class ExecuteGetDocumentService extends AsyncTask<DocumentInfoRequestDto, Void, DocumentInfoResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private DocumentInfoRequestDto ticketRequest;
+
+        public ExecuteGetDocumentService(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected DocumentInfoResponseDto doInBackground(DocumentInfoRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.getDocumentData(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(DocumentInfoResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+                    JsonObject documentData = responseData.getRecordObject();
+
+                    if (this.currentContext instanceof AttachmentActivity) {
+                        AttachmentActivity currentActivity = (AttachmentActivity) this.currentContext;
+                        currentActivity.attachmentServiceCallback(documentData);
+                    }
+
                 }
             }
         }

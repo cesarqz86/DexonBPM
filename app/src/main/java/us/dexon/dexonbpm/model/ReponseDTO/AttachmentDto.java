@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 public class AttachmentDto {
 
     //region Attributes
+    private int documentId;
     private String attachmentName;
     private JsonObject attachmentObject;
 
@@ -28,6 +29,14 @@ public class AttachmentDto {
 
     public void setAttachmentObject(JsonObject attachmentObject) {
         this.attachmentObject = attachmentObject;
+    }
+
+    public int getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(int documentId) {
+        this.documentId = documentId;
     }
     //endregion
 

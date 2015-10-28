@@ -43,6 +43,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.DocumentInfoResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
@@ -57,6 +58,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.DocumentInfoRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.LoginRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
@@ -99,6 +101,7 @@ public class TicketService implements ITicketService {
     private static String RECALCULATE_SLA_URL = "api/Incident/RecalculateSLA";
     private static String SAVE_RECORD_URL = "api/Incident/SaveRecord";
     private static String CLEAN_ENTITY_URL = "api/Helper/CleanEntity";
+    private static String GET_ATTACHMENT_URL = "api/Incident/GetDocumentByRecordID";
 
     private int columnCount = 6;
     //endregion
@@ -944,6 +947,46 @@ public class TicketService implements ITicketService {
         } catch (Exception ex) {
             finalResponse.setErrorMessage(ex.getMessage());
             Log.e("CallingService: " + CLEAN_ENTITY_URL, ex.getMessage(), ex);
+        }
+        return finalResponse;
+    }
+
+    public DocumentInfoResponseDto getDocumentData(Context context, DocumentInfoRequestDto documentInfoRequestDto, int reloginCount)
+    {
+        DocumentInfoResponseDto finalResponse = new DocumentInfoResponseDto();
+        Gson gsonSerializer = new Gson();
+        try {
+            String finalUrl = ConfigurationService.getConfigurationValue(context, "URLBase");
+            finalUrl += GET_ATTACHMENT_URL;
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<Object>(documentInfoRequestDto, headers);
+            ResponseEntity<JsonElement> response;
+            response = restTemplate.exchange(new URI(finalUrl), HttpMethod.POST, entity, JsonElement.class);
+            JsonElement jsonData = response.getBody();
+            finalResponse.setRecordObject(jsonData.getAsJsonObject());
+        } catch (HttpServerErrorException ex) {
+            finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), DocumentInfoResponseDto.class);
+            Log.e("CallingService: " + GET_ATTACHMENT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED && reloginCount < 2) {
+                ILoginService loginService = LoginService.getInstance();
+                LoginRequestDto loginRequestData = ConfigurationService.getUserInfo(context);
+                LoginResponseDto loggedUser = loginService.loginUser(context, loginRequestData);
+                documentInfoRequestDto.setLoggedUser(loggedUser);
+                finalResponse = this.getDocumentData(context, documentInfoRequestDto, reloginCount + 1);
+            } else {
+                finalResponse = gsonSerializer.fromJson(ex.getResponseBodyAsString(), DocumentInfoResponseDto.class);
+            }
+            Log.e("CallingService: " + GET_ATTACHMENT_URL, ex.getResponseBodyAsString() + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            finalResponse.setErrorMessage(ex.getMessage());
+            Log.e("CallingService: " + GET_ATTACHMENT_URL, ex.getMessage(), ex);
         }
         return finalResponse;
     }

@@ -34,4 +34,8 @@
     <!-- Related Data -->
     <string name="validation_related_success_title">Related Data</string>
     <string name="validation_related_success_message">Los datos relacionados han sido guardados.</string>
+
+    <!-- Attachment -->
+    <string name="validation_attachment_success_title">Adjuntos</string>
+    <string name="validation_no_app_for_attachment">No se encontró ninguna aplicación para abrir el adjunto.</string>
 </resources>

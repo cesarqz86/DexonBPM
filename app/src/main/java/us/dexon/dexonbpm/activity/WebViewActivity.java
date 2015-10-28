@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
-import com.joanzapata.pdfview.PDFView;
+//import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
 
@@ -21,10 +21,10 @@ public class WebViewActivity extends FragmentActivity {
         String pdfData = currentIntent.getStringExtra("PdfUrl");
         File pdfFile = new File(pdfData);
 
-        PDFView web_view = (PDFView) this.findViewById(R.id.web_view);
+        /*PDFView web_view = (PDFView) this.findViewById(R.id.web_view);
         web_view.fromFile(pdfFile)
                 .showMinimap(true)
                 .enableSwipe(true)
-                .load();
+                .load();*/
     }
 }

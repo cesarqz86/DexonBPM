@@ -38,10 +38,12 @@ import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TreeDataDto;
+import us.dexon.dexonbpm.model.RequestDTO.DocumentInfoRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TechnicianRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.TicketDetailRequestDto;
 
@@ -618,6 +620,33 @@ public final class DexonListeners {
             currentActivity.startActivityForResult(multilineIntent, 0);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
+        }
+    }
+
+    public static class DocumentClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final AttachmentDto jsonObject;
+
+        public DocumentClickListener(Context context,
+                                     AttachmentDto objectData) {
+            this.currentContext = context;
+            this.jsonObject = objectData;
+        }
+
+        public void onClick(View v) {
+
+            IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+            dexonDatabase.setContext(this.currentContext);
+            LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+            DocumentInfoRequestDto infoRequestDto = new DocumentInfoRequestDto();
+            infoRequestDto.setLoggedUser(loggedUser);
+            infoRequestDto.setDocumentId(this.jsonObject.getDocumentId());
+
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteGetDocumentService documentService = serviceExecuter.new ExecuteGetDocumentService(this.currentContext);
+            documentService.execute(infoRequestDto);
         }
     }
 

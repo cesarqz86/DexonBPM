@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.DocumentInfoResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.ReopenResponseDto;
@@ -19,6 +20,7 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketsResponseDto;
 import us.dexon.dexonbpm.model.RequestDTO.AllLayoutRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.DescendantRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.DocumentInfoRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.PrintTicketRequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecalculateSLARequestDto;
 import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
@@ -79,4 +81,6 @@ public interface ITicketService {
     SaveRecordResponseDto saveRercord(Context context, SaveRecordRequestDto saveRecordRequestDto, int reloginCount);
 
     CleanEntityResponseDto cleanEntity(Context context, CleanEntityRequestDto cleanEntityRequestDto);
+
+    DocumentInfoResponseDto getDocumentData(Context context, DocumentInfoRequestDto documentInfoRequestDto, int reloginCount);
 }
