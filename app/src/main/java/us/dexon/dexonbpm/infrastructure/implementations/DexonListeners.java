@@ -467,7 +467,7 @@ public final class DexonListeners {
             } else {
 
                 JsonObject relatedData = CommonSharedData.RelatedData;
-                relatedData.addProperty("record_ID", plantillaId);
+                relatedData.addProperty("record_ID", Integer.parseInt(plantillaId));
                 CommonSharedData.RelatedData = relatedData;
                 CommonSharedData.SelectedRelatedData.setFieldSonData(relatedData);
 

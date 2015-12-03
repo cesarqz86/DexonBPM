@@ -204,7 +204,7 @@ public class RelatedDataActivity extends FragmentActivity {
         this.lstvw_tree_detail.removeAllViews();
         LayoutInflater inflater = this.getLayoutInflater();
 
-        if (jsonData.has("multipleValues") && !jsonData.get("multipleValues").isJsonNull()) {
+        if (jsonData.has("multipleValues") && !jsonData.get("multipleValues").isJsonNull() ) {
             this.drawMultipleRelatedData(jsonData, inflater);
         } else {
             this.footer_container.setVisibility(View.INVISIBLE);
@@ -244,6 +244,11 @@ public class RelatedDataActivity extends FragmentActivity {
     }
 
     public void reloadRelatedData(JsonObject jsonData) {
+
+        /*if (jsonData != null && jsonData.has("multipleValues") && jsonData.get("multipleValues").isJsonNull()) {
+            jsonData.addProperty("multipleValues", "");
+        }*/
+
         CommonService.saveRelatedDataBackground(this, jsonData);
     }
 

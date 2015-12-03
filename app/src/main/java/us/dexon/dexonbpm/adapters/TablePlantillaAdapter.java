@@ -171,7 +171,7 @@ public class TablePlantillaAdapter extends BaseTableAdapter implements View.OnCl
             tempIndex++;
         }
 
-        relatedData.addProperty("record_ID", this.table[rowNumber][columnValueID]);
+        relatedData.addProperty("record_ID", Integer.parseInt(this.table[rowNumber][columnValueID]));
         CommonSharedData.RelatedData = relatedData;
         CommonSharedData.SelectedRelatedData.setFieldSonData(relatedData);
 

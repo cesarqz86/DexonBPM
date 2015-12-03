@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -891,7 +892,11 @@ public class TicketService implements ITicketService {
             finalUrl += SAVE_RECORD_URL;
 
             RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter());
+            restTemplate.getMessageConverters().add(new GsonHttpMessageConverter(true));
+
+            List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+            interceptors.add(new LoggingRequestInterceptor());
+            restTemplate.setInterceptors(interceptors);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
