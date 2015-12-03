@@ -13,6 +13,7 @@ public class TicketRelatedDataDto {
     private String fieldName;
     private String fieldKey;
     private JsonObject fieldSonData;
+    private boolean IsEditable;
     //endregion
 
     //region Properties
@@ -38,6 +39,14 @@ public class TicketRelatedDataDto {
 
     public void setFieldSonData(JsonObject fieldSonData) {
         this.fieldSonData = fieldSonData;
+    }
+
+    public boolean isEditable() {
+        return IsEditable;
+    }
+
+    public void setIsEditable(boolean isEditable) {
+        IsEditable = isEditable;
     }
     //endregion
 

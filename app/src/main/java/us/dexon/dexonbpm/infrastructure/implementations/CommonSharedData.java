@@ -47,7 +47,11 @@ public class CommonSharedData {
 
     public static JsonObject MultilineData;
 
+    public static String MultilineDataValue;
+
     public static TicketRelatedDataDto SelectedRelatedData;
 
     public static Boolean IsOnClick;
+
+    public static Boolean IsReloadRelatedData;
 }

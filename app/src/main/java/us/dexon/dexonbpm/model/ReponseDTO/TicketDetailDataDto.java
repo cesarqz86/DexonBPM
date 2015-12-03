@@ -17,6 +17,7 @@ public class TicketDetailDataDto {
     private String fieldKey;
     private String fieldSonData;
     private JsonObject fieldJsonObject;
+    private boolean isMandatory;
     //endregion
 
     //region Properties
@@ -74,6 +75,14 @@ public class TicketDetailDataDto {
 
     public void setFieldJsonObject(JsonObject fieldJsonObject) {
         this.fieldJsonObject = fieldJsonObject;
+    }
+
+    public boolean isMandatory() {
+        return isMandatory;
+    }
+
+    public void setIsMandatory(boolean isMandatory) {
+        this.isMandatory = isMandatory;
     }
     //endregion
 

@@ -454,15 +454,34 @@ public final class DexonListeners {
             String incidenteCode = ticketJsonInfo.get("uniqueCode").getAsString();
             String plantillaId = this.nodeInfo.getElementId();
 
-            NewTicketActivity newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
-            newTicket.reloadPlantillaCallback(plantillaId, incidenteCode);
-            TextView txt_plantilla_value = (TextView) newTicket.findViewById(R.id.txt_plantilla_value);
-            txt_plantilla_value.setText(this.nodeInfo.getElementName());
-
             Activity currentActivity = (Activity) this.currentContext;
-            Intent ticketDetailActivity = new Intent(currentActivity, NewTicketActivity.class);
-            ticketDetailActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            currentActivity.startActivity(ticketDetailActivity);
+            Intent intentActivity = null;
+
+            if (CommonSharedData.RelatedDataActivity == null) {
+                NewTicketActivity newTicket = (NewTicketActivity) CommonSharedData.TicketActivity;
+                newTicket.reloadPlantillaCallback(plantillaId, incidenteCode);
+                TextView txt_plantilla_value = (TextView) newTicket.findViewById(R.id.txt_plantilla_value);
+                txt_plantilla_value.setText(this.nodeInfo.getElementName());
+
+                intentActivity = new Intent(currentActivity, NewTicketActivity.class);
+            } else {
+
+                JsonObject relatedData = CommonSharedData.RelatedData;
+                relatedData.addProperty("record_ID", plantillaId);
+                CommonSharedData.RelatedData = relatedData;
+                CommonSharedData.SelectedRelatedData.setFieldSonData(relatedData);
+
+                /*RelatedDataActivity relatedDataActivity = (RelatedDataActivity) CommonSharedData.RelatedDataActivity;
+                relatedDataActivity.reloadRelatedData(relatedData);*/
+
+                intentActivity = new Intent(currentActivity, RelatedDataActivity.class);
+                intentActivity.putExtra("activityTitle", relatedData.get("tb_name").getAsString());
+                CommonSharedData.IsReloadRelatedData = true;
+                CommonSharedData.IsOnClick = true;
+            }
+
+            intentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            currentActivity.startActivity(intentActivity);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);
         }
@@ -606,17 +625,25 @@ public final class DexonListeners {
 
         private final Context currentContext;
         private final JsonObject jsonObject;
+        private final String valueToDisplay;
+        private final boolean IsEditable;
 
         public MultilineClickListener(Context context,
-                                      JsonObject objectData) {
+                                      JsonObject objectData,
+                                      String textToDisplay,
+                                      boolean controlEditable) {
             this.currentContext = context;
             this.jsonObject = objectData;
+            this.valueToDisplay = textToDisplay;
+            this.IsEditable = controlEditable;
         }
 
         public void onClick(View v) {
             Activity currentActivity = (Activity) this.currentContext;
             CommonSharedData.MultilineData = this.jsonObject;
+            CommonSharedData.MultilineDataValue = this.valueToDisplay;
             Intent multilineIntent = new Intent(this.currentContext, MultiLineActivity.class);
+            multilineIntent.putExtra("IsEditable", this.IsEditable);
             currentActivity.startActivityForResult(multilineIntent, 0);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);

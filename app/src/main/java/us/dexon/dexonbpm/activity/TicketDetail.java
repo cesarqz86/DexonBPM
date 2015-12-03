@@ -347,7 +347,9 @@ public class TicketDetail extends FragmentActivity {
                 //this.overridePendingTransition(R.anim.right_slide_in,
                 //        R.anim.right_slide_out);
                 Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setAction(Intent.ACTION_EDIT);
+                intent.setAction(Intent.CATEGORY_BROWSABLE);
                 intent.setDataAndType(Uri.fromFile(filePath), "application/pdf");
                 this.startActivityForResult(intent, 10);
                 this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);

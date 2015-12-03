@@ -197,22 +197,31 @@ public class CommonService {
             CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
         }
 
-        JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
         JsonObject headerInfo = CommonSharedData.TicketInfo.getTicketInfo().get("headerInfo").getAsJsonObject();
-        saveTicketInfo.add("headerInfo", headerInfo);
+        if (CommonValidations.validateHeaderInfo(CommonSharedData.TicketInfo)) {
+            JsonObject saveTicketInfo = CommonSharedData.TicketInfoUpdated.getTicketInfo();
+            saveTicketInfo.add("headerInfo", headerInfo);
 
-        Date currentDate = new Date();
-        SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
-        CharSequence currentDateString = dateFormater.format(currentDate);
-        saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
+            Date currentDate = new Date();
+            SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
+            CharSequence currentDateString = dateFormater.format(currentDate);
+            saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
 
-        SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
-        ticketData.setLoggedUser(loggedUser);
-        ticketData.setTicketInfo(saveTicketInfo);
+            SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
+            ticketData.setLoggedUser(loggedUser);
+            ticketData.setTicketInfo(saveTicketInfo);
 
-        ServiceExecuter serviceExecuter = new ServiceExecuter();
-        ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
-        saveTicketService.execute(ticketData);
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
+            saveTicketService.execute(ticketData);
+        }
+        else{
+            CommonService.ShowAlertDialog(context,
+                    R.string.validation_ticket_success_title,
+                    R.string.validation_ticket_required_message,
+                    MessageTypeIcon.Error,
+                    false);
+        }
     }
 
     public static void saveRelatedData(Context context, JsonObject jsonData) {
@@ -234,6 +243,26 @@ public class CommonService {
         ServiceExecuter.ExecuteSaveRecordService saveTicketService = serviceExecuter.new ExecuteSaveRecordService(context);
         saveTicketService.execute(ticketData);
     }
+
+    public static void saveRelatedDataBackground(Context context, JsonObject jsonData) {
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(context);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        if (CommonSharedData.TicketInfoUpdated == null) {
+            CommonSharedData.TicketInfoUpdated = CommonSharedData.TicketInfo;
+        }
+
+        SaveRecordRequestDto ticketData = new SaveRecordRequestDto();
+        ticketData.setLoggedUser(loggedUser);
+        ticketData.setFieldInformation(jsonData);
+        ticketData.setLoadRelatedData(true);
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteSaveRecordBackgroundService saveTicketService = serviceExecuter.new ExecuteSaveRecordBackgroundService(context);
+        saveTicketService.execute(ticketData);
+    }
     //endregion
 
     //region Private Methods
@@ -248,6 +277,17 @@ public class CommonService {
             for (TicketDetailDataDto itemDetail : responseDto.getDataList()) {
                 rowView = inflater.inflate(R.layout.item_detailticket, null);
                 RenderControlType controlType = itemDetail.getFieldType();
+                JsonObject jsonObject = itemDetail.getFieldJsonObject();
+                boolean isEditable = true;
+                boolean isDisable = false;
+                boolean isEditInPlace = true;
+                if(jsonObject.has("isDisable")){
+                    isDisable = jsonObject.get("isDisable").getAsBoolean();
+                }
+                if(jsonObject.has("edit_in_place")){
+                    isEditInPlace = jsonObject.get("edit_in_place").getAsBoolean();
+                }
+                isEditable = !isDisable && isEditInPlace;
                 switch (controlType) {
                     case DXControlsTree: {
                         rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
@@ -256,7 +296,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                             rowView.setOnClickListener(new DexonListeners.ListViewClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -271,7 +311,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                             rowView.setOnClickListener(new DexonListeners.TableClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -296,7 +336,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(dateString);
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                             txt_fieldvalue.setOnClickListener(new DexonListeners.DateClickListener(context, "", date, txt_fieldvalue));
                         }
                         break;
@@ -315,7 +355,7 @@ public class CommonService {
                         RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
                         RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                             DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(
                                     context,
                                     responseDto.getCurrentTechnician(),
@@ -333,7 +373,7 @@ public class CommonService {
                                         0, //top
                                         R.drawable.ic_arrow, //right
                                         0);//bottom
-                                if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                                if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                                     linear_select_technician.setOnClickListener(new DexonListeners.TableClickListener(
                                             context,
                                             itemDetail.getFieldSonData(),
@@ -371,12 +411,14 @@ public class CommonService {
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
                         //txt_fieldvalue.setEnabled(false);
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
                             //txt_fieldvalue.setEnabled(true);
 
                             rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
                                     context,
-                                    itemDetail.getFieldJsonObject()));
+                                    itemDetail.getFieldJsonObject(),
+                                    null,
+                                    true));
                         }
                         //txt_fieldvalue.setMovementMethod(new ScrollingMovementMethod());
                         break;
@@ -413,6 +455,18 @@ public class CommonService {
                 TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                 txt_fieldtitle.setText(itemDetail.getFieldName());
                 lstvw_relateddata.addView(rowView);
+                JsonObject jsonObject = itemDetail.getFieldSonData();
+                boolean isEditable;
+                boolean isDisable = false;
+                boolean isEditInPlace = true;
+                if(jsonObject.has("isDisable")){
+                    isDisable = jsonObject.get("isDisable").getAsBoolean();
+                }
+                if(jsonObject.has("edit_in_place")){
+                    isEditInPlace = jsonObject.get("edit_in_place").getAsBoolean();
+                }
+                isEditable = !isDisable && isEditInPlace;
+                itemDetail.setIsEditable(isEditable);
 
                 if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                     rowView.setOnClickListener(new DexonListeners.RelatedDataClickListener(

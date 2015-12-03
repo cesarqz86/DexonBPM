@@ -430,9 +430,13 @@ public class ServiceExecuter {
 
             if (responseData != null) {
 
-                ListViewActivity treeView = (ListViewActivity) this.currentContext;
-                if (treeView != null) {
+                if (this.currentContext instanceof ListViewActivity) {
+                    ListViewActivity treeView = (ListViewActivity) this.currentContext;
                     treeView.inidentsCallBack(responseData);
+                }
+                if (this.currentContext instanceof RelatedDataActivity) {
+                    RelatedDataActivity relatedDataActivity = (RelatedDataActivity) this.currentContext;
+                    relatedDataActivity.plantillaCallBack(responseData);
                 }
 
                 if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
@@ -1107,6 +1111,52 @@ public class ServiceExecuter {
                             R.string.validation_related_success_message,
                             MessageTypeIcon.Error,
                             false);
+                }
+            }
+        }
+    }
+
+    public class ExecuteSaveRecordBackgroundService extends AsyncTask<SaveRecordRequestDto, Void, SaveRecordResponseDto> {
+
+        private Context currentContext;
+        private ProgressDialog progressDialog;
+        private SaveRecordRequestDto ticketRequest;
+
+        public ExecuteSaveRecordBackgroundService(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected SaveRecordResponseDto doInBackground(SaveRecordRequestDto... params) {
+            ITicketService ticketService = TicketService.getInstance();
+            this.ticketRequest = params[0];
+            return ticketService.saveRercord(this.currentContext, this.ticketRequest, 1);
+        }
+
+        protected void onPostExecute(SaveRecordResponseDto responseData) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if (responseData != null) {
+
+                if (responseData.getErrorMessage() != null && !responseData.getErrorMessage().isEmpty()) {
+                    CommonService.ShowAlertDialog(this.currentContext, R.string.validation_general_error_title, R.string.validation_general_connection_message, MessageTypeIcon.Error, false);
+                } else {
+                    if (this.currentContext instanceof RelatedDataActivity) {
+                        RelatedDataActivity relatedDataActivity = (RelatedDataActivity) this.currentContext;
+                        CommonSharedData.SelectedRelatedData.setFieldSonData(responseData.getRecordObject());
+                        relatedDataActivity.drawRelatedData(responseData.getRecordObject());
+                    }
                 }
             }
         }

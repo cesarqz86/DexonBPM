@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,13 +32,18 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
+import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
+import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
+import us.dexon.dexonbpm.model.RequestDTO.RecordHeaderResquestDto;
 
 public class RelatedDataActivity extends FragmentActivity {
 
@@ -48,6 +54,7 @@ public class RelatedDataActivity extends FragmentActivity {
     private RelativeLayout footer_container;
     private JsonArray multipleValuesArray;
     private LinearLayout linear_plantilla;
+    private boolean isRelatedDataEditable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,7 @@ public class RelatedDataActivity extends FragmentActivity {
         this.footer_container = (RelativeLayout) this.findViewById(R.id.footer_container);
         this.linear_plantilla = (LinearLayout) this.findViewById(R.id.linear_plantilla);
 
-        JsonParser gsonSerializer = new JsonParser();
+        //JsonParser gsonSerializer = new JsonParser();
 
         Intent currentIntent = this.getIntent();
         String activityTitle = currentIntent.getStringExtra("activityTitle");
@@ -68,7 +75,32 @@ public class RelatedDataActivity extends FragmentActivity {
             this.nodeData = CommonSharedData.SelectedRelatedData.getFieldSonData();
             this.jsonNodeData = this.nodeData;
             CommonSharedData.RelatedData = jsonNodeData;
+
+            boolean isDisable = false;
+            boolean isEditInPlace = true;
+            if (this.jsonNodeData.has("isDisable")) {
+                isDisable = this.jsonNodeData.get("isDisable").getAsBoolean();
+            }
+            if (this.jsonNodeData.has("edit_in_place")) {
+                isEditInPlace = this.jsonNodeData.get("edit_in_place").getAsBoolean();
+            }
+            this.isRelatedDataEditable = !isDisable && isEditInPlace;
+
+            if (isDisable) {
+                // Menu options
+                MenuItem action_save = this.menu.findItem(R.id.action_save);
+                action_save.setVisible(false);
+                this.linear_plantilla.setVisibility(View.GONE);
+            } else {
+                this.linear_plantilla.setVisibility(View.VISIBLE);
+            }
+
             this.drawRelatedData(jsonNodeData);
+        }
+
+        if (CommonSharedData.IsReloadRelatedData != null && CommonSharedData.IsReloadRelatedData) {
+            CommonSharedData.IsReloadRelatedData = null;
+            this.reloadRelatedData(CommonSharedData.RelatedData);
         }
 
         CommonSharedData.RelatedDataActivity = this;
@@ -132,6 +164,30 @@ public class RelatedDataActivity extends FragmentActivity {
         this.startActivity(webIntent);
     }
 
+    public void selectPlantilla_Click(View view) {
+
+        IDexonDatabaseWrapper dexonDatabase = DexonDatabaseWrapper.getInstance();
+        dexonDatabase.setContext(this);
+
+        LoginResponseDto loggedUser = dexonDatabase.getLoggedUser();
+
+        RecordHeaderResquestDto recordHeader = new RecordHeaderResquestDto();
+        recordHeader.setLoggedUser(loggedUser);
+        recordHeader.setFieldInformation(this.nodeData);
+        recordHeader.setIncidentCode(CommonSharedData.TicketInfo.getTicketCode());
+
+        ServiceExecuter serviceExecuter = new ServiceExecuter();
+        ServiceExecuter.ExecuteAllRecordHeaderTree getAllRecords = serviceExecuter.new ExecuteAllRecordHeaderTree(this);
+        getAllRecords.execute(recordHeader);
+
+
+        /*Intent plantillaTreeView = new Intent(this, PlantillaListViewActivity.class);
+        plantillaTreeView.putExtra("fieldKey", "main_field");
+        this.startActivityForResult(plantillaTreeView, 0);
+        this.overridePendingTransition(R.anim.right_slide_in,
+                R.anim.right_slide_out);*/
+    }
+
     public void newDetailData(View view) {
 
         if (this.multipleValuesArray != null && this.multipleValuesArray.size() > 0) {
@@ -163,13 +219,32 @@ public class RelatedDataActivity extends FragmentActivity {
             rowView.setOnClickListener(new DexonListeners.DetailRelatedDataClickListener(this, this.nodeData));
             this.lstvw_tree_detail.addView(rowView);
         }
+    }
 
-        if (jsonData.has("record_ID") && jsonData.get("record_ID").getAsInt() == -1 &&
-                jsonData.has("edit_in_place") && jsonData.get("edit_in_place").getAsBoolean()) {
-            this.linear_plantilla.setVisibility(View.VISIBLE);
-        } else {
-            this.linear_plantilla.setVisibility(View.GONE);
+    public void plantillaCallBack(RecordHeaderResponseDto responseDto) {
+
+        if (responseDto != null) {
+            if (responseDto.getDataList() != null) {
+                CommonSharedData.TreeData = responseDto;
+                Intent plantillaTreeView = new Intent(this, PlantillaListViewActivity.class);
+                plantillaTreeView.putExtra("fieldKey", responseDto.getFieldKeyId());
+                this.startActivityForResult(plantillaTreeView, 0);
+                this.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+
+            } else if (responseDto.getTableDataList() != null) {
+                CommonSharedData.TreeData = responseDto;
+                Intent plantillaTableView = new Intent(this, PlantillaTableActivity.class);
+                plantillaTableView.putExtra("fieldKey", responseDto.getFieldKeyId());
+                this.startActivityForResult(plantillaTableView, 0);
+                this.overridePendingTransition(R.anim.right_slide_in,
+                        R.anim.right_slide_out);
+            }
         }
+    }
+
+    public void reloadRelatedData(JsonObject jsonData) {
+        CommonService.saveRelatedDataBackground(this, jsonData);
     }
 
     private void drawMultipleRelatedData(JsonObject jsonData, LayoutInflater inflater) {
@@ -332,7 +407,9 @@ public class RelatedDataActivity extends FragmentActivity {
                     txt_fieldvalue.setText(fieldValue);
                     rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
                             this,
-                            jsonField));
+                            jsonField,
+                            null,
+                            true));
                     break;
                 }
                 default: {
@@ -344,8 +421,22 @@ public class RelatedDataActivity extends FragmentActivity {
                     break;
                 }
             }
+            this.setEnableView(rowView, this.isRelatedDataEditable);
             rowView.setTag(fieldKey);
             this.lstvw_tree_detail.addView(rowView);
+        }
+    }
+
+    private void setEnableView(View rowView, boolean isEnable) {
+        rowView.setEnabled(isEnable);
+        if (rowView instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) rowView).getChildCount(); i++) {
+                View child = ((ViewGroup) rowView).getChildAt(i);
+                child.setEnabled(isEnable);
+                if (child instanceof ViewGroup && ((ViewGroup) child).getChildCount() > 0) {
+                    this.setEnableView(child, isEnable);
+                }
+            }
         }
     }
 

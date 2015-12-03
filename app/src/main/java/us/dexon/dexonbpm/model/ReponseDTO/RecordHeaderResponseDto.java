@@ -17,6 +17,8 @@ public class RecordHeaderResponseDto {
     private String errorMessage;
     private Map<String, List<TreeDataDto>> dataList;
     private String[][] tableDataList;
+    private String fieldKeyName;
+    private String fieldKeyId;
     //endregion
 
     //region Properties
@@ -50,6 +52,22 @@ public class RecordHeaderResponseDto {
 
     public void setTableDataList(String[][] tableDataList) {
         this.tableDataList = tableDataList;
+    }
+
+    public String getFieldKeyName() {
+        return fieldKeyName;
+    }
+
+    public void setFieldKeyName(String fieldKeyName) {
+        this.fieldKeyName = fieldKeyName;
+    }
+
+    public String getFieldKeyId() {
+        return fieldKeyId;
+    }
+
+    public void setFieldKeyId(String fieldKeyId) {
+        this.fieldKeyId = fieldKeyId;
     }
     //endregion
 

@@ -5,7 +5,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.EditText;
 
+import com.google.gson.JsonObject;
+
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
+import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
 
 /**
  * Created by Cesar Quiroz on 5/9/15.
@@ -71,6 +75,19 @@ public final class CommonValidations {
 
     public static boolean validateEqualsIgnoreCase(String firstValue, String secondValue) {
         return org.apache.commons.lang3.StringUtils.equalsIgnoreCase(firstValue, secondValue);
+    }
+
+    public static boolean validateHeaderInfo(TicketResponseDto ticketData) {
+        boolean finalResult = true;
+        if (ticketData != null && ticketData.getDataList() != null) {
+            for (TicketDetailDataDto itemHeader : ticketData.getDataList()) {
+                if (itemHeader.isMandatory() && !validateEmpty(itemHeader.getFieldValue())) {
+                    finalResult = false;
+                    break;
+                }
+            }
+        }
+        return finalResult;
     }
     //endregion
 }

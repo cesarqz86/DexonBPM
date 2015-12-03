@@ -459,7 +459,9 @@ public class TicketService implements ITicketService {
                         tempDataList.setFieldName(tempData.get("display_name").getAsString());
                         tempDataList.setFieldKey(headerInfoData.getKey());
                         tempDataList.setOrder(tempData.get("order").getAsInt());
+                        tempDataList.setIsMandatory(tempData.get("is_mandatory").getAsBoolean());
                         tempDataList.setFieldValue(this.getValueFromTicketField(tempData, controlType));
+                        tempDataList.setFieldJsonObject(tempData);
 
                         if (tempData.has("son")) {
                             JsonElement sonElement = tempData.get("son");
@@ -951,8 +953,7 @@ public class TicketService implements ITicketService {
         return finalResponse;
     }
 
-    public DocumentInfoResponseDto getDocumentData(Context context, DocumentInfoRequestDto documentInfoRequestDto, int reloginCount)
-    {
+    public DocumentInfoResponseDto getDocumentData(Context context, DocumentInfoRequestDto documentInfoRequestDto, int reloginCount) {
         DocumentInfoResponseDto finalResponse = new DocumentInfoResponseDto();
         Gson gsonSerializer = new Gson();
         try {
@@ -1044,15 +1045,15 @@ public class TicketService implements ITicketService {
     private String[] arrangeHeaderArray(String[] headerTempArray) {
         String[] result = new String[headerTempArray.length];
         LinkedHashMap<String, String> hm = new LinkedHashMap<>();
-        for (String headerTitle : headerTempArray){
+        for (String headerTitle : headerTempArray) {
             hm.put(headerTitle, headerTitle);
         }
 
         Set set = hm.entrySet();
         Iterator i = set.iterator();
         int index = 0;
-        while (i.hasNext()){
-            Map.Entry me = (Map.Entry)i.next();
+        while (i.hasNext()) {
+            Map.Entry me = (Map.Entry) i.next();
             result[index] = String.valueOf(me.getKey());
             index++;
         }
@@ -1149,6 +1150,7 @@ public class TicketService implements ITicketService {
                         tempDataList.setFieldName(tempData.get("display_name").getAsString());
                         tempDataList.setFieldKey(headerInfoData.getKey());
                         tempDataList.setOrder(tempData.get("order").getAsInt());
+                        tempDataList.setIsMandatory(tempData.get("is_mandatory").getAsBoolean());
                         tempDataList.setFieldValue(this.getValueFromTicketField(tempData, controlType));
                         tempDataList.setFieldJsonObject(tempData);
 
@@ -1245,19 +1247,26 @@ public class TicketService implements ITicketService {
             String keyId = sonData.get("tb_name").getAsString() + "_ID";
             JsonArray arrayData = jsonElement.getAsJsonArray();
 
-            Map<String, List<TreeDataDto>> finalDataList = new HashMap<>();
+            finalResult.setFieldKeyId(keyId);
+            finalResult.setFieldKeyName(keyName);
+
+            Map<String, List<TreeDataDto>> finalDataList = null;
+            String[][] finalDataTable = null;
 
             if (arrayData.size() > 0) {
 
-                List<TreeDataDto> tempDataList = new ArrayList<>();
-                for (JsonElement elementData : arrayData) {
-                    JsonObject tempElementData = elementData.getAsJsonObject();
-                    TreeDataDto dataTemp = new TreeDataDto();
-                    dataTemp.setElementName(tempElementData.get(keyName).getAsString());
-                    dataTemp.setElementId(tempElementData.get(keyId).getAsString());
-                    dataTemp.setParentId(tempElementData.get("PART_OF").getAsString());
-                    tempDataList.add(dataTemp);
-                }
+                if (arrayData.get(0).getAsJsonObject().has("PART_OF")) {
+
+                    finalDataList = new HashMap<>();
+                    List<TreeDataDto> tempDataList = new ArrayList<>();
+                    for (JsonElement elementData : arrayData) {
+                        JsonObject tempElementData = elementData.getAsJsonObject();
+                        TreeDataDto dataTemp = new TreeDataDto();
+                        dataTemp.setElementName(tempElementData.get(keyName).getAsString());
+                        dataTemp.setElementId(tempElementData.get(keyId).getAsString());
+                        dataTemp.setParentId(tempElementData.get("PART_OF").getAsString());
+                        tempDataList.add(dataTemp);
+                    }
 
                 /*Collections.sort(tempDataList, new Comparator<TreeDataDto>() {
                     @Override
@@ -1275,19 +1284,58 @@ public class TicketService implements ITicketService {
                     }
                 });*/
 
-                for (TreeDataDto elementData : tempDataList) {
-                    List<TreeDataDto> tempList = null;
-                    if (finalDataList.containsKey(elementData.getParentId())) {
-                        tempList = finalDataList.get(elementData.getParentId());
-                        tempList.add(elementData);
-                    } else {
-                        tempList = new ArrayList<>();
-                        tempList.add(elementData);
-                        finalDataList.put(elementData.getParentId(), tempList);
+                    for (TreeDataDto elementData : tempDataList) {
+                        List<TreeDataDto> tempList = null;
+                        if (finalDataList.containsKey(elementData.getParentId())) {
+                            tempList = finalDataList.get(elementData.getParentId());
+                            tempList.add(elementData);
+                        } else {
+                            tempList = new ArrayList<>();
+                            tempList.add(elementData);
+                            finalDataList.put(elementData.getParentId(), tempList);
+                        }
+                    }
+                } else {
+                    try {
+                        int finalSize = arrayData.size() + 1;
+                        finalDataTable = new String[finalSize][];
+                        Gson gsonSerializer = new Gson();
+                        JsonFactory factory = new JsonFactory();
+                        ObjectMapper jacksonSerializer = new ObjectMapper(factory);
+                        TypeReference<LinkedHashMap<String, String>> typeReference = new TypeReference<LinkedHashMap<String, String>>() {
+                        };
+                        String[] dataResponse;
+                        String dataString;
+                        LinkedHashMap<String, String> dataList;
+                        LinkedHashMap<String, String> dataListTemp;
+                        int indexPosition = 0;
+
+                        for (JsonElement elementData : arrayData) {
+                            dataString = gsonSerializer.toJson(elementData);
+                            dataListTemp = jacksonSerializer.readValue(dataString, typeReference);
+                            dataList = new LinkedHashMap<>();
+
+                            if (dataListTemp.containsKey(keyName)) {
+                                String keyNameValue = dataListTemp.get(keyName);
+                                dataListTemp.remove(keyName);
+                                dataList.put(keyName, keyNameValue);
+                                dataList.putAll(dataListTemp);
+                            }
+                            dataResponse = dataList.values().toArray(new String[0]);
+                            if (indexPosition == 0) {
+                                finalDataTable[indexPosition] = dataList.keySet().toArray(new String[0]);
+                                indexPosition++;
+                            }
+                            finalDataTable[indexPosition] = dataResponse;
+                            indexPosition++;
+                        }
+                    } catch (Exception ex) {
+
                     }
                 }
             }
             finalResult.setDataList(finalDataList);
+            finalResult.setTableDataList(finalDataTable);
         }
         return finalResult;
     }

@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.widget.EditText;
@@ -20,6 +21,9 @@ public class MultiLineActivity extends FragmentActivity {
 
         this.txt_fieldvalue = (EditText) this.findViewById(R.id.txt_fieldvalue);
 
+        Intent currentIntent = this.getIntent();
+        boolean isControlEditable = currentIntent.getBooleanExtra("IsEditable", true);
+
         if (CommonSharedData.MultilineData != null) {
             JsonObject jsonField = CommonSharedData.MultilineData;
             String fieldName = jsonField.get("display_name").getAsString();
@@ -37,6 +41,12 @@ public class MultiLineActivity extends FragmentActivity {
             this.txt_fieldvalue.setText(fieldValue);
             this.setTitle(fieldName);
         }
+
+        if(CommonSharedData.MultilineDataValue != null){
+            this.txt_fieldvalue.setText(CommonSharedData.MultilineDataValue);
+        }
+
+        this.txt_fieldvalue.setEnabled(isControlEditable);
     }
 
     @Override
