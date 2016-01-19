@@ -243,6 +243,7 @@ public class TicketDetail extends FragmentActivity {
     public void inidentsCallBack(TicketResponseDto responseDto) {
 
         CommonSharedData.TicketInfo = responseDto;
+        CommonSharedData.AttachmentList = null;
 
         this.ticketData = responseDto;
         CommonService.drawTicket(responseDto, this);

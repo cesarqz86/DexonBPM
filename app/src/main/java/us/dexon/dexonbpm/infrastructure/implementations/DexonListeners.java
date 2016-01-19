@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ActivityDetailActivity;
+import us.dexon.dexonbpm.activity.AttachmentActivity;
 import us.dexon.dexonbpm.activity.DetailRelatedDataActivity;
 import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.ListViewActivity;
@@ -39,6 +41,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
@@ -674,6 +677,31 @@ public final class DexonListeners {
             ServiceExecuter serviceExecuter = new ServiceExecuter();
             ServiceExecuter.ExecuteGetDocumentService documentService = serviceExecuter.new ExecuteGetDocumentService(this.currentContext);
             documentService.execute(infoRequestDto);
+        }
+    }
+
+    public static class PendingDocumentClickListener implements View.OnClickListener {
+
+        private final Context currentContext;
+        private final AttachmentItem jsonObject;
+
+        public PendingDocumentClickListener(Context context,
+                                            AttachmentItem objectData) {
+            this.currentContext = context;
+            this.jsonObject = objectData;
+        }
+
+        public void onClick(View v) {
+
+            if(this.currentContext instanceof AttachmentActivity){
+
+                String finalExtension = this.jsonObject.getFileName().substring((this.jsonObject.getFileName().lastIndexOf(".") + 1), this.jsonObject.getFileName().length());
+                finalExtension = CommonValidations.validateEmpty(finalExtension) ? finalExtension.replace(".", "") : "";
+                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(finalExtension);
+
+                AttachmentActivity activity = (AttachmentActivity)this.currentContext;
+                activity.showDownloadedFile(this.jsonObject.getAttachmentData(), this.jsonObject.getFileName(), mimeType);
+            }
         }
     }
 

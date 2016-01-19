@@ -10,6 +10,7 @@ import us.dexon.dexonbpm.activity.IncidentsActivity;
 import us.dexon.dexonbpm.activity.NewTicketActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.model.ReponseDTO.ActivityTreeDto;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.ReponseDTO.RecordHeaderResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
@@ -54,4 +55,6 @@ public class CommonSharedData {
     public static Boolean IsOnClick;
 
     public static Boolean IsReloadRelatedData;
+
+    public static List<AttachmentItem> AttachmentList;
 }

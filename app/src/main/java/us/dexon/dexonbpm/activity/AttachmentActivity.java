@@ -11,14 +11,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,27 +33,79 @@ import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
+import us.dexon.dexonbpm.utils.FileUtils;
 
 public class AttachmentActivity extends FragmentActivity {
 
-    private ListView lstvw_attachmentdata;
+    private static final int FILE_SELECT_CODE = 0;
+    private LinearLayout lstvw_attachmentdata;
+    private LinearLayout lstvw_pending_attachmentdata;
     private TextView txt_attachment_title;
+    private TextView txt_attachment_pending_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attachment);
 
-        this.lstvw_attachmentdata = (ListView) this.findViewById(R.id.lstvw_attachmentdata);
+        this.lstvw_attachmentdata = (LinearLayout) this.findViewById(R.id.lstvw_attachmentdata);
+        this.lstvw_pending_attachmentdata = (LinearLayout) this.findViewById(R.id.lstvw_pending_attachmentdata);
         this.txt_attachment_title = (TextView) this.findViewById(R.id.txt_attachment_title);
+        this.txt_attachment_pending_title = (TextView) this.findViewById(R.id.txt_attachment_pending_title);
 
         if (CommonSharedData.TicketInfo != null) {
             JsonObject jsonTicket = CommonSharedData.TicketInfo.getTicketInfo();
             this.drawAttachmentData(jsonTicket);
+            this.drawPendindAttachmentData();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case FILE_SELECT_CODE: {
+                if (resultCode == RESULT_OK) {
+
+                    if (CommonSharedData.AttachmentList == null) {
+                        CommonSharedData.AttachmentList = new ArrayList<AttachmentItem>();
+                    }
+                    Uri uri = data.getData();
+                    String path = null;
+                    try {
+                        path = FileUtils.getPath(this, uri);
+                        InputStream fileData = new FileInputStream(path);
+                        byte[] bytes;
+                        byte[] bufferRead = new byte[8192];
+                        int bytesRead;
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        while ((bytesRead = fileData.read(bufferRead)) != -1) {
+                            output.write(bufferRead, 0, bytesRead);
+                        }
+                        bytes = output.toByteArray();
+                        String encodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
+                        String fileName = path.substring(path.lastIndexOf("/") + 1);
+
+                        AttachmentItem newAttachment = new AttachmentItem();
+                        newAttachment.setAttachmentName(path);
+                        newAttachment.setAttachmentData(encodedString);
+                        newAttachment.setFileName(fileName);
+
+                        CommonSharedData.AttachmentList.add(newAttachment);
+                        this.drawPendindAttachmentData();
+                    } catch (URISyntaxException e) {
+                    } catch (Exception ex) {
+
+                    }
+                }
+                break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void logoClick(View view) {
@@ -61,10 +118,22 @@ public class AttachmentActivity extends FragmentActivity {
 
     public void newAttachment(View view) {
 
+        Intent newAttachmentIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        newAttachmentIntent.setType("*/*");
+        newAttachmentIntent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            this.startActivityForResult(
+                    Intent.createChooser(newAttachmentIntent, this.getString(R.string.activity_newattachment_title)),
+                    FILE_SELECT_CODE);
+        } catch (Exception ex) {
+            Log.e("Add Attachment", ex.getMessage(), ex);
+        }
     }
 
     public void drawAttachmentData(JsonObject ticketInfo) {
 
+        LayoutInflater inflater = this.getLayoutInflater();
         this.txt_attachment_title.setVisibility(View.GONE);
 
         if (ticketInfo != null && ticketInfo.has("attachedDocuments") && !ticketInfo.get("attachedDocuments").isJsonNull()) {
@@ -86,13 +155,40 @@ public class AttachmentActivity extends FragmentActivity {
 
             if (attachmentList.size() > 0) {
                 this.txt_attachment_title.setVisibility(View.VISIBLE);
+                for (int index = 0; index < attachmentList.size(); index++) {
+                    AttachmentDto tempObject = attachmentList.get(index);
+                    View rowView = inflater.inflate(R.layout.item_tree_regular, null);
+                    rowView.setOnClickListener(new DexonListeners.DocumentClickListener(
+                            rowView.getContext(),
+                            tempObject));
+                    TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                    txt_fieldvalue.setText(tempObject.getAttachmentName());
+                    txt_fieldvalue.setTag(tempObject.getAttachmentObject());
+                    this.lstvw_attachmentdata.addView(rowView);
+                }
             }
-
-            AttachmentAdapter detailAdapter = new AttachmentAdapter(this, attachmentList);
-            this.lstvw_attachmentdata.setAdapter(detailAdapter);
-
         }
 
+    }
+
+    public void drawPendindAttachmentData() {
+        LayoutInflater inflater = this.getLayoutInflater();
+        this.txt_attachment_pending_title.setVisibility(View.GONE);
+        this.lstvw_pending_attachmentdata.removeAllViews();
+
+        if (CommonSharedData.AttachmentList != null && CommonSharedData.AttachmentList.size() > 0) {
+            this.txt_attachment_pending_title.setVisibility(View.VISIBLE);
+            for (int index = 0; index < CommonSharedData.AttachmentList.size(); index++) {
+                AttachmentItem tempObject = CommonSharedData.AttachmentList.get(index);
+                View rowView = inflater.inflate(R.layout.item_tree_regular, null);
+                rowView.setOnClickListener(new DexonListeners.PendingDocumentClickListener(
+                        rowView.getContext(),
+                        tempObject));
+                TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
+                txt_fieldvalue.setText(tempObject.getFileName());
+                this.lstvw_pending_attachmentdata.addView(rowView);
+            }
+        }
     }
 
     public void attachmentServiceCallback(JsonObject documentData) {
@@ -105,31 +201,39 @@ public class AttachmentActivity extends FragmentActivity {
             try {
                 String bufferData = documentData.get("_buffer").getAsString();
                 String fileName = documentData.get("documentName").getAsString();
-                byte[] pdfData = Base64.decode(bufferData, Base64.DEFAULT);
-                String filePathString = Environment.getExternalStorageDirectory() + "/" + fileName;
-                File filePath = new File(filePathString);
-                if (filePath.exists()) {
-                    filePath.delete();
-                }
-                FileOutputStream fileWriter = new FileOutputStream(filePath, true);
-                fileWriter.write(pdfData);
-                fileWriter.flush();
-                fileWriter.close();
-
-                Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(filePath), mimeType);
-                this.startActivityForResult(intent, 10);
-                this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
-            } catch (ActivityNotFoundException ex) {
-                CommonService.ShowAlertDialog(this,
-                        R.string.validation_attachment_success_title,
-                        R.string.validation_no_app_for_attachment,
-                        MessageTypeIcon.Error,
-                        false);
+                this.showDownloadedFile(bufferData, fileName, mimeType);
             } catch (Exception ex) {
                 Log.e("Downloading attachment", ex.getMessage());
             }
+        }
+    }
+
+    public void showDownloadedFile(String bufferData, String fileName, String mimeType) {
+        try {
+            byte[] pdfData = Base64.decode(bufferData, Base64.DEFAULT);
+            String filePathString = Environment.getExternalStorageDirectory() + "/" + fileName;
+            File filePath = new File(filePathString);
+            if (filePath.exists()) {
+                filePath.delete();
+            }
+            FileOutputStream fileWriter = new FileOutputStream(filePath, true);
+            fileWriter.write(pdfData);
+            fileWriter.flush();
+            fileWriter.close();
+
+            Intent intent = new Intent();
+            intent.setAction(android.content.Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(filePath), mimeType);
+            this.startActivityForResult(intent, 10);
+            this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
+        } catch (ActivityNotFoundException ex) {
+            CommonService.ShowAlertDialog(this,
+                    R.string.validation_attachment_success_title,
+                    R.string.validation_no_app_for_attachment,
+                    MessageTypeIcon.Error,
+                    false);
+        } catch (Exception ex) {
+            Log.e("Downloading attachment", ex.getMessage());
         }
     }
 }

@@ -44,6 +44,7 @@
     <string name="txt_relateddata_delete_title">Delete</string>
 
     <string name="txt_attachment_title">Attachments</string>
+    <string name="txt_attachment_pending_title">Pending Attachments</string>
 
     <!-- Menu Labels -->
     <string name="menu_change_password_label">Cambiar Contraseña</string>
@@ -67,5 +68,6 @@
     <string name="activity_print_ticket">Print Ticket</string>
     <string name="activity_detail_relateddata_title">Detalle Maestro</string>
     <string name="activity_attachment_title">Adjuntos</string>
+    <string name="activity_newattachment_title">Adjuntar Archivo</string>
 
 </resources>

@@ -20,6 +20,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,6 +34,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketDetailDataDto;
 import us.dexon.dexonbpm.model.ReponseDTO.TicketRelatedDataDto;
@@ -206,6 +208,7 @@ public class CommonService {
             SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");
             CharSequence currentDateString = dateFormater.format(currentDate);
             saveTicketInfo.addProperty("LastUpdateTime", currentDateString.toString());
+            saveTicketInfo = setPendingAttachment(saveTicketInfo);
 
             SaveTicketRequestDto ticketData = new SaveTicketRequestDto();
             ticketData.setLoggedUser(loggedUser);
@@ -214,14 +217,37 @@ public class CommonService {
             ServiceExecuter serviceExecuter = new ServiceExecuter();
             ServiceExecuter.ExecuteSaveTicket saveTicketService = serviceExecuter.new ExecuteSaveTicket(context);
             saveTicketService.execute(ticketData);
-        }
-        else{
+        } else {
             CommonService.ShowAlertDialog(context,
                     R.string.validation_ticket_success_title,
                     R.string.validation_ticket_required_message,
                     MessageTypeIcon.Error,
                     false);
         }
+    }
+
+    private static JsonObject setPendingAttachment(JsonObject saveTicketInfo) {
+
+        if (CommonSharedData.AttachmentList != null && CommonSharedData.AttachmentList.size() > 0) {
+            JsonArray ticketAttachments = saveTicketInfo.get("attachedDocuments").getAsJsonArray();
+            for (int index = 0; index < CommonSharedData.AttachmentList.size(); index++) {
+                AttachmentItem tempObject = CommonSharedData.AttachmentList.get(index);
+                JsonObject tempJsonObject = new JsonObject();
+                tempJsonObject.addProperty("documentName", tempObject.getFileName());
+                tempJsonObject.addProperty("pathDocument", "");
+                tempJsonObject.addProperty("fullName", tempObject.getFileName());
+                tempJsonObject.addProperty("_buffer", tempObject.getAttachmentData());
+                tempJsonObject.addProperty("fileExtension", "");
+                tempJsonObject.add("tmpId", null);
+                tempJsonObject.addProperty("saved", false);
+                tempJsonObject.addProperty("physicalFile", true);
+                tempJsonObject.addProperty("typeClass", "DocumentModel");
+                ticketAttachments.add(tempJsonObject);
+            }
+            saveTicketInfo.add("attachedDocuments", ticketAttachments);
+        }
+
+        return saveTicketInfo;
     }
 
     public static void saveRelatedData(Context context, JsonObject jsonData) {
@@ -281,10 +307,10 @@ public class CommonService {
                 boolean isEditable = true;
                 boolean isDisable = false;
                 boolean isEditInPlace = true;
-                if(jsonObject.has("isDisable")){
+                if (jsonObject.has("isDisable")) {
                     isDisable = jsonObject.get("isDisable").getAsBoolean();
                 }
-                if(jsonObject.has("edit_in_place")){
+                if (jsonObject.has("edit_in_place")) {
                     isEditInPlace = jsonObject.get("edit_in_place").getAsBoolean();
                 }
                 isEditable = !isDisable && isEditInPlace;
@@ -459,10 +485,10 @@ public class CommonService {
                 boolean isEditable;
                 boolean isDisable = false;
                 boolean isEditInPlace = true;
-                if(jsonObject.has("isDisable")){
+                if (jsonObject.has("isDisable")) {
                     isDisable = jsonObject.get("isDisable").getAsBoolean();
                 }
-                if(jsonObject.has("edit_in_place")){
+                if (jsonObject.has("edit_in_place")) {
                     isEditInPlace = jsonObject.get("edit_in_place").getAsBoolean();
                 }
                 isEditable = !isDisable && isEditInPlace;
