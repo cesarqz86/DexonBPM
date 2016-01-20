@@ -21,7 +21,7 @@
     <color name="light_green">#4baa2b</color>
     <color name="light_green_tranparent">#664baa2b</color>
 
-    <color name="radio_button_selected_color">#005bff</color>
+    <color name="radio_button_selected_color">#325BA0</color>
     <color name="radio_button_unselected_color">#ffffff</color>
 
     <color name="progress_green">#00FF00</color>

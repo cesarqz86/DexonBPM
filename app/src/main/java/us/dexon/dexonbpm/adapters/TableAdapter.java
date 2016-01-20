@@ -156,9 +156,12 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
 
     private void headerClick(int rowNumber) {
 
+        Gson gsonConverter = new Gson();
+
         JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
         JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
         JsonObject fieldInfo = headerInfo.get(this.fieldKey).getAsJsonObject();
+        String originalFieldInfoString = gsonConverter.toJson(fieldInfo);
         JsonObject sonData = fieldInfo.get("son").getAsJsonObject();
 
         StringBuilder valueKeyBuilder = new StringBuilder();
@@ -185,7 +188,9 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
 
         if(CommonValidations.validateEqualsIgnoreCase(valueKey, "HD_TECHNICIAN_ID")){
-            CommonSharedData.OriginalTechnician = CommonSharedData.TicketInfo.getCurrentTechnician();
+            //CommonSharedData.ManualTechnician = CommonSharedData.TicketInfo.getCurrentTechnician();
+            String manualTechniciaString = gsonConverter.toJson(fieldInfo);
+            CommonSharedData.ManualTechnician = gsonConverter.fromJson(manualTechniciaString, JsonObject.class);
         }
 
         Activity currentActivity = this.context;
@@ -214,6 +219,9 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
         Boolean isStatus = this.fieldKey.equals("status");
         Boolean isReloadRequired = sonData.get("can_trigger_BF").getAsBoolean();
         if (isReloadRequired || isStatus) {
+
+            CommonSharedData.OriginalStatus = gsonConverter.fromJson(originalFieldInfoString, JsonObject.class);
+
             Date currentDate = new Date();
 
             SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'-05:00'");

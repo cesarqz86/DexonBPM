@@ -2,6 +2,7 @@ package us.dexon.dexonbpm.activity;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
@@ -28,6 +29,20 @@ public class WorkflowGridActivity extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteLoadWorkflowTable getAllRecords = serviceExecuter.new ExecuteLoadWorkflowTable(this);
         getAllRecords.execute(recordHeader);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            this.setResult(90, this.getIntent());
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
     public void inidentsCallBack(String[][] dataList) {

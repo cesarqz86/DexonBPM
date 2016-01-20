@@ -20,6 +20,8 @@ import us.dexon.dexonbpm.model.ReponseDTO.TicketResponseDto;
  */
 public class CommonSharedData {
 
+    public static String FilterCriteria;
+
     public static TicketResponseDto TicketInfo;
 
     public static TicketResponseDto TicketInfoUpdated;
@@ -38,7 +40,9 @@ public class CommonSharedData {
 
     public static JsonObject OriginalTechnician;
 
-    public static JsonObject OriginalState;
+    public static JsonObject ManualTechnician;
+
+    public static JsonObject OriginalStatus;
 
     public static IncidentsActivity IncidentListActivity;
 

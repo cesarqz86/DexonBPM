@@ -88,6 +88,8 @@ public class NewTicketActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         CommonSharedData.OriginalTechnician = null;
+        CommonSharedData.AttachmentList = null;
+        CommonSharedData.ManualTechnician = null;
     }
 
     public void selectPlantilla_Click(View view) {

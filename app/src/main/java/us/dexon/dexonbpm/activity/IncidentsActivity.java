@@ -74,11 +74,14 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     ServiceExecuter serviceExecuter = new ServiceExecuter();
                     ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(currentContext);
-                    filterService.execute(v.getText().toString());
+                    CommonSharedData.FilterCriteria = v.getText().toString();
+                    filterService.execute(CommonSharedData.FilterCriteria);
                 }
                 return false;
             }
         });
+
+        this.searchFilterCriteria();
 
         // To avoid issues with the Spring RestClient and HttpHeaders
         System.setProperty("http.keepAlive", "false");
@@ -222,6 +225,8 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
         ServiceExecuter.ExecuteTicketTotalService ticketTotalService = serviceExecuter.new ExecuteTicketTotalService(this);
         ticketTotalService.execute(ticketTotalFirstData);
+
+        this.searchFilterCriteria();
     }
 
     public void inidentsCallBack(String[][] dataList) {
@@ -262,5 +267,16 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
                         R.anim.right_slide_out);
             }
         }, 2000);
+    }
+
+    private void searchFilterCriteria(){
+
+        if(CommonValidations.validateEmpty(CommonSharedData.FilterCriteria)){
+            EditText findDaemon = (EditText) findViewById(R.id.search_field);
+            findDaemon.setText(CommonSharedData.FilterCriteria);
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(currentContext);
+            filterService.execute(CommonSharedData.FilterCriteria);
+        }
     }
 }

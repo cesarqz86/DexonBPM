@@ -338,6 +338,7 @@ public final class DexonListeners {
 
             switch (v.getId()) {
                 case R.id.btn_setmanual_technician: {
+                    Gson gsonConverter = new Gson();
                     ITicketService ticketService = TicketService.getInstance();
 
                     TicketDetail ticketDetail = null;
@@ -350,8 +351,13 @@ public final class DexonListeners {
                     }
 
                     JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
-                    ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", CommonSharedData.OriginalTechnician);
-                    this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, CommonSharedData.OriginalTechnician);
+                    JsonObject tempManualTechnician = CommonSharedData.OriginalTechnician;
+                    if (CommonSharedData.ManualTechnician != null) {
+                        String manualTechnicianString = gsonConverter.toJson(CommonSharedData.ManualTechnician);
+                        tempManualTechnician = gsonConverter.fromJson(manualTechnicianString, JsonObject.class);
+                    }
+                    ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempManualTechnician);
+                    this.ticketInfo = ticketService.convertToTicketData(ticketInfoTemp, R.id.btn_setmanual_technician, tempManualTechnician);
 
                     if (ticketDetail != null) {
                         ticketDetail.inidentsCallBack(this.ticketInfo);
@@ -394,7 +400,6 @@ public final class DexonListeners {
                     } else if (this.currentContext instanceof NewTicketActivity) {
                         newTicket = (NewTicketActivity) this.currentContext;
                     }
-
 
                     JsonObject ticketInfoTemp = this.ticketInfo.getTicketInfo();
                     ticketInfoTemp.get("headerInfo").getAsJsonObject().add("current_technician", tempTechninician);
@@ -693,13 +698,13 @@ public final class DexonListeners {
 
         public void onClick(View v) {
 
-            if(this.currentContext instanceof AttachmentActivity){
+            if (this.currentContext instanceof AttachmentActivity) {
 
                 String finalExtension = this.jsonObject.getFileName().substring((this.jsonObject.getFileName().lastIndexOf(".") + 1), this.jsonObject.getFileName().length());
                 finalExtension = CommonValidations.validateEmpty(finalExtension) ? finalExtension.replace(".", "") : "";
                 String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(finalExtension);
 
-                AttachmentActivity activity = (AttachmentActivity)this.currentContext;
+                AttachmentActivity activity = (AttachmentActivity) this.currentContext;
                 activity.showDownloadedFile(this.jsonObject.getAttachmentData(), this.jsonObject.getFileName(), mimeType);
             }
         }

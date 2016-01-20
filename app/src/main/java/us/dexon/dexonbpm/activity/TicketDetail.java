@@ -50,7 +50,9 @@ import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
+import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
+import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
@@ -220,12 +222,24 @@ public class TicketDetail extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         CommonSharedData.TreeData = null;
+
+        if(CommonSharedData.OriginalStatus != null && resultCode == 90){
+            JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
+            JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
+            headerInfo.add("status", CommonSharedData.OriginalStatus);
+            ITicketService ticketService = TicketService.getInstance();
+            CommonSharedData.TicketInfo = ticketService.convertToTicketData(ticketJsonInfo, R.id.btn_setmanual_technician, null);
+            this.inidentsCallBack(CommonSharedData.TicketInfo);
+            CommonSharedData.OriginalStatus = null;
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         CommonSharedData.OriginalTechnician = null;
+        CommonSharedData.AttachmentList = null;
+        CommonSharedData.ManualTechnician = null;
     }
 
     public void logoClick(View view) {
@@ -242,47 +256,52 @@ public class TicketDetail extends FragmentActivity {
 
     public void inidentsCallBack(TicketResponseDto responseDto) {
 
-        CommonSharedData.TicketInfo = responseDto;
-        CommonSharedData.AttachmentList = null;
+        if (responseDto != null) {
+            CommonSharedData.TicketInfo = responseDto;
+            CommonSharedData.AttachmentList = null;
 
-        this.ticketData = responseDto;
-        CommonService.drawTicket(responseDto, this);
+            this.ticketData = responseDto;
+            CommonService.drawTicket(responseDto, this);
 
-        String activityTitle = this.getString(R.string.app_name);
-        for (TicketDetailDataDto ticketData : responseDto.getDataList()) {
-            if (ticketData.getFieldKey().equals("ticket")) {
-                activityTitle = ticketData.getFieldValue();
-                break;
+            String activityTitle = this.getString(R.string.app_name);
+
+            if(responseDto.getDataList() != null) {
+                for (TicketDetailDataDto ticketData : responseDto.getDataList()) {
+                    if (ticketData.getFieldKey().equals("ticket")) {
+                        activityTitle = ticketData.getFieldValue();
+                        break;
+                    }
+                }
             }
-        }
-        this.setTitle(activityTitle);
+            this.setTitle(activityTitle);
 
-        // Menu options
-        MenuItem action_reopen = this.menu.findItem(R.id.action_reopen);
-        MenuItem action_save = this.menu.findItem(R.id.action_save);
+            // Menu options
+            MenuItem action_reopen = this.menu.findItem(R.id.action_reopen);
+            MenuItem action_save = this.menu.findItem(R.id.action_save);
 
-        action_save.setVisible(false);
-        action_reopen.setVisible(false);
+            action_save.setVisible(false);
+            action_reopen.setVisible(false);
 
-        if (responseDto.getIsOpen()) {
-            if (responseDto.getIsEditable()) {
-                action_save.setVisible(true);
+            if (responseDto.getIsOpen()) {
+                if (responseDto.getIsEditable()) {
+                    action_save.setVisible(true);
+                }
+            } else {
+                action_reopen.setVisible(true);
             }
-        } else {
-            action_reopen.setVisible(true);
-        }
 
-        // Progress Pager
-        ProgressPagerAdapter progressPagerAdapter = new ProgressPagerAdapter(
-                this.getSupportFragmentManager(), responseDto);
-        ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
-        progress_pager.setAdapter(progressPagerAdapter);
+            // Progress Pager
+            ProgressPagerAdapter progressPagerAdapter = new ProgressPagerAdapter(
+                    this.getSupportFragmentManager(), responseDto);
+            ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
+            progress_pager.setAdapter(progressPagerAdapter);
 
-        CirclePageIndicator progress_pager_indicator = (CirclePageIndicator) this.findViewById(R.id.progress_pager_indicator);
-        progress_pager_indicator.setViewPager(progress_pager);
+            CirclePageIndicator progress_pager_indicator = (CirclePageIndicator) this.findViewById(R.id.progress_pager_indicator);
+            progress_pager_indicator.setViewPager(progress_pager);
 
-        if (responseDto.getBarPercentDone() == null) {
-            progress_pager_indicator.setVisibility(View.INVISIBLE);
+            if (responseDto.getBarPercentDone() == null) {
+                progress_pager_indicator.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
