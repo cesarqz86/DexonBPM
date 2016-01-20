@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.activity;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,16 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.dexon.dexonbpm.R;
-import us.dexon.dexonbpm.adapters.AttachmentAdapter;
-import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
-import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
-import us.dexon.dexonbpm.model.RequestDTO.CleanEntityRequestDto;
 import us.dexon.dexonbpm.utils.FileUtils;
 
 public class AttachmentActivity extends FragmentActivity {
@@ -227,11 +224,19 @@ public class AttachmentActivity extends FragmentActivity {
             this.startActivityForResult(intent, 10);
             this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
         } catch (ActivityNotFoundException ex) {
-            CommonService.ShowAlertDialog(this,
-                    R.string.validation_attachment_success_title,
-                    R.string.validation_no_app_for_attachment,
-                    MessageTypeIcon.Error,
-                    false);
+//            CommonService.ShowAlertDialog(this,
+//                    R.string.validation_attachment_success_title,
+//                    R.string.validation_no_app_for_attachment,
+//                    MessageTypeIcon.Error,
+//                    false);
+
+            AttachmentItem attachmentItem = new AttachmentItem();
+            attachmentItem.setFileName(fileName);
+            attachmentItem.setAttachmentData(bufferData);
+
+            ServiceExecuter serviceExecuter = new ServiceExecuter();
+            ServiceExecuter.ExecuteDownloadFile downloadFile = serviceExecuter.new ExecuteDownloadFile(this);
+            downloadFile.execute(attachmentItem);
         } catch (Exception ex) {
             Log.e("Downloading attachment", ex.getMessage());
         }

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.google.gson.JsonObject;
@@ -36,6 +37,7 @@ import us.dexon.dexonbpm.infrastructure.interfaces.IChangePasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IForgotPasswordService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ILoginService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.ReponseDTO.ChangePassResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.CleanEntityResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
@@ -1256,6 +1258,59 @@ public class ServiceExecuter {
                     }
 
                 }
+            }
+        }
+    }
+
+    public class ExecuteDownloadFile extends AsyncTask<AttachmentItem, Void, Boolean> {
+
+        private Context currentContext;
+        private LoginRequestDto loginRequestDto;
+        private ProgressDialog progressDialog;
+
+        public ExecuteDownloadFile(Context context) {
+            this.currentContext = context;
+            this.progressDialog = CommonService.getCustomProgressDialog(this.currentContext);
+            //this.progressDialog = new ProgressDialog(this.currentContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(AttachmentItem... params) {
+            Boolean result = true;
+            try {
+                AttachmentItem attachmentItem = params[0];
+                byte[] pdfData = Base64.decode(attachmentItem.getAttachmentData(), Base64.DEFAULT);
+                String filePathString = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + attachmentItem.getFileName();
+                File filePath = new File(filePathString);
+                if (filePath.exists()) {
+                    filePath.delete();
+                }
+                FileOutputStream fileWriter = new FileOutputStream(filePath, true);
+                fileWriter.write(pdfData);
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (Exception iex) {
+                result =false;
+            }
+            return result;
+        }
+
+        protected void onPostExecute(Boolean downloadResult) {
+
+            if (this.progressDialog != null && this.progressDialog.isShowing()) {
+                this.progressDialog.dismiss();
+            }
+
+            if(downloadResult){
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_attachment_success_title, R.string.validation_downloaded_attachment, MessageTypeIcon.Success, false);
+            }
+            else{
+                CommonService.ShowAlertDialog(this.currentContext, R.string.validation_attachment_success_title, R.string.validation_downloaded_error_attachment, MessageTypeIcon.Error, false);
             }
         }
     }

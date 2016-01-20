@@ -39,4 +39,7 @@
     <!-- Attachment -->
     <string name="validation_attachment_success_title">Adjuntos</string>
     <string name="validation_no_app_for_attachment">No se encontró ninguna aplicación para abrir el adjunto.</string>
+    <string name="validation_downloading_attachment">Descargando adjunto.</string>
+    <string name="validation_downloaded_attachment">Adjunto descargado, en la carpeta de descargas.</string>
+    <string name="validation_downloaded_error_attachment">Se presento un error al descargar el archivo, por favor intentelo más tarde.</string>
 </resources>
