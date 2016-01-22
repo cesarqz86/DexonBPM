@@ -1,6 +1,9 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import us.dexon.dexonbpm.adapters.TicketDetailAdapter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
@@ -62,6 +66,7 @@ public class NewTicketActivity extends FragmentActivity {
         }
 
         CommonSharedData.TicketActivity = this;
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -148,6 +153,18 @@ public class NewTicketActivity extends FragmentActivity {
         ServiceExecuter serviceExecuter = new ServiceExecuter();
         ServiceExecuter.ExecuteTicketByLayout ticketService = serviceExecuter.new ExecuteTicketByLayout(this);
         ticketService.execute(layoutData);
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
+        View related_data_separator = this.findViewById(R.id.related_data_separator);
+        View related_data_detail_separator = this.findViewById(R.id.related_data_detail_separator);
+
+        related_data_separator.setBackgroundColor(primaryColor);
+        related_data_detail_separator.setBackgroundColor(primaryColor);
     }
 
 }

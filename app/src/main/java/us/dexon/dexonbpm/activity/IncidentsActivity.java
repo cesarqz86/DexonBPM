@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -87,6 +92,7 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         System.setProperty("http.keepAlive", "false");
 
         CommonSharedData.IncidentListActivity = this;
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -269,14 +275,32 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         }, 2000);
     }
 
-    private void searchFilterCriteria(){
+    private void searchFilterCriteria() {
 
-        if(CommonValidations.validateEmpty(CommonSharedData.FilterCriteria)){
+        if (CommonValidations.validateEmpty(CommonSharedData.FilterCriteria)) {
             EditText findDaemon = (EditText) findViewById(R.id.search_field);
             findDaemon.setText(CommonSharedData.FilterCriteria);
             ServiceExecuter serviceExecuter = new ServiceExecuter();
             ServiceExecuter.ExecuteFilter filterService = serviceExecuter.new ExecuteFilter(currentContext);
             filterService.execute(CommonSharedData.FilterCriteria);
         }
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
+        Drawable ic_incidentes = this.getResources().getDrawable(R.drawable.ic_incidentes);
+        Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
+        Drawable ic_plus = this.getResources().getDrawable(R.drawable.ic_plus);
+        Drawable ic_action_ticket_menu = this.getResources().getDrawable(R.drawable.ic_action_ticket_menu);
+        View blue_separator = this.findViewById(R.id.blue_separator);
+
+        ic_incidentes.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_plus.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_action_ticket_menu.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        blue_separator.setBackgroundColor(primaryColor);
     }
 }

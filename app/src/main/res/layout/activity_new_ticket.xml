@@ -59,6 +59,7 @@
             android:padding="5dp" />
 
         <View
+            android:id="@+id/related_data_separator"
             android:layout_width="fill_parent"
             android:layout_height="1dip"
             android:background="@color/related_data_separator_color" />
@@ -78,6 +79,7 @@
             android:textStyle="bold" />
 
         <View
+            android:id="@+id/related_data_detail_separator"
             android:layout_width="fill_parent"
             android:layout_height="1dip"
             android:layout_below="@+id/asignados_btn"

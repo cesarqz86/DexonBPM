@@ -1,10 +1,16 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import us.dexon.dexonbpm.R;
@@ -22,6 +28,7 @@ public class ChangePasswordActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
+        this.SetConfiguredColors();
     }
 
     public void btnChangePasswordClick(View view) {
@@ -70,5 +77,19 @@ public class ChangePasswordActivity extends FragmentActivity {
         webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
         webIntent.setData(Uri.parse(this.getString(R.string.dexon_website)));
         this.startActivity(webIntent);
+    }
+
+    private void SetConfiguredColors() {
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        Button btn_changepass = (Button)this.findViewById(R.id.btn_changepass);
+        Drawable btn_changepass_background =  btn_changepass.getBackground();
+        if(btn_changepass_background instanceof StateListDrawable) {
+            StateListDrawable shapeDrawable = (StateListDrawable)btn_changepass_background;
+            //shapeDrawable.invoke
+        }
     }
 }

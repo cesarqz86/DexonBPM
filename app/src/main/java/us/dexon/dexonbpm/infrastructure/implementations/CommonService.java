@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -474,12 +475,16 @@ public class CommonService {
         LinearLayout lstvw_relateddata = (LinearLayout) currentActivity.findViewById(R.id.lstvw_relateddata);
         lstvw_relateddata.removeAllViews();
 
+        String primaryColorString = ConfigurationService.getConfigurationValue(context, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
         LayoutInflater inflater = currentActivity.getLayoutInflater();
         if (responseDto != null && responseDto.getRelatedList() != null && responseDto.getRelatedList().size() > 0) {
             for (TicketRelatedDataDto itemDetail : responseDto.getRelatedList()) {
                 View rowView = inflater.inflate(R.layout.item_disclosure, null);
                 TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                 txt_fieldtitle.setText(itemDetail.getFieldName());
+                txt_fieldtitle.setTextColor(primaryColor);
                 lstvw_relateddata.addView(rowView);
                 JsonObject jsonObject = itemDetail.getFieldSonData();
                 boolean isEditable;

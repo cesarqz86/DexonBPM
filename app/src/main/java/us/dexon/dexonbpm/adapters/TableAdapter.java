@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +29,7 @@ import us.dexon.dexonbpm.activity.RelatedDataActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
 
@@ -95,6 +100,15 @@ public class TableAdapter extends BaseTableAdapter implements View.OnClickListen
             int rowNumber = row + 1;
             convertView.setTag(R.id.tag_column_table, String.valueOf(rowNumber));
             convertView.setOnClickListener(this);
+        }
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this.context, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        Drawable background = convertView.getBackground();
+        if (background instanceof LayerDrawable) {
+            LayerDrawable shapeDrawable = (LayerDrawable)background;
+            Drawable originalColor = shapeDrawable.getDrawable(0);
+            originalColor.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         }
         return convertView;
     }

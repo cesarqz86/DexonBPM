@@ -2,6 +2,10 @@ package us.dexon.dexonbpm.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -102,6 +106,8 @@ public class TicketDetail extends FragmentActivity {
         }
 
         CommonSharedData.TicketActivity = this;
+
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -223,7 +229,7 @@ public class TicketDetail extends FragmentActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         CommonSharedData.TreeData = null;
 
-        if(CommonSharedData.OriginalStatus != null && resultCode == 90){
+        if (CommonSharedData.OriginalStatus != null && resultCode == 90) {
             JsonObject ticketJsonInfo = CommonSharedData.TicketInfo.getTicketInfo();
             JsonObject headerInfo = ticketJsonInfo.get("headerInfo").getAsJsonObject();
             headerInfo.add("status", CommonSharedData.OriginalStatus);
@@ -265,7 +271,7 @@ public class TicketDetail extends FragmentActivity {
 
             String activityTitle = this.getString(R.string.app_name);
 
-            if(responseDto.getDataList() != null) {
+            if (responseDto.getDataList() != null) {
                 for (TicketDetailDataDto ticketData : responseDto.getDataList()) {
                     if (ticketData.getFieldKey().equals("ticket")) {
                         activityTitle = ticketData.getFieldValue();
@@ -353,19 +359,6 @@ public class TicketDetail extends FragmentActivity {
                 fileWriter.flush();
                 fileWriter.close();
 
-                //Intent pdfIntent = new Intent(this, WebViewActivity.class);
-                ////pdfIntent.putExtra("PdfData", printTicketResponseDto.getBufferData());
-                //String filePathString = Environment.getExternalStorageDirectory() + "/temp.pdf";
-                //pdfIntent.putExtra("PdfUrl", filePathString);
-
-                ///*Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
-                ////pdfIntent.addCategory(Intent.CATEGORY_BROWSABLE);
-                //String finalPath = "file://" + Environment.getExternalStorageDirectory() + "/temp.pdf";
-                ////pdfIntent.setDataAndType(Uri.parse(finalPath), "application/pdf");
-                //pdfIntent.setDataAndType(Uri.fromFile(filePath), "application/pdf");*/
-                //this.startActivity(pdfIntent);
-                //this.overridePendingTransition(R.anim.right_slide_in,
-                //        R.anim.right_slide_out);
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setAction(Intent.ACTION_EDIT);
@@ -383,6 +376,30 @@ public class TicketDetail extends FragmentActivity {
             } catch (Exception e) {
                 Log.e("Error loading PDF data", e.getMessage());
             }
+        }
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
+        ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
+        Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
+        Drawable ic_action_ticket_menu = this.getResources().getDrawable(R.drawable.ic_action_ticket_menu);
+        Drawable progress_pager_background = progress_pager.getBackground();
+        View related_data_separator = this.findViewById(R.id.related_data_separator);
+        View related_data_detail_separator = this.findViewById(R.id.related_data_detail_separator);
+
+        logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_action_ticket_menu.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        related_data_separator.setBackgroundColor(primaryColor);
+        related_data_detail_separator.setBackgroundColor(primaryColor);
+
+        if (progress_pager_background instanceof LayerDrawable) {
+            LayerDrawable layerDrawable = (LayerDrawable) progress_pager_background;
+            Drawable firstDrawable = layerDrawable.getDrawable(0);
+            firstDrawable.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         }
     }
 }

@@ -1,5 +1,6 @@
 package us.dexon.dexonbpm.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 
 import us.dexon.dexonbpm.R;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 
 /**
  * Created by Cesar Quiroz on 8/30/15.
@@ -33,21 +35,27 @@ public class RectangularProgressFragment extends Fragment {
         progressText.append(progressInt);
         progressText.append("%");
 
+        String primaryColorString = ConfigurationService.getConfigurationValue(container.getContext(), "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
         TextView txt_progresstext = (TextView) rootView.findViewById(R.id.txt_progresstext);
+        TextView txt_progress_above = (TextView) rootView.findViewById(R.id.txt_progress_above);
         RoundCornerProgressBar rectangularProgressBar = (RoundCornerProgressBar) rootView.findViewById(R.id.rectangularProgressBar);
         rectangularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
         rectangularProgressBar.setProgress(progressInt);
         txt_progresstext.setText(progressText.toString());
+        txt_progresstext.setTextColor(primaryColor);
+        txt_progress_above.setTextColor(primaryColor);
 
         if (progressInt <= 50) {
             txt_progresstext.setTextColor(getResources().getColor(R.color.progress_green_transparent));
-            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_green));
+            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_green_transparent));
         } else if (progressInt <= 80) {
             txt_progresstext.setTextColor(getResources().getColor(R.color.progress_yellow_transparent));
-            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_yellow));
+            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_yellow_transparent));
         } else {
             txt_progresstext.setTextColor(getResources().getColor(R.color.progress_red_transparent));
-            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_red));
+            rectangularProgressBar.setProgressColor(getResources().getColor(R.color.progress_red_transparent));
         }
 
         if (progressText.length() >= 4) {

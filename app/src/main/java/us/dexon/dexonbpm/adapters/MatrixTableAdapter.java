@@ -4,6 +4,11 @@ package us.dexon.dexonbpm.adapters;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +21,7 @@ import inqbarna.tablefixheaders.adapters.BaseTableAdapter;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.activity.ForgotPasswordActivity;
 import us.dexon.dexonbpm.activity.TicketDetail;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 
 public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClickListener{
 
@@ -79,6 +85,15 @@ public class MatrixTableAdapter extends BaseTableAdapter implements View.OnClick
             String tagValue = String.valueOf(table[row + 1][this.indexColumnID]);
             convertView.setTag(R.string.tag_id_ticket, tagValue);
             convertView.setOnClickListener(this);
+        }
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this.context, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        Drawable background = convertView.getBackground();
+        if (background instanceof LayerDrawable) {
+            LayerDrawable shapeDrawable = (LayerDrawable)background;
+            Drawable originalColor = shapeDrawable.getDrawable(0);
+            originalColor.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         }
         return convertView;
     }

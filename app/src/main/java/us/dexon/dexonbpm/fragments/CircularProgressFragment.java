@@ -1,17 +1,20 @@
 package us.dexon.dexonbpm.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.lzyzsd.circleprogress.DonutProgress;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 
 /**
  * Created by Cesar Quiroz on 8/30/15.
@@ -36,7 +39,15 @@ public class CircularProgressFragment extends Fragment {
 
         int pixelSize = CommonService.convertSpToPixel(25f, this.getActivity());
 
+        String primaryColorString = ConfigurationService.getConfigurationValue(container.getContext(), "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+
         DonutProgress circularProgressBar = (DonutProgress) rootView.findViewById(R.id.circularProgressBar);
+        TextView txt_progress_left = (TextView) rootView.findViewById(R.id.txt_progress_left);
+        TextView txt_progress_right = (TextView) rootView.findViewById(R.id.txt_progress_right);
+        txt_progress_left.setTextColor(primaryColor);
+        txt_progress_right.setTextColor(primaryColor);
+
         circularProgressBar.setMax(progressInt > 100 ? progressInt : 100);
         circularProgressBar.setProgress(progressInt);
         circularProgressBar.setTextSize(pixelSize);
@@ -44,15 +55,15 @@ public class CircularProgressFragment extends Fragment {
 
         if (progressInt <= 50) {
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_green_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_green));
+            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_green_transparent));
             circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
         } else if (progressInt <= 80) {
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_yellow_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_yellow));
+            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_yellow_transparent));
             circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
         } else {
             circularProgressBar.setTextColor(getResources().getColor(R.color.progress_red_transparent));
-            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_red));
+            circularProgressBar.setFinishedStrokeColor(getResources().getColor(R.color.progress_red_transparent));
             circularProgressBar.setUnfinishedStrokeColor(getResources().getColor(R.color.progress_background));
         }
 
