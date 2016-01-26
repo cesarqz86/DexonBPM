@@ -68,12 +68,13 @@ public class AttachmentActivity extends FragmentActivity {
             case FILE_SELECT_CODE: {
                 if (resultCode == RESULT_OK) {
 
-                    if (CommonSharedData.AttachmentList == null) {
-                        CommonSharedData.AttachmentList = new ArrayList<AttachmentItem>();
-                    }
-                    Uri uri = data.getData();
-                    String path = null;
                     try {
+                        if (CommonSharedData.AttachmentList == null) {
+                            CommonSharedData.AttachmentList = new ArrayList<AttachmentItem>();
+                        }
+                        Uri uri = data.getData();
+                        String path = null;
+
                         path = FileUtils.getPath(this, uri);
                         InputStream fileData = new FileInputStream(path);
                         byte[] bytes;
@@ -94,7 +95,6 @@ public class AttachmentActivity extends FragmentActivity {
 
                         CommonSharedData.AttachmentList.add(newAttachment);
                         this.drawPendindAttachmentData();
-                    } catch (URISyntaxException e) {
                     } catch (Exception ex) {
 
                     }
@@ -224,12 +224,6 @@ public class AttachmentActivity extends FragmentActivity {
             this.startActivityForResult(intent, 10);
             this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
         } catch (ActivityNotFoundException ex) {
-//            CommonService.ShowAlertDialog(this,
-//                    R.string.validation_attachment_success_title,
-//                    R.string.validation_no_app_for_attachment,
-//                    MessageTypeIcon.Error,
-//                    false);
-
             AttachmentItem attachmentItem = new AttachmentItem();
             attachmentItem.setFileName(fileName);
             attachmentItem.setAttachmentData(bufferData);

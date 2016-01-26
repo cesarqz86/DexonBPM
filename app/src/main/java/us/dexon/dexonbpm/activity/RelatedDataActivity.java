@@ -2,6 +2,9 @@ package us.dexon.dexonbpm.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -32,6 +35,7 @@ import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonService;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -104,6 +108,8 @@ public class RelatedDataActivity extends FragmentActivity {
         }
 
         CommonSharedData.RelatedDataActivity = this;
+
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -277,6 +283,9 @@ public class RelatedDataActivity extends FragmentActivity {
 
         Gson gsonSerializer = new Gson();
 
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
         if (jsonField.has("is_hidden") && !jsonField.get("is_hidden").getAsBoolean()) {
             View rowView = inflater.inflate(R.layout.item_detailticket_int, null);
             RenderControlType controlType = RenderControlType.values()[jsonField.get("render_ctl").getAsInt()];
@@ -427,6 +436,10 @@ public class RelatedDataActivity extends FragmentActivity {
                 }
             }
             this.setEnableView(rowView, this.isRelatedDataEditable);
+            View separator = rowView.findViewById(R.id.blue_separator);
+            if(separator != null){
+                separator.setBackgroundColor(secondaryColor);
+            }
             rowView.setTag(fieldKey);
             this.lstvw_tree_detail.addView(rowView);
         }
@@ -595,5 +608,17 @@ public class RelatedDataActivity extends FragmentActivity {
             this.jsonNodeData.add("multipleValues", this.multipleValuesArray);
             this.drawRelatedData(this.jsonNodeData);
         }
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        Drawable ic_action_newticket_layoutimage3x = this.getResources().getDrawable(R.drawable.ic_action_newticket_layoutimage3x);
+
+        ic_action_newticket_layoutimage3x.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
     }
 }

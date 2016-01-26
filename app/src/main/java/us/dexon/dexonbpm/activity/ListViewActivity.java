@@ -1,11 +1,14 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,6 +23,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.adapters.TreeAdapter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
@@ -93,6 +97,8 @@ public class ListViewActivity extends FragmentActivity {
                 return false;
             }
         });
+
+        this.SetConfiguredColors();
     }
 
     public void inidentsCallBack(RecordHeaderResponseDto responseDto) {
@@ -123,5 +129,20 @@ public class ListViewActivity extends FragmentActivity {
                 CommonSharedData.TicketInfo,
                 this.fieldKey);
         lstvw_tree_detail.setAdapter(detailAdapter);
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        LinearLayout search_container = (LinearLayout) this.findViewById(R.id.search_container);
+        ListView lstvw_tree_detail = (ListView) this.findViewById(R.id.lstvw_tree_detail);
+
+        lstvw_tree_detail.setDivider(new ColorDrawable(secondaryColor));
+        lstvw_tree_detail.setDividerHeight(1);
+        search_container.setBackgroundColor(secondaryColor);
     }
 }

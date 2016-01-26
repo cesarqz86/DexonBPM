@@ -159,10 +159,14 @@ public class NewTicketActivity extends FragmentActivity {
 
         String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
         int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
 
         View related_data_separator = this.findViewById(R.id.related_data_separator);
         View related_data_detail_separator = this.findViewById(R.id.related_data_detail_separator);
+        Drawable ic_action_newticket_layoutimage3x = this.getResources().getDrawable(R.drawable.ic_action_newticket_layoutimage3x);
 
+        ic_action_newticket_layoutimage3x.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         related_data_separator.setBackgroundColor(primaryColor);
         related_data_detail_separator.setBackgroundColor(primaryColor);
     }

@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -21,10 +19,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 import inqbarna.tablefixheaders.TableFixHeaders;
 import us.dexon.dexonbpm.R;
@@ -44,7 +40,6 @@ import us.dexon.dexonbpm.model.RequestDTO.TicketsRequestDto;
 
 public class IncidentsActivity extends FragmentActivity implements View.OnClickListener {
 
-    //private TableLayout tbl_incidents;
     private TicketFilter currentTicketFilter = TicketFilter.AssignedTickets;
     private boolean includeClose;
     static final int FILTER_INCIDENT_CODE = 1;  // The request code
@@ -290,17 +285,23 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
 
         String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
         int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
 
         Drawable ic_incidentes = this.getResources().getDrawable(R.drawable.ic_incidentes);
         Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
         Drawable ic_plus = this.getResources().getDrawable(R.drawable.ic_plus);
         Drawable ic_action_ticket_menu = this.getResources().getDrawable(R.drawable.ic_action_ticket_menu);
+        Drawable ic_arrow = this.getResources().getDrawable(R.drawable.ic_arrow);
         View blue_separator = this.findViewById(R.id.blue_separator);
+        LinearLayout search_container = (LinearLayout) this.findViewById(R.id.search_container);
 
         ic_incidentes.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         ic_plus.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         ic_action_ticket_menu.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_arrow.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         blue_separator.setBackgroundColor(primaryColor);
+        search_container.setBackgroundColor(secondaryColor);
     }
 }

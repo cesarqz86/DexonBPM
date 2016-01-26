@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -57,6 +58,7 @@ import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
 import us.dexon.dexonbpm.infrastructure.interfaces.IDexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.interfaces.ITicketService;
+import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
 import us.dexon.dexonbpm.model.ReponseDTO.DescendantResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.LoginResponseDto;
 import us.dexon.dexonbpm.model.ReponseDTO.PrintTicketResponseDto;
@@ -78,6 +80,7 @@ public class TicketDetail extends FragmentActivity {
     private String ticketId = "";
     private Menu menu;
     private TicketResponseDto ticketData;
+    private String activityTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,17 +272,17 @@ public class TicketDetail extends FragmentActivity {
             this.ticketData = responseDto;
             CommonService.drawTicket(responseDto, this);
 
-            String activityTitle = this.getString(R.string.app_name);
+            this.activityTitle = this.getString(R.string.app_name);
 
             if (responseDto.getDataList() != null) {
                 for (TicketDetailDataDto ticketData : responseDto.getDataList()) {
                     if (ticketData.getFieldKey().equals("ticket")) {
-                        activityTitle = ticketData.getFieldValue();
+                        this.activityTitle = ticketData.getFieldValue();
                         break;
                     }
                 }
             }
-            this.setTitle(activityTitle);
+            this.setTitle(this.activityTitle);
 
             // Menu options
             MenuItem action_reopen = this.menu.findItem(R.id.action_reopen);
@@ -361,18 +364,19 @@ public class TicketDetail extends FragmentActivity {
 
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                intent.setAction(Intent.ACTION_EDIT);
-                intent.setAction(Intent.CATEGORY_BROWSABLE);
-                intent.setDataAndType(Uri.fromFile(filePath), "application/pdf");
+                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
+                intent.setDataAndType(Uri.fromFile(filePath), mimeType);
                 this.startActivityForResult(intent, 10);
                 this.overridePendingTransition(R.anim.right_slide_in, R.anim.right_slide_out);
 
             } catch (ActivityNotFoundException ex) {
-                CommonService.ShowAlertDialog(this,
-                        R.string.validation_attachment_success_title,
-                        R.string.validation_no_app_for_attachment,
-                        MessageTypeIcon.Error,
-                        false);
+                AttachmentItem attachmentItem = new AttachmentItem();
+                attachmentItem.setFileName(this.activityTitle + ".pdf");
+                attachmentItem.setAttachmentData(printTicketResponseDto.getBufferData());
+
+                ServiceExecuter serviceExecuter = new ServiceExecuter();
+                ServiceExecuter.ExecuteDownloadFile downloadFile = serviceExecuter.new ExecuteDownloadFile(this);
+                downloadFile.execute(attachmentItem);
             } catch (Exception e) {
                 Log.e("Error loading PDF data", e.getMessage());
             }
@@ -383,6 +387,8 @@ public class TicketDetail extends FragmentActivity {
 
         String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
         int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
 
         ViewPager progress_pager = (ViewPager) this.findViewById(R.id.progress_pager);
         Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
@@ -394,7 +400,7 @@ public class TicketDetail extends FragmentActivity {
         logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         ic_action_ticket_menu.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         related_data_separator.setBackgroundColor(primaryColor);
-        related_data_detail_separator.setBackgroundColor(primaryColor);
+        related_data_detail_separator.setBackgroundColor(secondaryColor);
 
         if (progress_pager_background instanceof LayerDrawable) {
             LayerDrawable layerDrawable = (LayerDrawable) progress_pager_background;

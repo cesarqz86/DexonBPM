@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -298,6 +301,11 @@ public class CommonService {
         LinearLayout lstvw_ticketdetail = (LinearLayout) currentActivity.findViewById(R.id.lstvw_ticketdetail);
         lstvw_ticketdetail.removeAllViews();
 
+        String primaryColorString = ConfigurationService.getConfigurationValue(context, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(context, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
         LayoutInflater inflater = currentActivity.getLayoutInflater();
         if (responseDto != null && responseDto.getDataList() != null && responseDto.getDataList().size() > 0) {
             View rowView = null;
@@ -371,6 +379,14 @@ public class CommonService {
                     case DXControlsGridWithOptions: {
                         rowView = inflater.inflate(R.layout.item_detailticket_technician, null);
 
+                        LinearLayout lstvw_techniciancontainer = (LinearLayout) rowView.findViewById(R.id.lstvw_techniciancontainer);
+                        Drawable lstvw_techniciancontainerBackground = lstvw_techniciancontainer.getBackground();
+                        if (lstvw_techniciancontainerBackground instanceof LayerDrawable) {
+                            LayerDrawable shapeDrawable = (LayerDrawable)lstvw_techniciancontainerBackground;
+                            Drawable originalColor = shapeDrawable.getDrawable(0);
+                            originalColor.setColorFilter(secondaryColor, PorterDuff.Mode.SRC_ATOP);
+                        }
+
                         LinearLayout linear_select_technician = (LinearLayout) rowView.findViewById(R.id.linear_select_technician);
                         TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
@@ -430,16 +446,13 @@ public class CommonService {
                         break;
                     }
                     case DXControlsMultiline: {
-                        //rowView = inflater.inflate(R.layout.item_detailticket_text_multi, null);
                         rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
                         TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                         TextView txt_fieldvalue = (TextView) rowView.findViewById(R.id.txt_fieldvalue);
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        //txt_fieldvalue.setEnabled(false);
                         if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
-                            //txt_fieldvalue.setEnabled(true);
 
                             rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
                                     context,
@@ -447,7 +460,6 @@ public class CommonService {
                                     null,
                                     true));
                         }
-                        //txt_fieldvalue.setMovementMethod(new ScrollingMovementMethod());
                         break;
                     }
                     default: {
@@ -459,6 +471,12 @@ public class CommonService {
                         break;
                     }
                 }
+
+                View separator = rowView.findViewById(R.id.blue_separator);
+                if(separator != null){
+                    separator.setBackgroundColor(secondaryColor);
+                }
+
                 lstvw_ticketdetail.addView(rowView);
             }
 
@@ -477,6 +495,8 @@ public class CommonService {
 
         String primaryColorString = ConfigurationService.getConfigurationValue(context, "ColorPrimario");
         int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(context, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
 
         LayoutInflater inflater = currentActivity.getLayoutInflater();
         if (responseDto != null && responseDto.getRelatedList() != null && responseDto.getRelatedList().size() > 0) {
@@ -485,6 +505,9 @@ public class CommonService {
                 TextView txt_fieldtitle = (TextView) rowView.findViewById(R.id.txt_fieldtitle);
                 txt_fieldtitle.setText(itemDetail.getFieldName());
                 txt_fieldtitle.setTextColor(primaryColor);
+                View blue_separator = rowView.findViewById(R.id.blue_separator);
+                blue_separator.setBackgroundColor(secondaryColor);
+
                 lstvw_relateddata.addView(rowView);
                 JsonObject jsonObject = itemDetail.getFieldSonData();
                 boolean isEditable;
