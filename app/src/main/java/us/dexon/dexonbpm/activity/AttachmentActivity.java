@@ -3,6 +3,7 @@ package us.dexon.dexonbpm.activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -10,6 +11,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Base64;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +43,7 @@ import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
 import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
+import us.dexon.dexonbpm.infrastructure.implementations.FileHelper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentItem;
@@ -82,9 +87,8 @@ public class AttachmentActivity extends FragmentActivity {
                             CommonSharedData.AttachmentList = new ArrayList<AttachmentItem>();
                         }
                         Uri uri = data.getData();
-                        String path = null;
+                        String path = FileHelper.getPath(this, uri);
 
-                        path = FileUtils.getPath(this, uri);
                         InputStream fileData = new FileInputStream(path);
                         byte[] bytes;
                         byte[] bufferRead = new byte[8192];
@@ -263,5 +267,30 @@ public class AttachmentActivity extends FragmentActivity {
 
         dexon_logo.setBackground(logo_mini);
         plus_button.setBackground(ic_plus);
+    }
+
+    private String getFileName(Uri originalUri) {
+        String wholeID = DocumentsContract.getDocumentId(originalUri);
+
+        String id = wholeID.split(":")[1];
+
+        String[] column = {MediaStore.Images.Media.DATA};
+
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = getContentResolver().
+                query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        column, sel, new String[]{id}, null);
+
+        String filePath = "";
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+
+        cursor.close();
+        return filePath;
     }
 }
