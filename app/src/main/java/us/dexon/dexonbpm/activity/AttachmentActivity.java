@@ -3,15 +3,21 @@ package us.dexon.dexonbpm.activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +37,7 @@ import java.util.List;
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.model.ReponseDTO.AttachmentDto;
@@ -60,6 +67,8 @@ public class AttachmentActivity extends FragmentActivity {
             this.drawAttachmentData(jsonTicket);
             this.drawPendindAttachmentData();
         }
+
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -234,5 +243,25 @@ public class AttachmentActivity extends FragmentActivity {
         } catch (Exception ex) {
             Log.e("Downloading attachment", ex.getMessage());
         }
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
+        Drawable ic_plus = this.getResources().getDrawable(R.drawable.ic_plus);
+
+        ImageButton plus_button = (ImageButton) this.findViewById(R.id.plus_button);
+        ImageButton dexon_logo = (ImageButton) this.findViewById(R.id.dexon_logo);
+
+        logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_plus.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+
+        dexon_logo.setBackground(logo_mini);
+        plus_button.setBackground(ic_plus);
     }
 }

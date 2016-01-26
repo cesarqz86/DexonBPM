@@ -397,10 +397,16 @@ public class TicketDetail extends FragmentActivity {
         View related_data_separator = this.findViewById(R.id.related_data_separator);
         View related_data_detail_separator = this.findViewById(R.id.related_data_detail_separator);
 
+        ImageButton menu_button = (ImageButton) this.findViewById(R.id.menu_button);
+        ImageButton dexon_logo = (ImageButton) this.findViewById(R.id.dexon_logo);
+
         logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         ic_action_ticket_menu.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         related_data_separator.setBackgroundColor(primaryColor);
         related_data_detail_separator.setBackgroundColor(secondaryColor);
+
+        dexon_logo.setBackground(logo_mini);
+        menu_button.setBackground(ic_action_ticket_menu);
 
         if (progress_pager_background instanceof LayerDrawable) {
             LayerDrawable layerDrawable = (LayerDrawable) progress_pager_background;

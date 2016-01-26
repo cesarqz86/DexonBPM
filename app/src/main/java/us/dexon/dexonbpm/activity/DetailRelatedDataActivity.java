@@ -1,6 +1,9 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
@@ -11,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -27,6 +31,7 @@ import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.RenderControlType;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonListeners;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
@@ -52,6 +57,8 @@ public class DetailRelatedDataActivity extends FragmentActivity {
             this.jsonNodeData = CommonSharedData.RelatedDataDetail;
             this.drawDetailRelatedData(this.jsonNodeData);
         }
+
+        this.SetConfiguredColors();
     }
 
     @Override
@@ -272,5 +279,25 @@ public class DetailRelatedDataActivity extends FragmentActivity {
             rowView.setTag(fieldKey);
             this.lstvw_ticketdetail.addView(rowView);
         }
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        Drawable logo_mini = this.getResources().getDrawable(R.drawable.logo_mini);
+        Drawable ic_plus = this.getResources().getDrawable(R.drawable.ic_plus);
+
+        ImageButton plus_button = (ImageButton) this.findViewById(R.id.plus_button);
+        ImageButton dexon_logo = (ImageButton) this.findViewById(R.id.dexon_logo);
+
+        logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        ic_plus.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+
+        dexon_logo.setBackground(logo_mini);
+        plus_button.setBackground(ic_plus);
     }
 }

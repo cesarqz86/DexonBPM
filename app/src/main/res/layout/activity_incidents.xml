@@ -51,8 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/footer_container"
         android:layout_below="@+id/blue_separator"
-        android:orientation="vertical">
-    </inqbarna.tablefixheaders.TableFixHeaders>
+        android:orientation="vertical"></inqbarna.tablefixheaders.TableFixHeaders>
 
     <RelativeLayout
         android:id="@+id/footer_container"
@@ -67,8 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_incidentes" />
+            android:background="@android:color/transparent" />
 
         <ImageButton
             android:id="@+id/dexon_logo"
@@ -78,8 +76,7 @@
             android:layout_centerVertical="true"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:onClick="logoClick"
-            android:src="@drawable/logo_mini" />
+            android:onClick="logoClick" />
 
         <ImageButton
             android:id="@+id/plus_button"
@@ -88,8 +85,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="25dp"
             android:background="@android:color/transparent"
-            android:onClick="newTicketClick"
-            android:src="@drawable/ic_plus" />
+            android:onClick="newTicketClick" />
 
     </RelativeLayout>
 

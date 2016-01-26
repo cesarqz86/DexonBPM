@@ -1,11 +1,16 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonParser;
@@ -21,6 +26,7 @@ import us.dexon.dexonbpm.adapters.MatrixTableAdapter;
 import us.dexon.dexonbpm.adapters.TableAdapter;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonSharedData;
 import us.dexon.dexonbpm.infrastructure.implementations.CommonValidations;
+import us.dexon.dexonbpm.infrastructure.implementations.ConfigurationService;
 import us.dexon.dexonbpm.infrastructure.implementations.DexonDatabaseWrapper;
 import us.dexon.dexonbpm.infrastructure.implementations.ServiceExecuter;
 import us.dexon.dexonbpm.infrastructure.implementations.TicketService;
@@ -102,6 +108,8 @@ public class TableActivity extends FragmentActivity {
                 return false;
             }
         });
+
+        this.SetConfiguredColors();
     }
 
     public void inidentsCallBack(String[][] dataList) {
@@ -130,5 +138,17 @@ public class TableActivity extends FragmentActivity {
         TableFixHeaders tableFixHeaders = (TableFixHeaders) findViewById(R.id.table_detail);
         this.matrixTableAdapter = new TableAdapter(this, dataList, indexColumnID, this.fieldKey);
         tableFixHeaders.setAdapter(this.matrixTableAdapter);
+    }
+
+    private void SetConfiguredColors() {
+
+        String primaryColorString = ConfigurationService.getConfigurationValue(this, "ColorPrimario");
+        int primaryColor = Color.parseColor(primaryColorString);
+        String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
+        int secondaryColor = Color.parseColor(secondaryColorString);
+
+        LinearLayout search_container = (LinearLayout) this.findViewById(R.id.search_container);
+
+        search_container.setBackgroundColor(secondaryColor);
     }
 }

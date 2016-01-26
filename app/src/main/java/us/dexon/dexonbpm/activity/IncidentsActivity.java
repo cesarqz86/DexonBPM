@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -296,6 +297,10 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         View blue_separator = this.findViewById(R.id.blue_separator);
         LinearLayout search_container = (LinearLayout) this.findViewById(R.id.search_container);
 
+        ImageButton menu_button = (ImageButton) this.findViewById(R.id.menu_button);
+        ImageButton dexon_logo = (ImageButton) this.findViewById(R.id.dexon_logo);
+        ImageButton plus_button = (ImageButton) this.findViewById(R.id.plus_button);
+
         ic_incidentes.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         logo_mini.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         ic_plus.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
@@ -303,5 +308,10 @@ public class IncidentsActivity extends FragmentActivity implements View.OnClickL
         ic_arrow.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
         blue_separator.setBackgroundColor(primaryColor);
         search_container.setBackgroundColor(secondaryColor);
+
+        menu_button.setBackground(ic_incidentes);
+        dexon_logo.setBackground(logo_mini);
+        plus_button.setBackground(ic_plus);
+
     }
 }

@@ -97,8 +97,7 @@
             android:layout_centerVertical="true"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:onClick="logoClick"
-            android:src="@drawable/logo_mini" />
+            android:onClick="logoClick" />
 
         <ImageButton
             android:id="@+id/menu_button"
@@ -108,8 +107,7 @@
             android:layout_marginRight="10dp"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:onClick="menuClick"
-            android:src="@drawable/ic_action_ticket_menu" />
+            android:onClick="menuClick" />
 
     </RelativeLayout>
 
