@@ -423,6 +423,7 @@ public class RelatedDataActivity extends FragmentActivity {
                             this,
                             jsonField,
                             null,
+                            fieldKey,
                             true));
                     break;
                 }

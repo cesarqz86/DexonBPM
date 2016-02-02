@@ -1,42 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false">
-        <layer-list>
-            <!-- CONTENT LAYER -->
-            <item android:left="2dp" android:top="2dp">
-                <shape>
-                    <solid android:color="@color/blue_buttons" />
-                </shape>
-            </item>
-        </layer-list>
-    </item>
-    <item android:state_pressed="true">
-        <layer-list>
-            <!-- CONTENT LAYER -->
-            <item android:left="2dp" android:top="2dp">
-                <shape>
-                    <solid android:color="@color/blue_buttons_transparent" />
-                </shape>
-            </item>
-        </layer-list>
-    </item>
-    <item>
-        <layer-list>
-            <!-- SHADOW LAYER -->
-            <item android:left="2dp" android:top="2dp">
-                <shape>
-                    <solid android:color="#26000000" />
-                    <!--<corners android:radius="5dip" />-->
-                    <corners android:bottomLeftRadius="5dip" />
-                    <corners android:bottomRightRadius="5dip" />
-                </shape>
-            </item>
-            <!-- CONTENT LAYER -->
-            <item android:bottom="2dp" android:right="2dp">
-                <shape>
-                    <solid android:color="@color/blue_buttons" />
-                </shape>
-            </item>
-        </layer-list>
-    </item>
+    <item android:drawable="@drawable/blue_btn_style_state_enabled" android:state_enabled="false" />
+    <item android:drawable="@drawable/blue_btn_style_state_pressed" android:state_pressed="true" />
+    <item android:drawable="@drawable/blue_btn_style_shadow" />
 </selector>

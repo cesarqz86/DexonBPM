@@ -634,15 +634,18 @@ public final class DexonListeners {
         private final Context currentContext;
         private final JsonObject jsonObject;
         private final String valueToDisplay;
+        private final String elementKey;
         private final boolean IsEditable;
 
         public MultilineClickListener(Context context,
                                       JsonObject objectData,
                                       String textToDisplay,
+                                      String elementKeyData,
                                       boolean controlEditable) {
             this.currentContext = context;
             this.jsonObject = objectData;
             this.valueToDisplay = textToDisplay;
+            this.elementKey = elementKeyData;
             this.IsEditable = controlEditable;
         }
 
@@ -652,6 +655,7 @@ public final class DexonListeners {
             CommonSharedData.MultilineDataValue = this.valueToDisplay;
             Intent multilineIntent = new Intent(this.currentContext, MultiLineActivity.class);
             multilineIntent.putExtra("IsEditable", this.IsEditable);
+            multilineIntent.putExtra("ElementKey", this.elementKey);
             currentActivity.startActivityForResult(multilineIntent, 0);
             currentActivity.overridePendingTransition(R.anim.right_slide_in,
                     R.anim.right_slide_out);

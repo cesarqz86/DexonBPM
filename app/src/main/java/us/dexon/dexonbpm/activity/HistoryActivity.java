@@ -86,6 +86,7 @@ public class HistoryActivity extends FragmentActivity {
                                     this,
                                     null,
                                     fieldValue,
+                                    "",
                                     false));
 
                             this.lstvw_historydata.addView(rowView);

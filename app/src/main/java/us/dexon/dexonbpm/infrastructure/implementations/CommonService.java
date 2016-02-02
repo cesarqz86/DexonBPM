@@ -313,16 +313,6 @@ public class CommonService {
                 rowView = inflater.inflate(R.layout.item_detailticket, null);
                 RenderControlType controlType = itemDetail.getFieldType();
                 JsonObject jsonObject = itemDetail.getFieldJsonObject();
-                boolean isEditable = true;
-                boolean isDisable = false;
-                boolean isEditInPlace = true;
-                if (jsonObject.has("isDisable")) {
-                    isDisable = jsonObject.get("isDisable").getAsBoolean();
-                }
-                if (jsonObject.has("edit_in_place")) {
-                    isEditInPlace = jsonObject.get("edit_in_place").getAsBoolean();
-                }
-                isEditable = !isDisable && isEditInPlace;
                 switch (controlType) {
                     case DXControlsTree: {
                         rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
@@ -331,7 +321,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                             rowView.setOnClickListener(new DexonListeners.ListViewClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -346,7 +336,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                             rowView.setOnClickListener(new DexonListeners.TableClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -371,7 +361,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(dateString);
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                             txt_fieldvalue.setOnClickListener(new DexonListeners.DateClickListener(context, "", date, txt_fieldvalue));
                         }
                         break;
@@ -398,7 +388,7 @@ public class CommonService {
                         RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
                         RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                             DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(
                                     context,
                                     responseDto.getCurrentTechnician(),
@@ -416,7 +406,7 @@ public class CommonService {
                                         0, //top
                                         R.drawable.ic_arrow, //right
                                         0);//bottom
-                                if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                                if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
                                     linear_select_technician.setOnClickListener(new DexonListeners.TableClickListener(
                                             context,
                                             itemDetail.getFieldSonData(),
@@ -452,12 +442,13 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable() && isEditable) {
+                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
 
                             rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
                                     context,
                                     itemDetail.getFieldJsonObject(),
                                     null,
+                                    itemDetail.getFieldKey(),
                                     true));
                         }
                         break;

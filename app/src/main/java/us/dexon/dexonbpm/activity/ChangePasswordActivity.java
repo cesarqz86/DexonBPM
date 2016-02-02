@@ -85,11 +85,25 @@ public class ChangePasswordActivity extends FragmentActivity {
         String secondaryColorString = ConfigurationService.getConfigurationValue(this, "ColorSecundario");
         int secondaryColor = Color.parseColor(secondaryColorString);
 
-        Button btn_changepass = (Button)this.findViewById(R.id.btn_changepass);
-        Drawable btn_changepass_background =  btn_changepass.getBackground();
-        if(btn_changepass_background instanceof StateListDrawable) {
-            StateListDrawable shapeDrawable = (StateListDrawable)btn_changepass_background;
-            //shapeDrawable.invoke
-        }
+        /*Button btn_changepass = (Button) this.findViewById(R.id.btn_changepass);
+
+        LayerDrawable blue_btn_style_state_enabled = (LayerDrawable) this.getResources().getDrawable(R.drawable.blue_btn_style_state_enabled);
+        LayerDrawable blue_btn_style_state_pressed = (LayerDrawable) this.getResources().getDrawable(R.drawable.blue_btn_style_state_pressed);
+        LayerDrawable blue_btn_style_shadow = (LayerDrawable) this.getResources().getDrawable(R.drawable.blue_btn_style_shadow);
+
+        Drawable firstDrawable = blue_btn_style_state_enabled.getDrawable(0);
+        firstDrawable.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        blue_btn_style_state_enabled.setDrawableByLayerId(0, firstDrawable);
+
+        //blue_btn_style_state_enabled.setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+        //blue_btn_style_state_pressed.setColorFilter(secondaryColor, PorterDuff.Mode.SRC_ATOP);
+
+        StateListDrawable testDrawable = new StateListDrawable();
+        testDrawable.addState(new int[]{android.R.attr.state_enabled}, blue_btn_style_state_enabled);
+        testDrawable.addState(new int[]{android.R.attr.state_pressed}, blue_btn_style_state_pressed);
+        testDrawable.addState(new int[]{}, blue_btn_style_shadow);
+
+        btn_changepass.setBackground(testDrawable);*/
+
     }
 }
