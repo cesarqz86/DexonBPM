@@ -313,6 +313,14 @@ public class CommonService {
                 rowView = inflater.inflate(R.layout.item_detailticket, null);
                 RenderControlType controlType = itemDetail.getFieldType();
                 JsonObject jsonObject = itemDetail.getFieldJsonObject();
+
+                boolean isEditable;
+                boolean isDisable = false;
+                if (jsonObject.has("is_disabled")) {
+                    isDisable = jsonObject.get("is_disabled").getAsBoolean();
+                }
+                isEditable = !isDisable && responseDto.getIsOpen() && responseDto.getIsEditable();
+
                 switch (controlType) {
                     case DXControlsTree: {
                         rowView = inflater.inflate(R.layout.item_detailticket_tree, null);
@@ -321,7 +329,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (isEditable) {
                             rowView.setOnClickListener(new DexonListeners.ListViewClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -336,7 +344,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (isEditable) {
                             rowView.setOnClickListener(new DexonListeners.TableClickListener(
                                     context,
                                     itemDetail.getFieldSonData(),
@@ -361,7 +369,7 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(dateString);
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (isEditable) {
                             txt_fieldvalue.setOnClickListener(new DexonListeners.DateClickListener(context, "", date, txt_fieldvalue));
                         }
                         break;
@@ -372,7 +380,7 @@ public class CommonService {
                         LinearLayout lstvw_techniciancontainer = (LinearLayout) rowView.findViewById(R.id.lstvw_techniciancontainer);
                         Drawable lstvw_techniciancontainerBackground = lstvw_techniciancontainer.getBackground();
                         if (lstvw_techniciancontainerBackground instanceof LayerDrawable) {
-                            LayerDrawable shapeDrawable = (LayerDrawable)lstvw_techniciancontainerBackground;
+                            LayerDrawable shapeDrawable = (LayerDrawable) lstvw_techniciancontainerBackground;
                             Drawable originalColor = shapeDrawable.getDrawable(0);
                             originalColor.setColorFilter(secondaryColor, PorterDuff.Mode.SRC_ATOP);
                         }
@@ -388,7 +396,7 @@ public class CommonService {
                         RadioButton btn_setautomatic_technician = (RadioButton) rowView.findViewById(R.id.btn_setautomatic_technician);
                         RadioButton btn_settome_technician = (RadioButton) rowView.findViewById(R.id.btn_settome_technician);
 
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                        if (isEditable) {
                             DexonListeners.TechnicianClickListener technicianClickListener = new DexonListeners.TechnicianClickListener(
                                     context,
                                     responseDto.getCurrentTechnician(),
@@ -406,7 +414,7 @@ public class CommonService {
                                         0, //top
                                         R.drawable.ic_arrow, //right
                                         0);//bottom
-                                if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
+                                if (isEditable) {
                                     linear_select_technician.setOnClickListener(new DexonListeners.TableClickListener(
                                             context,
                                             itemDetail.getFieldSonData(),
@@ -442,15 +450,14 @@ public class CommonService {
 
                         txt_fieldtitle.setText(itemDetail.getFieldName());
                         txt_fieldvalue.setText(itemDetail.getFieldValue());
-                        if (responseDto.getIsOpen() && responseDto.getIsEditable()) {
 
-                            rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
-                                    context,
-                                    itemDetail.getFieldJsonObject(),
-                                    null,
-                                    itemDetail.getFieldKey(),
-                                    true));
-                        }
+                        rowView.setOnClickListener(new DexonListeners.MultilineClickListener(
+                                context,
+                                itemDetail.getFieldJsonObject(),
+                                null,
+                                itemDetail.getFieldKey(),
+                                isEditable));
+
                         break;
                     }
                     default: {
@@ -464,7 +471,7 @@ public class CommonService {
                 }
 
                 View separator = rowView.findViewById(R.id.blue_separator);
-                if(separator != null){
+                if (separator != null) {
                     separator.setBackgroundColor(secondaryColor);
                 }
 

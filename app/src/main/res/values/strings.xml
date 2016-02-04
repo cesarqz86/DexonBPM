@@ -58,6 +58,7 @@
     <string name="menu_recalculate_sla">Recalcular SLA</string>
     <string name="menu_history">Historial</string>
     <string name="menu_attachment">Adjuntos</string>
+    <string name="menu_done">Done</string>
 
     <!-- Activity Title -->
     <string name="activity_incident_title">Incidentes</string>
