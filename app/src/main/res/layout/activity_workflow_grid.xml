@@ -19,6 +19,7 @@
             android:background="@drawable/rounded_corners"
             android:drawableLeft="@drawable/lupa"
             android:drawablePadding="10dp"
+            android:imeOptions="flagNoExtractUi"
             android:inputType="textAutoComplete"
             android:padding="5dp"
             android:textColorHint="@color/gray_darker" />

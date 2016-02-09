@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:hint="@string/txt_loginemail_hint"
+            android:imeOptions="flagNoExtractUi"
             android:inputType="textVisiblePassword" />
 
         <EditText
@@ -39,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="@string/txt_loginpassword_hint"
+            android:imeOptions="flagNoExtractUi"
             android:inputType="textPassword" />
 
         <Button

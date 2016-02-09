@@ -1,6 +1,7 @@
 package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -29,6 +31,7 @@ public class ChangePasswordActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
         this.SetConfiguredColors();
+        this.updateOrientationVisibility();
     }
 
     public void btnChangePasswordClick(View view) {
@@ -105,5 +108,22 @@ public class ChangePasswordActivity extends FragmentActivity {
 
         btn_changepass.setBackground(testDrawable);*/
 
+    }
+
+    private void updateOrientationVisibility() {
+        ImageView logo_image = (ImageView) this.findViewById(R.id.logo_image);
+        View line_separator = this.findViewById(R.id.line_separator);
+        ImageView logo_bottom = (ImageView) this.findViewById(R.id.logo_bottom);
+
+        logo_image.setVisibility(View.INVISIBLE);
+        line_separator.setVisibility(View.INVISIBLE);
+        logo_bottom.setVisibility(View.INVISIBLE);
+
+        int currentOrientation = this.getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            logo_image.setVisibility(View.VISIBLE);
+            line_separator.setVisibility(View.VISIBLE);
+            logo_bottom.setVisibility(View.VISIBLE);
+        }
     }
 }

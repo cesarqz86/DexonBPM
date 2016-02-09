@@ -1212,7 +1212,6 @@ public class TicketService implements ITicketService {
             case DXControlsPhone:
             case DXControlsCellphone:
             case DXControlsEmail:
-            case DXControlsMultiline:
             case DXControlsPassword:
             case DXControlsCurrency:
             case DXControlsCharacter:
@@ -1223,6 +1222,15 @@ public class TicketService implements ITicketService {
             case DXControlsContainer:
             case DXControlsTable: {
                 finalNodeData = nodeData.get("Value");
+                break;
+            }
+            case DXControlsMultiline:{
+                if(nodeData.get("Value").isJsonPrimitive() && nodeData.get("Value").getAsJsonPrimitive().isString()) {
+                    finalNodeData = nodeData.get("Value");
+                }
+                else{
+                    nodeData.addProperty("Value", "");
+                }
                 break;
             }
             case DXControlsGrid:

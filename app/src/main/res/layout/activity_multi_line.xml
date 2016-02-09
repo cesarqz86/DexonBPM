@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/item_int_background"
         android:gravity="top"
+        android:imeOptions="flagNoExtractUi"
         android:textColor="@color/gray_darker"
         android:textSize="15sp" />
 
