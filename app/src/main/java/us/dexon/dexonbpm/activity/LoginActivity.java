@@ -2,12 +2,14 @@ package us.dexon.dexonbpm.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import us.dexon.dexonbpm.R;
 import us.dexon.dexonbpm.infrastructure.enums.MessageTypeIcon;
@@ -82,6 +84,8 @@ public class LoginActivity extends FragmentActivity {
         ImageView logo_image = (ImageView) this.findViewById(R.id.logo_image);
         View line_separator = this.findViewById(R.id.line_separator);
         ImageView logo_bottom = (ImageView) this.findViewById(R.id.logo_bottom);
+        RelativeLayout main_container = (RelativeLayout) this.findViewById(R.id.main_container);
+        Drawable splashImage = this.getResources().getDrawable(R.drawable.splash);
 
         logo_image.setVisibility(View.INVISIBLE);
         line_separator.setVisibility(View.INVISIBLE);
@@ -92,6 +96,7 @@ public class LoginActivity extends FragmentActivity {
             logo_image.setVisibility(View.VISIBLE);
             line_separator.setVisibility(View.VISIBLE);
             logo_bottom.setVisibility(View.VISIBLE);
+            main_container.setBackground(splashImage);
         }
     }
 }
