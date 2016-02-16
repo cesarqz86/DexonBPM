@@ -85,7 +85,7 @@ public class LoginActivity extends FragmentActivity {
         View line_separator = this.findViewById(R.id.line_separator);
         ImageView logo_bottom = (ImageView) this.findViewById(R.id.logo_bottom);
         RelativeLayout main_container = (RelativeLayout) this.findViewById(R.id.main_container);
-        Drawable splashImage = this.getResources().getDrawable(R.drawable.splash);
+        Drawable splashImage = this.getResources().getDrawable(R.drawable.splash_bitmap);
 
         logo_image.setVisibility(View.INVISIBLE);
         line_separator.setVisibility(View.INVISIBLE);
@@ -96,6 +96,9 @@ public class LoginActivity extends FragmentActivity {
             logo_image.setVisibility(View.VISIBLE);
             line_separator.setVisibility(View.VISIBLE);
             logo_bottom.setVisibility(View.VISIBLE);
+        }
+
+        if(currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             main_container.setBackground(splashImage);
         }
     }
